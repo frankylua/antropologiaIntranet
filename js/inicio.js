@@ -1,0 +1,21 @@
+$(document).ready(function(){
+    $('#btn_estudiante').click(function(){
+        location.href='ver.estudiante.php'
+    })
+    $('#btn_docente').click(function(){
+        location.href='ver.docente.php'
+    })
+    $('#btn_curso_inicio').click(function(){
+        location.href='../form-doc/ver.curso.php'
+    })
+    $('#btn_cal_acad').click(function(){
+        location.href='../form-doc/calend.acad.php'
+    })
+    $('#btn_regl').click(function(){
+        location.href='../form-doc/reglamento.php'
+    })
+    $('#btn_reporte').click(function(){
+        location.href='tabla.predefinida.php'
+    })
+
+})

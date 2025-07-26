@@ -1,0 +1,90 @@
+body{
+    padding-top: 10%;
+    padding-bottom: 10%;
+    font-family:  'Open Sans', sans-serif;	
+}
+.loadPage{
+  display: block;
+  background: #fff;
+  color:#fff;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top:0;
+  left: 0;
+  z-index: 1000;  
+}
+.loadPage img{
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+}
+.text-rosado{
+    color:#ff7b7b;
+}
+.btn-inicio{
+	font-family: "Oswald", Arial, Sans-serif;
+	font-weight: lighter;
+}
+
+
+ .titulo_card{
+	font-weight: 400;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: "Oswald", Arial, Sans-serif;
+	font-weight: normal;
+}
+.buscar input[type="text"]{
+	background: none;
+	border:1px solid rgba(255,255,255,.7);
+	color:rgba(255,255,255,.7);
+	height: 30px;
+	padding: 0 10px;
+	padding-right: 32px; 
+}
+.btn-inicio{
+    background-color: #fff;
+    border: none;
+}
+.valid-danger{
+    color: red;
+}
+.buscar .icono-buscar {
+   color:rgba(255,255,255,.7);
+   position: absolute;
+   right: 0;
+   background: none;
+   border:none;
+   cursor:pointer;
+   padding: 6px;
+   font-size: 16px;
+   line-height: 16px;
+}
+
+.borde {
+    height: 25px;
+   
+}
+	
+    
+
+
+
+    
+    
+
+
+    
+
+
+
+
+
+
+
