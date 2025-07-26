@@ -1,5 +1,5 @@
 <?php
-define('RUTA', 'http://localhost/doctoradoantropologia/');
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 if (strlen(session_id()) < 1) {
@@ -25,8 +25,8 @@ $miperfil = isset($_SESSION['docente']) ? RUTA . 'form-doc/info.docente.php' : (
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="<?php echo RUTA; ?>/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="<?php echo RUTA; ?>/css/nav.css">
+    <link rel="stylesheet" href="html-public/doctoradoIntranet/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="html-public/doctoradoIntranet/css/nav.css">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
     <script src="https://kit.fontawesome.com/50f392008f.js" crossorigin="anonymous"></script>
@@ -37,10 +37,10 @@ $miperfil = isset($_SESSION['docente']) ? RUTA . 'form-doc/info.docente.php' : (
     <header class="fixed-top">
         <div class="row justify-content-between bg-white">
             <div class="col-1 ">
-                <img src="<?php echo RUTA; ?>/img/images.png" class="img-fluid" alt="...">
+                <img src="html-public/doctoradoIntranet/img/images.png" class="img-fluid" alt="...">
             </div>
             <div class="col-1">
-                <img src="<?php echo RUTA; ?>/img/logo-ucn.jpg" class="img-fluid" alt="...">
+                <img src="html-public/doctoradoIntranet/img/logo-ucn.jpg" class="img-fluid" alt="...">
             </div>
         </div>
 

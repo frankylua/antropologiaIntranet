@@ -13,25 +13,25 @@
     </div>
   </div>
 </footer>
-<script src="<?php echo RUTA;?>/dist/js/bootstrap.bundle.min.js"></script>
-<script src="<?php echo RUTA;?>js/jquery-3.7.0.min.js"></script>
-<script src="<?php echo RUTA;?>js/funcAjax.js"></script>
-<script src="<?php echo RUTA;?>js/funcForm.js"></script>
-<script src="<?php echo RUTA;?>js/funcValid.js"></script>
-<script src="<?php echo RUTA;?>js/agrFormReporte.js"></script>
-<script src="<?php echo RUTA;?>js/inicio.js"></script>
-<script src="<?php echo RUTA;?>js/tableToExcel.js"></script>
-<script src="<?php echo RUTA;?>js/buttons.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/agrFormDatPers.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/usuario.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/grado.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/postdoctorado.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/publicacion.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/congreso.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/proyecto.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/pasantia.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/beca.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/tesis.js"></script>
+<script src="html-public/doctoradoIntranet/dist/js/bootstrap.bundle.min.js"></script>
+<script src="html-public/doctoradoIntranet/js/jquery-3.7.0.min.js"></script>
+<script src="html-public/doctoradoIntranet/js/funcAjax.js"></script>
+<script src="html-public/doctoradoIntranet/js/funcForm.js"></script>
+<script src="html-public/doctoradoIntranet/js/funcValid.js"></script>
+<script src="html-public/doctoradoIntranet/js/agrFormReporte.js"></script>
+<script src="html-public/doctoradoIntranet/js/inicio.js"></script>
+<script src="html-public/doctoradoIntranet/js/tableToExcel.js"></script>
+<script src="html-public/doctoradoIntranet/js/buttons.js"></script>
+<script src="html-public/doctoradoIntranet/form-doc/scripts/agrFormDatPers.js"></script>
+<script src="html-public/doctoradoIntranet/form-doc/scripts/usuario.js"></script>
+<script src="html-public/doctoradoIntranet/form-doc/scripts/grado.js"></script>
+<script src="html-public/doctoradoIntranet/form-doc/scripts/postdoctorado.js"></script>
+<script src="html-public/doctoradoIntranet/form-doc/scripts/publicacion.js"></script>
+<script src="html-public/doctoradoIntranet/form-doc/scripts/congreso.js"></script>
+<script src="html-public/doctoradoIntranet/form-doc/scripts/proyecto.js"></script>
+<script src="html-public/doctoradoIntranet/form-doc/scripts/pasantia.js"></script>
+<script src="html-public/doctoradoIntranet/form-doc/scripts/beca.js"></script>
+<script src="html-public/doctoradoIntranet/form-doc/scripts/tesis.js"></script>
 </html>
     
 
