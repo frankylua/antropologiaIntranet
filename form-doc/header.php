@@ -1,5 +1,5 @@
 <?php
-define('RUTA', '/public_html/doctoradoIntranet/');
+define('RUTA', '/antropologiaIntranet/');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 if (strlen(session_id()) < 1) {
