@@ -75,7 +75,7 @@ function leerDatProgDoc(){
     let vinculo=$('#vinculo').val();
     let lineaInv=[]
     let permiso= $('#permiso').val();  
-    let permisos=permiso==1?[1,4]:permiso==2?[2,4]:permiso==3?[3,4]:0;
+    let permisos=permiso==1?[1,4]:permiso==2?[2,4]:permiso==3?[4]:3;
     // let id_login=$('#id_login').val()==''?0:$('#id_login').val();
     $("input:checkbox:checked").each(function() {
         lineaInv.push($(this).val())

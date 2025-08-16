@@ -10,12 +10,6 @@ class Docente extends Usuario{
         return ejecutarConsulta($sql);   
     }
    
-
-    
-
-
-
-        
     // public function mostrarPorId($id_curso){
     //     $sql="SELECT * FROM curso c JOIN nombre_curso n ON c.nom_curso=n.id_nom_curso  WHERE c.id_curso='$id_curso'";
     //     return resultadoConsultaPorId($sql);

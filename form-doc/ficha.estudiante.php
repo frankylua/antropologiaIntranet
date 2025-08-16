@@ -188,7 +188,7 @@
   </div>
 </div>
 
-<div class="row" id="info_est" name="<?php echo $id_estudiante   ?>">
+<div class="row" id="info_est" name="<?php echo $id_estudiante?>">
   <input type="hidden"  id="tipo_usuario" name="est">
 
   <h3 class=" text-center ">INFORMACIÓN ESTUDIANTE<button type="button" id='vol-infoest'
@@ -217,18 +217,18 @@
 
 
         <!-- incio -->
-        <div class="accordion" id="accordionExample">
+        <div class="accordion" id="accordionEst">
           <!-- grado academico -->
           <div class="accordion-item">
-            <h5 class="accordion-header">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGrado"
-                aria-expanded="false" aria-controls="collapseGrado">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseGrado" aria-expanded="false" aria-controls="collapseGrado">
                 <H5>GRADO ACADÉMICO</H5>
               </button>
-            </h5>
-            <div id="collapseGrado" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+            </h2>
+            <div id="collapseGrado" class="accordion-collapse collapse" data-bs-parent="#accordionEst">
               <div class="accordion-body">
-                <div class="col-12" id="grad_est" name="0"></div>
+                <div class="col-12" id="grado_est"></div>
               </div>
             </div>
           </div>
@@ -240,7 +240,7 @@
                 <H5>POSTDOCTORADO</H5>
               </button>
             </h2>
-            <div id="collapsePostdoc" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+            <div id="collapsePostdoc" class="accordion-collapse collapse" data-bs-parent="#accordionEst">
               <div class="accordion-body">
                 <div class="col-12" id="postdoc_est"></div>
               </div>
@@ -254,7 +254,7 @@
                 <H5>PUBLICACIÓN</H5>
               </button>
             </h2>
-            <div id="collapsePub" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+            <div id="collapsePub" class="accordion-collapse collapse" data-bs-parent="#accordionEst">
               <div class="accordion-body">
                 <div class="col-12" id="publi_est"></div>
               </div>
@@ -268,7 +268,7 @@
                 <H5>CONGRESO</H5>
               </button>
             </h2>
-            <div id="collapseCongreso" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+            <div id="collapseCongreso" class="accordion-collapse collapse" data-bs-parent="#accordionEst">
               <div class="accordion-body">
                 <div class="col-12" id="cong_est"></div>
               </div>
@@ -282,7 +282,7 @@
                 <H5>PROYECTO DE INVESTIGACIÓN</H5>
               </button>
             </h2>
-            <div id="collapseProy" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+            <div id="collapseProy" class="accordion-collapse collapse" data-bs-parent="#accordionEst">
               <div class="accordion-body">
                 <div class="col-12" id="proy_est"></div>
               </div>
@@ -296,10 +296,9 @@
                 <H5>PASANTÍA</H5>
               </button>
             </h2>
-            <div id="collapsePasant" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+            <div id="collapsePasant" class="accordion-collapse collapse" data-bs-parent="#accordionEst">
               <div class="accordion-body">
-                <div class="col-12" id="pasant_est"></div>
-
+                <div class="col-12" id="pasant_est"></div>   
               </div>
             </div>
           </div>

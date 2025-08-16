@@ -6,7 +6,22 @@ function formGrado(contenedor) {
     $(contenedor).append('<div class="row" ><div class="col-md-6 " id="institucion"></div><div class="col-md-6 " id="otro_titulo"></div></div>')
     $(contenedor).append('<div class="row"><div class="col-md-6"><label class="form-label" for="fech_grado">Fecha de Graduación</label><input type="date" class="form-control" id="fech_grado"></div></div>')
     $(contenedor).append(' <div class="row justify-content-center mt-3" id="mnsj_row_grad"><div class="col-lg-8 alert  text-center alert-danger" role="alert" id="mnsj_grad"></div></div>')
-    ajaxSelect('#inst_grado', ruta + 'ajax/institucion.php', 'Seleccione', 'read', 'inst');
+  
+    $.ajax({
+        async:true,
+        url:  '/antropologiaIntranet/ajax/institucion.php',
+        type: "POST",
+        data: { op:'read', tipo:'inst'},
+        success: function (response) {
+        let listas = JSON.parse(response);
+        let template = "";
+        template = `<option value="0">Seleccionar...</option>`;
+        listas.forEach((p) => {
+            template += `<option value="${p[0]}"> ${cadenaMay(p[1])}</option>`;
+        });
+        $('#inst_grado').html(template);
+        },
+    });
     $('#mnsj_row_grad').hide();
 }
 function listaGrados(id_tipo, id_grado) {
@@ -60,7 +75,21 @@ $(document).on('change', '.tit', function () {
     if ($('#grado').val() == '4') {
         tipo = 'doc'
     }
-    ajaxSelect('#s_tit', ruta + 'ajax/titulo.php', 'Seleccione', 'read', tipo)
+        $.ajax({
+        async:true,
+        url: '/antropologiaIntranet/ajax/titulo.php',
+        type: "POST",
+        data: { op:'read', tipo:tipo},
+        success: function (response) {
+        let listas = JSON.parse(response);
+        let template = "";
+        template = `<option value="0">Seleccionar...</option>`;
+        listas.forEach((p) => {
+            template += `<option value="${p[0]}"> ${cadenaMay(p[1])}</option>`;
+        });
+        $('#s_tit').html(template);
+        },
+    });
 })
 //Eliminar Grado Académico  (eliminar el registro relcionado al id)
 $(document).on('click', '#borrar_grado', function () {
@@ -70,13 +99,15 @@ $(document).on('click', '#borrar_grado', function () {
     //$('#grado_card'+id).fadeIn()
 });
 function cargarGrado(usuario, id) {
+    console.log(usuario)
     op = 'read'
     $.ajax({
-        async: false,
+        async: true,
         type: 'POST',
         url: '../ajax/grado.php',
         data: { op, usuario },
         success: function (response) {
+            console.log(response)
             let grados = JSON.parse(response);
             let conpre = 1
             let conpost = 1
@@ -104,6 +135,7 @@ function cargarGrado(usuario, id) {
 
 
                 }
+
 
                 template += `
         <div class="col-12" id="cont-${grado['id_grado']}">

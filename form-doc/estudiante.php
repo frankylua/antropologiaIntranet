@@ -98,7 +98,7 @@ require('datos.pers.php')
               <?php
                 require('../form-doc/lineaInv.php');
             ?>
-            <?php if (isset ($_SESSION['admin'])): ?>
+            <?php if (isset ($_SESSION['admin']) || isset ($_SESSION['comite'])): ?>
               <div class="col-md-6 mb-3">
                   <label for="tipo_est" class="form-label">Tipo de Alumno</label>
                   <select id="tipo_est"  class="form-select">

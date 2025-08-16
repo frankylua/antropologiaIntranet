@@ -3,26 +3,25 @@ body{
     padding-bottom: 10%;
     font-family:  'Open Sans', sans-serif;	
 }
-.loadPage{
-  display: block;
-  background: #fff;
-  color:#fff;
-  width: 100%;
-  height: 100%;
-  position: fixed;
-  top:0;
-  left: 0;
-  z-index: 1000;  
-}
-.loadPage img{
-    display: block;
-    position: absolute;
+.loadPage {
+    position: fixed;           /* Posiciona en toda la pantalla */
     top: 0;
     left: 0;
-    bottom: 0;
-    right: 0;
-    margin: auto;
+    width: 100vw;              /* Ocupa todo el ancho de la ventana */
+    height: 100vh;             /* Ocupa todo el alto de la ventana */
+    background: rgba(255, 255, 255, 0.7); /* Fondo semi-transparente opcional */
+    display: flex;             /* Centrado con Flexbox */
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;             /* Encima de todo */
 }
+
+.loadPage img {
+    width: 60px;               /* Tamaño fijo en píxeles, más control */
+    height: 60px;
+    object-fit: contain;       /* Asegura que no se deforme */
+}
+
 .text-rosado{
     color:#ff7b7b;
 }

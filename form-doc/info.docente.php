@@ -9,9 +9,9 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSIO
     require ('header.php');
     $id_profesor=$_SESSION['docente'];
     ?>
-    <span class="loadPage">
-        <img src="../img/loadPage.gif" alt="" width="20%" height="20%">
-    </span>
+    <!-- <span class="loadPage">
+        <img src="https://i.gifer.com/ZZ5H.gif" alt="" width="20%" height="20%">
+    </span> -->
     <div class="container mt-5">
         <?php
         require 'ficha.docente.php';

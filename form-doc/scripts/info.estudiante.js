@@ -5,8 +5,7 @@ function cargarFichaEst() {
         url: '../ajax/estudiante.php',
         type: 'POST',
         data: { op: 'read_est_perfil'
-            
-         },
+            },
         success: function (response) {
             console.log(response)
             let usu = JSON.parse(response);
@@ -136,7 +135,14 @@ function cargarFichaEst() {
         }
     })
     $('#ant_acad_est').append('<div class="row m-2"><div class="col-md-4 m-0 p-2 ps-0 ms-0 mt-2 "><h4 class="text-left m-0 p-0">ANTECEDENTES ACADÉMICOS</h4></div><div class="col-md-8 m-0 p-2"><h4><button type="button" class="btn btn-dark btn-sm text-center agrAcadEst" id="">Agregar Datos Académicos</button></h4></div></div>')
-    cargarGrado($('#info_est').attr('name'), '#grad_est')
+    $("#grado_est").html('')
+    $('#postdoc_est').html('')
+    $('#publi_est').html('')
+    $('#cong_est').html('')
+    $('#pasant_est').html('')
+    $('#proy_est').html('')
+    $('#beca_est').html('')
+    cargarGrado($('#info_est').attr('name'), '#grado_est')
     cargarPostdoc($('#info_est').attr('name'), '#postdoc_est')
     cargarPub($('#info_est').attr('name'), '#publi_est')
     cargarCong($('#info_est').attr('name'), '#cong_est')

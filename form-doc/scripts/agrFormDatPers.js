@@ -11,7 +11,7 @@ $(document).ready(function(){
   $('#si').click(function(){
     $('#p').remove()
     $('#row_pueb').append('<div class="col-md-6 mb-3" id="p"><label for="pueb_ind" class="form-label" >Pueblo Indígena</label><select id="select_pueb" name="select_pueb" class="form-select"></select></div>')
-    ajaxSelect('#select_pueb',ruta+'ajax/pueblo.php','Seleccione','read');
+    ajaxSelect('#select_pueb','../ajax/pueblo.php','Seleccione','read');
   });
   $('#no').click(function(){
     $('#p').remove()

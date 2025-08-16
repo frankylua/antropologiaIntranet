@@ -42,11 +42,17 @@ switch ($op) {
         break;
     case 'insert-update':
         $login = $doc->insertarLogin($correo, $pass);
-        
-            foreach ($permiso as $per) {
-                $per = (int) $per;
-                $doc->insertarPermisos($login, $per);
-            }
+        if(isset($_SESSION['admin'])){
+            $permiso = (!empty($permiso)) ;
+        }else if(isset($_SESSION['comite'])){
+            $permiso =  [4];
+        }else{
+            $permiso = [3];
+        }
+        foreach ($permiso as $per) {
+            $per = (int) $per;
+            $doc->insertarPermisos($login, $per);
+        }
            
         $usuario = $doc->insertarUsuario($pueblo, $pais_res, $pais_nac, $login, $fech_nac, $nombres, $ap_mat, $ap_pat, $documento, $nro_doc, $inst, $genero, $region, $comuna, $telefono, $direccion, $cont_em, $tel_em);
         $docente = $doc->insertar($catAcad, $anioIng, $vinculo, $usuario);

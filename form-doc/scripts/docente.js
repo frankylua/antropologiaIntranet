@@ -65,6 +65,7 @@ $('#form_usuario').submit(function(e){
                 url : '../ajax/institucion.php',
                 data : {op,nombre:profProg['instTrab']},
                 success : function(response) {
+                    console.log(response)
                     let dato = JSON.parse(response);
                     $('#id_inst_doc').attr('name',dato);
                 }
@@ -74,15 +75,15 @@ $('#form_usuario').submit(function(e){
         jQuery.extend(usuario,profProg);
         usuario.op='insert-update'
         $.post('../ajax/docente.php',usuario,function(response){
+            console.log(response)
             let dato = JSON.parse(response);
-            console.log(dato);
             $('#id_usuario').attr('name',dato[1]);
-            $('#mnsj_row_acad_prof').show();
-            $('#mnsj_acad_prof').removeClass('alert-danger');
-            $('#mnsj_acad_prof').addClass('alert-success');
-            $('#mnsj_acad_prof').html(dato[0]);
+            $('#mnsj_row_prog_doc').show();
+            $('#mnsj_row_prog_doc').removeClass('alert-danger');
+            $('#mnsj_prog_doc').addClass('alert-success');
+            $('#mnsj_prog_doc').html(dato[0]);
             setTimeout(function() {
-                $("#mnsj_row_acad_prof").fadeOut(1500);
+                $("#mnsj_row_prog_prof").fadeOut(1500);
                 AntecAcad();
             },3000);
         })       

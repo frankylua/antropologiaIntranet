@@ -15,7 +15,7 @@ $('#btn_beca').click(function(){
   $(document).on('change','#tipo_beca',function(){
     $('#n_b').remove();
     if($('#tipo_beca').val()==1){
-      ajaxSelect('#nom_beca',ruta+'ajax/beca.php','Seleccione','read-nombre',1);
+      ajaxSelect('#nom_beca',ruta+'/ajax/beca.php','Seleccione','read-nombre',1);
     }else if($('#tipo_beca').val()==2){
       ajaxSelect('#nom_beca',ruta+'ajax/beca.php','Seleccione','read-nombre',2);
     }else{

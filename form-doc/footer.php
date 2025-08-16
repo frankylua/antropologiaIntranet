@@ -13,7 +13,7 @@
     </div>
   </div>
 </footer>
-<script src="<?php echo RUTA;?>/dist/js/bootstrap.bundle.min.js"></script>
+<script src="<?php echo RUTA;?>/dist/js/bootstrap.bundle.min.js?"></script>
 <script src="<?php echo RUTA;?>js/jquery-3.7.0.min.js"></script>
 <script src="<?php echo RUTA;?>js/funcAjax.js"></script>
 <script src="<?php echo RUTA;?>js/funcForm.js"></script>

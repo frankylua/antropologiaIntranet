@@ -1,0 +1,1 @@
+var ruta='localhost/antropologiaIntranet/';  

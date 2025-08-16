@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once "../model/Institucion.php";
 require "validaciones.php";
 $institucion=new Institucion();
@@ -25,7 +26,6 @@ switch($op){
         break;
     case 'read':
         $respuesta=$institucion->mostrarConsultaOrdenada();
-        $prueba=['prueba'=>'hola'];
          echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
          break;
     case'delete':
