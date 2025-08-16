@@ -56,7 +56,7 @@ function cargarListas(n_input) {
   op = "read";
   if (n_input == "pueb") {
       $.ajax({
-      async:true,
+      async:false,
       url: '../ajax/pueblo.php',
       type: "POST",
       data: { op: op },
