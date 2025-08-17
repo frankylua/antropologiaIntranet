@@ -55,36 +55,44 @@ function cargarListas(n_input) {
   $("#oculto").val("");
   op = "read";
   if (n_input == "pueb") {
-      $.ajax({
-      url: '../ajax/pueblo.php',
-      type: "POST",
-      data: { op: op },
-      success: function (response) {
-        console.log('la respuesta es ')
+      // // $.ajax({
+      // // url: '../ajax/pueblo.php',
+      // // type: "POST",
+      // // data: { op: op },
+      // // success: function (response) {
+      // //   console.log('la respuesta es ')
+      // //   console.log(response)
+      // // let listas = JSON.parse(response);
+        $.post( '../ajax/pueblo.php', {op}, function (response) {
+        let template = "";
         console.log(response)
-      let listas = JSON.parse(response);
-      let template = "";
-      listas.forEach((list) => {
-        template += `
-        <li class='list-group-item'> 
-        <div class='row justify-content-between'>
-        <div class='col-auto '>
-        ${cadenaMay(list[1])} 
+        response.forEach((list) => {
+          template += `
+          <li class='list-group-item'> 
+          <div class='row justify-content-between'>
+          <div class='col-auto '>
+          ${cadenaMay(list[1])} 
+          </div>
+          <div class='col-auto p-0 m-0'>
+          <button type="button" class='btn btn-link link-success btn-sm editar_lista' name='${
+            list[1]
+          }'  id='${list[0]}'>Editar</button>
+         
         </div>
-        <div class='col-auto p-0 m-0'>
-        <button type="button" class='btn btn-link link-success btn-sm editar_lista' name='${
-          list[1]
-        }'  id='${list[0]}'>Editar</button>
-       
-      </div>
-      </div>
-      </li>
-      `;
-      });
-      $('#listas').html(template);
-     },
-  });
+        </div>
+        </li>
+        `;
+        });
+        $('#listas').html(template);
+
+      })
+
   }
+
+
+
+
+ // -------------------------------------------------------------
   if (
     n_input == "lic" ||
     n_input == "un" ||
