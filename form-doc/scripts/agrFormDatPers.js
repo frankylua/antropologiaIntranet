@@ -1,6 +1,7 @@
 
 
 $(document).ready(function(){
+
   ajaxSelect('#pais_nac','../ajax/pais.php','Seleccione','pais');
   ajaxSelect('#pais_res','../ajax/pais.php','Seleccione','pais');
 
