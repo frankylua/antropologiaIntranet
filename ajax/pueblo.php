@@ -1,6 +1,6 @@
 <?php
 
-
+header('Content-Type: application/json');
 require "../model/Pueblo.php";
 require "validaciones.php";
 $pueblo=new Pueblo();

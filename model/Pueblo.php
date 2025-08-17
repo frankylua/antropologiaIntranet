@@ -1,5 +1,5 @@
 <?php
-header('Content-Type: application/json');
+
 if (strlen(session_id()) < 1) {
     session_start();//Validamos si existe o no la sesión
 }
