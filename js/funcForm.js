@@ -1,6 +1,5 @@
 //listar años
 
-var ruta='localhost/doctoradoantropologia/'
 function mostrarFecha(dato) {
   fecha = new Date(dato);
   dia = fecha.getDate() < 10 ? "0" + fecha.getDate() : fecha.getDate();
