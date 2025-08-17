@@ -13,25 +13,25 @@
     </div>
   </div>
 </footer>
-<script src="<?php echo RUTA;?>dist/js/bootstrap.bundle.min.js"></script>
-<script src="<?php echo RUTA;?>js/jquery-3.7.0.min.js"></script>
-<script src="<?php echo RUTA;?>js/funcAjax.js"></script>
-<script src="<?php echo RUTA;?>js/funcForm.js"></script>
-<script src="<?php echo RUTA;?>js/funcValid.js"></script>
-<script src="<?php echo RUTA;?>js/agrFormReporte.js"></script>
-<script src="<?php echo RUTA;?>js/inicio.js"></script>
-<script src="<?php echo RUTA;?>js/tableToExcel.js"></script>
-<script src="<?php echo RUTA;?>js/buttons.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/agrFormDatPers.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/usuario.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/grado.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/postdoctorado.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/publicacion.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/congreso.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/proyecto.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/pasantia.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/beca.js"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/tesis.js"></script>
+<script src="../dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/jquery-3.7.0.min.js"></script>
+<script src="../js/funcAjax.js"></script>
+<script src="../js/funcForm.js"></script>
+<script src="../js/funcValid.js"></script>
+<script src="../js/agrFormReporte.js"></script>
+<script src="../js/inicio.js"></script>
+<script src="../js/tableToExcel.js"></script>
+<script src="../js/buttons.js"></script>
+<script src="../form-doc/scripts/agrFormDatPers.js"></script>
+<script src="../form-doc/scripts/usuario.js"></script>
+<script src="../form-doc/scripts/grado.js"></script>
+<script src="../form-doc/scripts/postdoctorado.js"></script>
+<script src="../form-doc/scripts/publicacion.js"></script>
+<script src="../form-doc/scripts/congreso.js"></script>
+<script src="../form-doc/scripts/proyecto.js"></script>
+<script src="../form-doc/scripts/pasantia.js"></script>
+<script src="../form-doc/scripts/beca.js"></script>
+<script src="../form-doc/scripts/tesis.js"></script>
 
     
 

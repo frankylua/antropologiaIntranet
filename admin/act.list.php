@@ -2,13 +2,11 @@
 if (strlen(session_id()) < 1) {
     session_start();//Validamos si existe o no la sesión
 }
-error_reporting(E_ALL);
-ini_set("display_errors", 1);
 
 if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
     header('Location:../index.php');
 } else {
-    // require ('../form-doc/header.php');
+    require ('../form-doc/header.php');
     ?>
     <div class="container mt-2">
         <div class="row">
@@ -65,7 +63,7 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
     </div>
     </div>
     <?php
-    require ('../form-doc/footer.php');
+    require '../form-doc/footer.php';
     ?>
     <script src="scripts/listas.js"></script>
     <?php
