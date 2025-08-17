@@ -53,3 +53,4 @@ require ('datos.pers.php');
 require ('footer.php');
 ?>
 <script src="scripts/docente.js"></script>
+</html>

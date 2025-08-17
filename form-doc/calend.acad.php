@@ -29,3 +29,4 @@ require('header.php')
 }
 ob_end_flush();
 ?>
+</html>

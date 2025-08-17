@@ -158,6 +158,7 @@ require('datos.pers.php')
         ?>
 
 <script src="scripts/estudiante.js"></script>
+</html>
   
     
           
