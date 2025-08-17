@@ -11,8 +11,6 @@ $.post('../ajax/pais.php', {op:'pais'}, function (response) {
         templateSelect(data,'#pais_res')
 })
 
-
-
   // mostrarPais('#pais_nac');
   // mostrarPais('#pais_res');
 
@@ -34,6 +32,7 @@ $.post('../ajax/pais.php', {op:'pais'}, function (response) {
       $('#row_pueb').append('<div class="col-md-6 mb-3  offset-md-6" id="otro_pue"><input type="text" class="form-control" id="otro_pueb" placeholder="Nombre del pueblo indígena al que pertenece" name="otro_pueb"></div>')
     }
   })
+})
 })
   
     
