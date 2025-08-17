@@ -1,6 +1,6 @@
 <?php
 if (strlen(session_id()) < 1) {
-    session_start();//Validamos si existe o no la sesión
+    session_start();
 }
 require ("../model/Login_.php");
 //require('validaciones.php');
