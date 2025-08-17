@@ -9,15 +9,25 @@ $('#btn_beca').click(function(){
     $('#card_beca').append(' <div class="row justify-content-center " id="mnsj_row_beca"><div class="col-lg-8 alert  text-center alert-danger" role="alert" id="mnsj_beca"></div></div>')
     $('#card_beca').append('<div class="row justify-content-center" ><div class="col-md-6 mt-3 d-grid gap-2"><button type="submit" class="btn btn-dark">Guardar Beca</button></div></div>');
     $('#mnsj_row_beca').hide();
-    ajaxSelect('#inst_beca',ruta+'ajax/institucion.php','Seleccione','read');
+    $.post('../ajax/institucion.php', {op:'read'}, function (response) {
+        data = JSON.parse(response);
+        templateSelect(data,'#inst_beca')
+})
   
   });
   $(document).on('change','#tipo_beca',function(){
     $('#n_b').remove();
     if($('#tipo_beca').val()==1){
-      ajaxSelect('#nom_beca',ruta+'ajax/beca.php','Seleccione','read-nombre',1);
+
+       $.post('../ajax/beca.php', {op:'read-nombre',tipo:1}, function (response) {
+        data = JSON.parse(response);
+        templateSelect(data,'#nom_beca')
+    })
     }else if($('#tipo_beca').val()==2){
-      ajaxSelect('#nom_beca',ruta+'ajax/beca.php','Seleccione','read-nombre',2);
+       $.post('../ajax/beca.php', {op:'read-nombre',tipo:2}, function (response) {
+        data = JSON.parse(response);
+        templateSelect(data,'#nom_beca')
+    })
     }else{
       $('#nom_beca').html('<option value="0"></option>')
     }

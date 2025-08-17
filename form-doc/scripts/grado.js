@@ -6,7 +6,11 @@ function formGrado(contenedor) {
     $(contenedor).append('<div class="row" ><div class="col-md-6 " id="institucion"></div><div class="col-md-6 " id="otro_titulo"></div></div>')
     $(contenedor).append('<div class="row"><div class="col-md-6"><label class="form-label" for="fech_grado">Fecha de Graduación</label><input type="date" class="form-control" id="fech_grado"></div></div>')
     $(contenedor).append(' <div class="row justify-content-center mt-3" id="mnsj_row_grad"><div class="col-lg-8 alert  text-center alert-danger" role="alert" id="mnsj_grad"></div></div>')
-    ajaxSelect('#inst_grado', ruta + 'ajax/institucion.php', 'Seleccione', 'read', 'inst');
+    $.post('../ajax/institucion.php', {op:'read',tipo:'inst'}, function (response) {
+        data = JSON.parse(response);
+        templateSelect(data,'#inst_grado')
+})
+
     $('#mnsj_row_grad').hide();
 }
 function listaGrados(id_tipo, id_grado) {
@@ -60,7 +64,10 @@ $(document).on('change', '.tit', function () {
     if ($('#grado').val() == '4') {
         tipo = 'doc'
     }
-    ajaxSelect('#s_tit', ruta + 'ajax/titulo.php', 'Seleccione', 'read', tipo)
+      $.post('../ajax/titulo.php', {op:'read',tipo:tipo}, function (response) {
+        data = JSON.parse(response);
+        templateSelect(data,'#s_tit')
+})
 })
 //Eliminar Grado Académico  (eliminar el registro relcionado al id)
 $(document).on('click', '#borrar_grado', function () {

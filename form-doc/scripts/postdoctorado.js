@@ -4,7 +4,10 @@ function formPostdoc(contenedor) {
     $(contenedor).append('<div class="row "> <div class="col-md-6 mb-3"><label for="fech_in_postdoc" class="form-label">Fecha Inicio</label><input type="date" class="form-control" id="fech_in_postdoc" ></div><div class="col-md-6 mb-3"><label for="fech_ter_postdoc" class="form-label">Fecha Término</label><input type="date" class="form-control" id="fech_ter_postdoc" name="fecha_ter"> </div></div>');
     $(contenedor).append(' <div class="row justify-content-center " id="mnsj_row_postdoc"><div class="col-lg-8 alert  text-center alert-danger" role="alert" id="mnsj_postdoc"></div></div>')
     $('#mnsj_row_postdoc').hide();
-    ajaxSelect('#inst_postdoc', ruta + 'ajax/institucion.php', 'Seleccione', 'read');
+     $.post('../ajax/institucion.php', {op:'read'}, function (response) {
+        data = JSON.parse(response);
+        templateSelect(data,'#inst_postdoc')
+        })
 
 }
 $('#btn_postdoc').click(function () {

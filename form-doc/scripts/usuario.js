@@ -1,8 +1,21 @@
 
-ajaxSelect('#inst_unid','../ajax/institucion.php','Seleccione','read','inst');
-ajaxSelect('#inst_unid_trabajo','../ajax/institucion.php','Seleccione','read','inst');
-ajaxSelect('#pais_nac','../ajax/pais.php','Seleccione','read');
-ajaxSelect('#pais_res','../ajax/pais.php','Seleccione','read');
+
+$.post('../ajax/institucion.php', {op:'read',tipo:'inst'}, function (response) {
+    data = JSON.parse(response);
+    templateSelect(data,'#inst_unid')
+  })
+  $.post('../ajax/institucion.php', {op:'read',tipo:'inst'}, function (response) {
+    data = JSON.parse(response);
+    templateSelect(data,'#inst_unid_trabajo')
+  })
+  $.post('../ajax/pais.php', {op:'read'}, function (response) {
+    data = JSON.parse(response);
+    templateSelect(data,'#pais_nac')
+  })
+  $.post('../ajax/institucion.php', {op:'read'}, function (response) {
+    data = JSON.parse(response);
+    templateSelect(data,'#pais_res')
+  })
 
 
   

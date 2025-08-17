@@ -10,7 +10,11 @@ $('#btn_proyecto').click(function () {
     $('#card_proy').append('<div class="row justify-content-center"><div class="col-md-6 mt-3 d-grid gap-2"><button type="submit" class="btn btn-dark">Guardar Proyecto</button></div></div>');
     $('#mnsj_row_proy').hide();
     anios('#anio_adj', 1960)
-    ajaxSelect('#financ', ruta + 'ajax/financiamiento.php', 'Seleccione', 'read');
+
+    $.post('../ajax/financiamiento.php', {op:'read'}, function (response) {
+        data = JSON.parse(response);
+        templateSelect(data,'#financ')
+        })
     $('#folio_proy').keyup(function () {
         $('#list_proy').hide();
         busqueda = $('#folio_proy').val();
@@ -64,7 +68,11 @@ $('body').on('click', '.listProy', function () {
                     $('#financ').prop('disabled', true);
                     $('#nombre_rol').append('<input type="text" class="form-control" id="input_rol" >')
                     $('#id_inst_proy').append('<label for="instituto" class="form-label">Institución Coinvestigador</label><select id="inst_proy" class="form-select"></select>')
-                    ajaxSelect('#inst_proy', ruta + 'ajax/institucion.php', 'Seleccione', 'read');
+
+                    $.post('../ajax/institucion.php', {op:'read'}, function (response) {
+                        data = JSON.parse(response);
+                        templateSelect(data,'#inst_proy')
+                     })
 
                     if (proy[0]['id_inv'] == null) {
                         $('#rol_proy').val(1);
@@ -128,7 +136,10 @@ $(document).on('change', '#rol_proy', function () {
         $('#label_rol').append('Investigador/a')
         $('#nombre_rol').append('<input type="text" class="form-control" id="input_rol" >')
         $('#id_inst_proy').append('<label for="inst_proy" class="form-label">Institución</label><select id="inst_proy" class="form-select"></select>')
-        ajaxSelect('#inst_proy', ruta + 'ajax/institucion.php', 'Seleccione', 'read');
+        $.post('../ajax/institucion.php', {op:'read'}, function (response) {
+                        data = JSON.parse(response);
+                        templateSelect(data,'#inst_proy')
+                     })
 
     }
     if ($('#rol_proy').val() == '1') {
