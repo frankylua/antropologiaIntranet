@@ -34,7 +34,7 @@
 </div>
 <div class="row justify-content-between">
   <?php
-  require ('../form-doc/lineaInv.php');
+  require '../form-doc/lineaInv.php';
   ?>
   <!-- validar permiso otorgar permisos de sesion -->
   <?php if (isset ($_SESSION['admin'])): ?>

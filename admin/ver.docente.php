@@ -7,7 +7,7 @@ if (strlen(session_id()) < 1) {
         header('Location:../index.php');
     }else
     {
-    require('../form-doc/header.php')
+    require '../form-doc/header.php';
 ?>
 <span class="loadPage">
       <img src="../img/loadPage.gif" alt="" width="20%" height="20%">
@@ -90,7 +90,7 @@ if (strlen(session_id()) < 1) {
 
 
 <?php
-    require('../form-doc/footer.php')
+    require '../form-doc/footer.php';
 ?>
 <script src="../form-doc/scripts/ficha.docente.js"></script>
 <script src="scripts/ver.docente.js"></script>

@@ -4,7 +4,7 @@
 //las variables de los datos de usuario
 
 
-require('datos.pers.php')
+require 'datos.pers.php';
 ?><div class="container">
   <div class="row mt-3 ">
     
@@ -96,7 +96,7 @@ require('datos.pers.php')
               </div>
               <div class="row">
               <?php
-                require('../form-doc/lineaInv.php');
+                require '../form-doc/lineaInv.php';
             ?>
             <?php if (isset ($_SESSION['admin'])): ?>
               <div class="col-md-6 mb-3">
@@ -128,8 +128,8 @@ require('datos.pers.php')
               
             <h3 class="cardtitle text-center">ANTECEDENTES ACADÉMICOS</h3>
             <?php
-          require('agr.form.dat.acad.php');
-          require('agr.form.beca.php');
+          require 'agr.form.dat.acad.php';
+          require 'agr.form.beca.php';
           
           ?>
             </div>
@@ -154,7 +154,7 @@ require('datos.pers.php')
       
    
 <?php
-        require('footer.php');
+        require 'footer.php';
         ?>
 
 <script src="scripts/estudiante.js"></script>

@@ -1,12 +1,12 @@
 <?php
-require ('datos.pers.php');
+require 'datos.pers.php';
 ?>
 <div class="container mt-5">
   <div class="row" id="info_acad">
     <div class="col">
       <h3 class=" mb-5 text-center ">INFORMACIÓN ACADÉMICA</h3>
       <?php
-      require ('../form-doc/agr.form.dat.prog.doc.php');
+      require '../form-doc/agr.form.dat.prog.doc.php';
       ?>
       <div class="row mt-5 justify-content-between ">
         <div class="col-6 col-md-4 mb-3">
@@ -24,7 +24,7 @@ require ('datos.pers.php');
     <div class="col-12" id="id_usuario" name="0">
       <h3 class="cardtitle text-center">ANTECEDENTES ACADÉMICOS</h3>
       <?php
-      require ('agr.form.dat.acad.php');
+      require 'agr.form.dat.acad.php';
       ?>
       <div class='row '>
         <div class="col-12" id="tesis_card">
@@ -50,7 +50,7 @@ require ('datos.pers.php');
 </div>
 </div>
 <?php
-require ('footer.php');
+require 'footer.php';
 ?>
 <script src="scripts/docente.js"></script>
 </html>

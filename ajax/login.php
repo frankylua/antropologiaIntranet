@@ -1,5 +1,5 @@
 <?php
-require ("../model/Login_.php");
+require "../model/Login_.php";
 //require('validaciones.php');
 $login= new Login();
 $correo=isset($_POST['correo'])?$_POST['correo']:"";

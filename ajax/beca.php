@@ -1,6 +1,6 @@
 <?php
 require "validaciones.php";
-require ("../model/Beca.php");
+require "../model/Beca.php";
 $nombre=isset($_POST['nombre'])?$_POST['nombre']:'';
 $nueva_beca=isset($_POST['nueva_beca'])?$_POST['nueva_beca']:'';
 $tipo_beca=isset($_POST['tipo'])?$_POST['tipo']:'';

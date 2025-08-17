@@ -120,7 +120,7 @@ if (strlen(session_id()) < 1) {
 
         </div>
 <?php
-    require('../form-doc/footer.php')
+    require '../form-doc/footer.php';
 ?>
 <script src="scripts/perfil.js"></script>
 <?php

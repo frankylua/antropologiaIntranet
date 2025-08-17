@@ -6,8 +6,8 @@ if (strlen(session_id()) < 1) {
 if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSION['docente'])) {
     header('Location:../index.php');
 } else {
-    require ('header.php');
-    $id_profesor=$_SESSION['docente'];
+    require 'header.php';
+
     ?>
     <span class="loadPage">
         <img src="../img/loadPage.gif" alt="" width="20%" height="20%">

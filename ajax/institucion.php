@@ -1,5 +1,5 @@
 <?php
-require_once "../model/Institucion.php";
+require "../model/Institucion.php";
 require "validaciones.php";
 $institucion=new Institucion();
 $nombre=isset($_POST['nombre'])?$_POST['nombre']:"";

@@ -1,5 +1,5 @@
 <?php
-require ("../model/Curso.php");
+require "../model/Curso.php";
 require "validaciones.php";
 $curso=new Curso();
 

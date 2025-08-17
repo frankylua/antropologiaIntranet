@@ -16,7 +16,7 @@ $id_estudiante=0;
 
 // $id = $_SESSION['admin'];
 // $user = mostrar_perfil_admin($conexion,$id); 
-$miperfil = isset($_SESSION['docente']) ? RUTA . 'form-doc/info.docente.php' : (isset($_SESSION['estudiante']) ? RUTA . 'form-doc/info.estudiante.php' : RUTA . 'admin/perfil.php');
+$miperfil = isset($_SESSION['docente']) ?  'form-doc/info.docente.php' : (isset($_SESSION['estudiante']) ?  'form-doc/info.estudiante.php' : '../admin/perfil.php');
 // if(isset($_SESSION['profesor'])){
 //     $miperfil = RUTA . 'form-doc/info.docente.php';
 // }else if(isset($_SESSION['estudiante'])){

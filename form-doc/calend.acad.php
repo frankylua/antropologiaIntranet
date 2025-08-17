@@ -6,7 +6,7 @@ if (strlen(session_id()) < 1) {
         header('Location:../index.php');
     }else
     {
-require('header.php')
+require 'header.php';
 
 ?>
 <div class="container mt-5">
@@ -21,7 +21,7 @@ require('header.php')
             
   </div>
 <?php
-    require('footer.php')
+    require 'footer.php';
 
 ?>
 <?php

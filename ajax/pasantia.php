@@ -1,6 +1,6 @@
 <?php
 require "validaciones.php";
-require ("../model/Pasantia.php");
+require "../model/Pasantia.php";
 $prof=isset($_POST['prof'])?$_POST['prof']:'';
 $inst=isset($_POST['inst'])?(int)$_POST['inst']:'';
 $usuario=isset($_POST['usuario'])?(int)$_POST['usuario']:'';

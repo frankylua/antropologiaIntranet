@@ -7,7 +7,7 @@ if (strlen(session_id()) < 1) {
         header('Location:../index.php');
     }else
     {
-    require('../form-doc/header.php');
+    require '../form-doc/header.php';
 ?>
 
 <div class="container mt-5">
@@ -122,7 +122,7 @@ if (strlen(session_id()) < 1) {
                         <!-- Tablas predefinidas -->
                             
                        
-        <?php require('../form-doc/footer.php');?>
+        <?php require '../form-doc/footer.php';?>
     
         <?php
 }
