@@ -7,6 +7,10 @@ ini_set('display_errors', 1);
 if (strlen(session_id()) < 1) {
     session_start();//Validamos si existe o no la sesión
 }
+header('Content-Type: application/json');
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
+header("Access-Control-Allow-Headers: Content-Type");
 // $id = $_SESSION['admin'];
 // $user = mostrar_perfil_admin($conexion,$id); 
 $miperfil = isset($_SESSION['docente']) ? RUTA . 'form-doc/info.docente.php' : (isset($_SESSION['estudiante']) ? RUTA . 'form-doc/info.estudiante.php' : RUTA . 'admin/perfil.php');
