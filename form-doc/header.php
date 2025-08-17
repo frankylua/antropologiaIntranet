@@ -1,5 +1,5 @@
 <?php
-define('RUTA', '/antropologiaIntranet/');
+define('RUTA', 'antropologiaIntranet/');
 // define('RUTA', '/localhost/doctoradoantropologia')
 
 error_reporting(E_ALL);
