@@ -9,7 +9,6 @@ $('#form_ingr').submit(function (e) {
         correo: correo,
         pass: pass
     }
-    console.log(login)
     $.post('../ajax/login.php', login, function (response) {
         mensaje = JSON.parse(response);
         console.log(mensaje)
