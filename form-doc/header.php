@@ -7,7 +7,7 @@ ini_set('display_errors', 1);
 if (strlen(session_id()) < 1) {
     session_start();//Validamos si existe o no la sesión
 }
-header('Content-Type: application/json');
+
 
 // $id = $_SESSION['admin'];
 // $user = mostrar_perfil_admin($conexion,$id); 
