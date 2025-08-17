@@ -3,6 +3,8 @@ define('RUTA', '/antropologiaIntranet/');
 if (strlen(session_id()) < 1) {
     session_start();//Validamos si existe o no la sesión
 }
+$id_profesor=0;
+$id_estudiante=0;
 // define('RUTA', '/localhost/doctoradoantropologia')
 
 // error_reporting(E_ALL);
