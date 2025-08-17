@@ -111,7 +111,7 @@
 
 
 </div>
-  <div class="row" id="info_doc" name="<?php echo $id_profesor ?>">
+  <div class="row" id="info_doc" name="<?php echo isset($_SESSION['docente']) ?>">
   <input type="hidden" name="prof" id="tipo_usuario">
   <h3 class=" text-center ">INFORMACIÓN DOCENTE<button type="button" id='vol-infodoc'
       class="btn  btn-dark volverTablaDoc m-3" id="volver">Volver</button>

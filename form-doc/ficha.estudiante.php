@@ -188,7 +188,7 @@
   </div>
 </div>
 
-<div class="row" id="info_est" name="<?php echo $id_estudiante   ?>">
+<div class="row" id="info_est" name="<?php echo isset($_SESSION['estudiante'])  ?>">
   <input type="hidden"  id="tipo_usuario" name="est">
 
   <h3 class=" text-center ">INFORMACIÓN ESTUDIANTE<button type="button" id='vol-infoest'
