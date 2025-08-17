@@ -56,11 +56,12 @@ function cargarListas(n_input) {
   op = "read";
   if (n_input == "pueb") {
       $.ajax({
-      async:false,
       url: '../ajax/pueblo.php',
       type: "POST",
       data: { op: op },
       success: function (response) {
+        console.log('la respuesta es ')
+        console.log(response)
       let listas = JSON.parse(response);
       let template = "";
       listas.forEach((list) => {
