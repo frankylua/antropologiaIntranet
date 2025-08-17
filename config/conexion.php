@@ -1,10 +1,11 @@
 <?php
-require_once "global.php";
+require "global.php";
 function conexion(){
     try {
         $conexion = new PDO('mysql:host=localhost;dbname='.DB_NAME,DB_USERNAME,DB_PASS);
         return $conexion;
     } catch (PDOException $e) {
+        echo 'Error de conexión: ' . $e->getMessage();
         return false;
     }
 }
