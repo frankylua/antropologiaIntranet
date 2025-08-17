@@ -67,7 +67,7 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
     <?php
     require ('../form-doc/footer.php');
     ?>
-    <script src="scripts/listas.js"></script>
+    <script src="/antropologiaIntranet/scripts/listas.js"></script>
     <?php
 }
 
