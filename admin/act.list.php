@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 ob_start();
-
+session_start();
 
 if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
     header('Location:../index.php');
