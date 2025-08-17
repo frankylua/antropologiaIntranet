@@ -2,8 +2,16 @@
 
 $(document).ready(function(){
 
-  ajaxSelect('#pais_nac','../ajax/pais.php','Seleccione','pais');
-  ajaxSelect('#pais_res','../ajax/pais.php','Seleccione','pais');
+$.post('/ajax/login.php', {op:'pais'}, function (response) {
+        mensaje = JSON.parse(response);
+        templateSelect(listas,'#pais_nac')
+})
+$.post('/ajax/pais.php', login, function (response) {
+        mensaje = JSON.parse(response);
+        templateSelect(listas,'#pais_res')
+})
+
+
 
   // mostrarPais('#pais_nac');
   // mostrarPais('#pais_res');
