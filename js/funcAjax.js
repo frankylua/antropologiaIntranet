@@ -40,6 +40,7 @@ function cargarListas(n_input) {
   op = "read";
   if (n_input == "pueb") {
         $.post( '../ajax/pueblo.php', {op}, function (response) {
+          console.log('resultado'+response)
           data = JSON.parse(response);
         templateListas(data,"#listas")
 
