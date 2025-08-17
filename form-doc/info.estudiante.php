@@ -1,8 +1,5 @@
 <?php
-ob_start();
-if (strlen(session_id()) < 1) {
-    session_start();//Validamos si existe o no la sesión
-}
+
 if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSION['estudiante'])) {
     header('Location:../index.php');
 } else {
@@ -26,5 +23,5 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSIO
     <script src="scripts/ficha.estudiante.js"></script>
     <?php
 }
-ob_end_flush();
+
 ?>

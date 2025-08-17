@@ -1,5 +1,4 @@
 <?php
-session_start();
 require "usuario.php";
 require ("../model/Docente.php");
 $doc = new Docente();

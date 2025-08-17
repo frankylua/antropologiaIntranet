@@ -1,8 +1,5 @@
 <?php
-ob_start();
-if (strlen(session_id()) < 1) {
-  session_start();//Validamos si existe o no la sesión
-}
+
 if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
   header('Location:../index.php');
 } else {
@@ -91,6 +88,7 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
     <script src="scripts/ver.estudiante.js"></script>
     <?php
 }
-ob_end_flush();
+
+
 ?>
 </html>

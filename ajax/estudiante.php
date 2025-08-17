@@ -1,5 +1,5 @@
 <?php
-session_start();
+
 require "usuario.php";
 require ("../model/Estudiante.php");
 $est = new Estudiante();

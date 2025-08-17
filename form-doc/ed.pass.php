@@ -1,5 +1,5 @@
 <?php
-session_start();
+
 $conexion = conexion($bd_config);
 $id_login = rol_id();
 $errores = '';
