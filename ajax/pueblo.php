@@ -4,7 +4,7 @@
 ob_start();
 session_start();
 
-require_once "../model/Pueblo.php";
+require "../model/Pueblo.php";
 require "validaciones.php";
 $pueblo=new Pueblo();
 $nombre=isset($_POST['nombre'])?limpiar_datos($_POST['nombre']):"";
