@@ -1,5 +1,7 @@
 <?php
-
+if (strlen(session_id()) < 1) {
+    session_start();//Validamos si existe o no la sesión
+}
 $conexion = conexion($bd_config);
 $id_login = rol_id();
 $errores = '';

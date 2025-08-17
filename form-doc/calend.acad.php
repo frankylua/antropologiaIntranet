@@ -1,4 +1,7 @@
 <?php
+if (strlen(session_id()) < 1) {
+    session_start();//Validamos si existe o no la sesión
+}
     if(!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSION['aceptado']) ){
         header('Location:../index.php');
     }else
@@ -26,6 +29,3 @@ require('header.php')
 
 ?>
 </html>
-<?php
-ob_end_flush();
-?>

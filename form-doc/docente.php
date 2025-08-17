@@ -54,6 +54,3 @@ require ('footer.php');
 ?>
 <script src="scripts/docente.js"></script>
 </html>
-<?php
-ob_end_flush();
-?>

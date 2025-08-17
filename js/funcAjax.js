@@ -24,13 +24,13 @@ function templateListas(listas,id) {
 function templateSelect(listas,id) {
 
       let template = "";
-      template = `<option value="0">${titulo}</option>`;
+      template = `<option value="0">Seleccione...</option>`;
       listas.forEach((p) => {
         template += `<option value="${p[0]}"> ${cadenaMay(p[1])}</option>`;
       });
-      if (op !== "pais" && op !== "read_cursos") {
-        template += '<option value="otro">Otro</option>';
-      }
+      // if (op !== "pais" && op !== "read_cursos") {
+      //   template += '<option value="otro">Otro</option>';
+      // }
       $(id).html(template);
 
 
@@ -53,7 +53,7 @@ function cargarListas(n_input) {
     n_input == "mag" ||
     n_input == "doc"
   ) {
-    $.post( '../ajax/titulo.php', {op:op,tin_inputpo}, function (response) {
+    $.post( '../ajax/titulo.php', {op:op,tipo : n_input}, function (response) {
           data = JSON.parse(response);
         templateListas(data,"#listas")
 
@@ -61,7 +61,7 @@ function cargarListas(n_input) {
     
   }
   if (n_input == "inst") {
-    $.post('../ajax/institucion.php', {op:'read',tin_inputpo}, function (response) {
+    $.post('../ajax/institucion.php', {op:'read',tipo : n_input}, function (response) {
         data = JSON.parse(response);
         templateListas(data,"#listas")
 })

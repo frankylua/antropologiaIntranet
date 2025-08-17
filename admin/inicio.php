@@ -1,18 +1,13 @@
 <?php
-
-    if(!isset($_SESSION['admin']) && !isset($_SESSION['comite'])){
-        header('Location:../index.php');
-    }else
-    {
+if (strlen(session_id()) < 1) {
+    session_start();//Validamos si existe o no la sesión
+}
     require('../form-doc/header.php');
 ?>
 <div class="container mt-5">
     <div class="row m mb-5">
         <div class="col text-center">
             <h3 class=" mb-5">INTRANET DOCTORADO EN ANTROPOLOGÍA</h3>
-
-        
-   
 
         <div class="row justify-content-around">
             <div class="col-md-3 ">
@@ -37,9 +32,6 @@
 
 <?php
     require('../form-doc/footer.php');
-?>
-<?php
-}
 
 ?>
 </html>
