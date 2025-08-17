@@ -13,10 +13,14 @@ function conexion(){
 
 if(!function_exists('ejecutarConsulta')){
     function ejecutarConsulta($sql){//sql string,arr_datos array
-        $conexion =conexion();
-        $statement=$conexion->prepare($sql);
-        $statement->execute();
-        return $statement;
+        if (!$conexion) {
+        // Si la conexión falla, retorna un mensaje de error
+        return ['error' => 'Error de conexión a la base de datos'];
+    }
+        // $conexion =conexion();
+        // $statement=$conexion->prepare($sql);
+        // $statement->execute();
+        // return $statement;
     }
         
     function ejecutarConsultaResultados($sql){//sql string,arr_datos array
