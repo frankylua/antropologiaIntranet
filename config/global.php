@@ -4,9 +4,9 @@ define('DB_HOST','localhost');
 //nombre db
 define('DB_NAME','c1441353_antr_db');
 //user
-define('DB_USERNAME','c1441353_antr_db');
+define('DB_USERNAME','root');
 //db pass
-define('DB_PASS','34TIgubeki');
+define('DB_PASS','');
 //codificacion caracteres
 define('DB_ENCODE','utf8');
 //nombre del proyecto

@@ -93,3 +93,4 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
 }
 ob_end_flush();
 ?>
+</html>

@@ -39,43 +39,13 @@ function cargarListas(n_input) {
   $("#oculto").val("");
   op = "read";
   if (n_input == "pueb") {
-      // // $.ajax({
-      // // url: '../ajax/pueblo.php',
-      // // type: "POST",
-      // // data: { op: op },
-      // // success: function (response) {
-      // //   console.log('la respuesta es ')
-      // //   console.log(response)
-      // // let listas = JSON.parse(response);
         $.post( '../ajax/pueblo.php', {op}, function (response) {
-        let template = "";
-        console.log(response)
-        response.forEach((list) => {
-          template += `
-          <li class='list-group-item'> 
-          <div class='row justify-content-between'>
-          <div class='col-auto '>
-          ${cadenaMay(list[1])} 
-          </div>
-          <div class='col-auto p-0 m-0'>
-          <button type="button" class='btn btn-link link-success btn-sm editar_lista' name='${
-            list[1]
-          }'  id='${list[0]}'>Editar</button>
-         
-        </div>
-        </div>
-        </li>
-        `;
-        });
-        $('#listas').html(template);
+          data = JSON.parse(response);
+        templateListas(data,"#listas")
 
       })
 
   }
-
-
-
-
  // -------------------------------------------------------------
   if (
     n_input == "lic" ||
@@ -83,16 +53,31 @@ function cargarListas(n_input) {
     n_input == "mag" ||
     n_input == "doc"
   ) {
-    ajaxListas("#listas", "../ajax/titulo.php", op, n_input);
+    $.post( '../ajax/titulo.php', {op:op,tin_inputpo}, function (response) {
+          data = JSON.parse(response);
+        templateListas(data,"#listas")
+
+      })
+    
   }
   if (n_input == "inst") {
-    ajaxListas("#listas", "../ajax/institucion.php", "read");
+    $.post('../ajax/institucion.php', {op:'read',tin_inputpo}, function (response) {
+        data = JSON.parse(response);
+        templateListas(data,"#listas")
+})
   }
   if (n_input == "bec_ext" ||n_input == "bec_int" ) {
-    ajaxListas("#listas", "../ajax/beca.php", 'read_lista', n_input);
+       $.post('../ajax/beca.php', {op:'read_lista',tipo:n_input}, function (response) {
+        data = JSON.parse(response);
+        templateListas(data,"#listas")
+})
   }
   if (n_input == "financ") {
-    ajaxListas("#listas", "../ajax/financiamiento.php", "read");
+           $.post('../ajax/financiamiento.php', {op:'read'}, function (response) {
+        data = JSON.parse(response);
+        templateListas(data,"#listas")
+})
+    
   }
 }
 function eliminarLista(id, n_input) {

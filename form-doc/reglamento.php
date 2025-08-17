@@ -34,3 +34,4 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSIO
 }
 ob_end_flush();
 ?>
+</html>

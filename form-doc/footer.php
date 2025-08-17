@@ -32,7 +32,7 @@
 <script src="<?php echo RUTA;?>form-doc/scripts/pasantia.js"></script>
 <script src="<?php echo RUTA;?>form-doc/scripts/beca.js"></script>
 <script src="<?php echo RUTA;?>form-doc/scripts/tesis.js"></script>
-</html>
+
     
 
    
