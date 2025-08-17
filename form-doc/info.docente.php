@@ -23,3 +23,7 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSIO
 }
 
 ?>
+</html>
+<?php
+ob_end_flush();
+?>

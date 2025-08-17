@@ -26,3 +26,6 @@ require('header.php')
 
 ?>
 </html>
+<?php
+ob_end_flush();
+?>
