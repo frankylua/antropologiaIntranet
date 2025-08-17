@@ -9,8 +9,15 @@ function agregarCotutela() {
   $('#card_cotutela').append('<div class="row"><div class="col-md-6 mb-3"><label for="fondo" class="form-label">Fondo</label><input type="text" class="form-control" id="fondo" maxlength="45"></div><div class="col-md-6 mb-3"><label for="ciudad_cot" class="form-label">Ciudad</label><input type="text" class="form-control" id="ciudad_cot" maxlength="45"></div></div>')
   $('#card_cotutela').append('<div class="row" id="row_pais"><label for="pais_cot" class="form-label">País</label><div class="col-md-6 mb-3"><select id="pais_cot" class="form-select"></select></div></div>')
   $('#card_cotutela').append('<div class="row></div>')
-  ajaxSelect('#pais_cot', '../ajax/pais.php', 'Seleccione', 'pais');
-  ajaxSelect('#inst_cot', '../ajax/institucion.php', 'Seleccione', 'read');
+
+  $.post('../ajax/pais.php', {op:'pais'}, function (response) {
+    data = JSON.parse(response);
+    templateSelect(data,'#pais_cot')
+  })
+  $.post('../ajax/institucion.php', {op:'read'}, function (response) {
+    data = JSON.parse(response);
+    templateSelect(data,'#inst_cot')
+  })
 
 }
 function cargarTesis(usu, id) {
@@ -201,8 +208,15 @@ $('#btn_tesis').click(function () {
   $('#card_tesis').append(' <div class="row justify-content-center " id="mnsj_row_tesis"><div class="col-lg-8 alert  text-center alert-danger" role="alert" id="mnsj_tesis"></div></div>')
   $('#card_tesis').append('<div class="row justify-content-center"><div class="col-md-6 mt-3 d-grid gap-2"><button type="submit" class="btn btn-dark">Guardar Tesis</button></div></div>');
   $('#mnsj_row_tesis').hide();
-  ajaxSelect('#pais_tesis', ruta + 'ajax/pais.php', 'Seleccione', 'pais');
-  ajaxSelect('#inst_tesis', ruta + 'ajax/institucion.php', 'Seleccione', 'read');
+
+   $.post('../ajax/pais.php', {op:'pais'}, function (response) {
+    data = JSON.parse(response);
+    templateSelect(data,'#pais_tesis')
+  })
+   $.post('../ajax/institucion.php', {op:'read'}, function (response) {
+    data = JSON.parse(response);
+    templateSelect(data,'#inst_tesis')
+  })
   anios('#anio_tesis', 2006)
   $('#nom_est').keyup(function () {
     //$('#list_est').hide();

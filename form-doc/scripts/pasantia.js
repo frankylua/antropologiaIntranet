@@ -8,8 +8,14 @@ $('#btn_pasantia').click(function () {
     $('#card_pasant').append('<div class="row"><div class="col-md-4"><label for="pais_pasant" class="form-label pais_pa">País</label><select class="form-select" id="pais_pasant"></select></div><div class="col-md-4 mb-3"><label for="fech_in_pasant" class="form-label">Fecha Inicio</label><input type="date" class="form-control" id="fech_in_pasant"></div><div class="col-md-4 mb-3"><label for="fech_ter_pasant" class="form-label">Fecha Término</label><input type="date" class="form-control" id="fech_ter_pasant"> </div></div></div>');
     $('#card_pasant').append(' <div class="row justify-content-center " id="mnsj_row_pasant"><div class="col-lg-8 alert  text-center alert-danger" role="alert" id="mnsj_pasant"></div></div>')
     $('#card_pasant').append('<div class="row justify-content-center"  ><div class="col-md-6 mt-3 d-grid gap-2"><button type="submit" class="btn btn-dark">Guardar Pasantia</button></div></div>');
-    ajaxSelect('#inst_pasant', ruta + 'ajax/institucion.php', 'Seleccione', 'read');
-    ajaxSelect('#pais_pasant', ruta + 'ajax/pais.php', 'Seleccione', 'pais');
+       $.post('../ajax/institucion.php', {op:'read'}, function (response) {
+        data = JSON.parse(response);
+        templateSelect(data,'#inst_pasant')
+        })
+   $.post('../ajax/pais.php', {op:'read'}, function (response) {
+        data = JSON.parse(response);
+        templateSelect(data,'#pais_pasant')
+        })
     $('#mnsj_row_pasant').hide();
 });
 $(document).on('change', '#inst_pasant', function () {

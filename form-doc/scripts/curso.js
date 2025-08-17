@@ -328,7 +328,11 @@ function init(){
     mostrarCurso();
     $('.loadPage').fadeOut();
     $('#mnsj_elim').hide();
-    ajaxSelect('#nom_curso','../ajax/curso.php','Seleccione','read_cursos');
+    
+      $.post('../ajax/curso.php', {op:'read_cursos'}, function (response) {
+        data = JSON.parse(response);
+        templateSelect(data,'#nom_curso')
+})
     anios('#anio_curso',2006);
     $('#car_hor').prop('disabled',true)
     

@@ -3,12 +3,12 @@
 $(document).ready(function(){
 
 $.post('../ajax/pais.php', {op:'pais'}, function (response) {
-        mensaje = JSON.parse(response);
-        templateSelect(listas,'#pais_nac')
+        data = JSON.parse(response);
+        templateSelect(data,'#pais_nac')
 })
 $.post('../ajax/pais.php', {op:'pais'}, function (response) {
-        mensaje = JSON.parse(response);
-        templateSelect(listas,'#pais_res')
+        data = JSON.parse(response);
+        templateSelect(data,'#pais_res')
 })
 
 

@@ -248,7 +248,11 @@ $('#form_usuario').submit(function(e){
 })        
 function init(){
     $('#mnsj_row_acad_est').hide();
-    ajaxSelect('#tipo_est','../ajax/estudiante.php','Seleccione','read_tipo');
+
+      $.post('../ajax/estudiante.php', {op:'_tipo'}, function (response) {
+        data = JSON.parse(response);
+        templateSelect(data,'#tipo_est')
+})
     //AntecAcad();
     $('.loadPage').fadeOut();
     infoPers();
