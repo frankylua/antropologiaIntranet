@@ -98,11 +98,11 @@ function clickListas(nom) {
 $(document).ready(function () {
   $('#tabla-listas').hide();
   $('#btn_pueblos').click(function () {
-    // hacer scroll hasta la lista seleccionada (investigar mas)
-    // $("html, body").animate({
-    //   scrollTop: $('#btn_institucion').offset().top
-    // });
-    clickListas('pueb');
+    $.post( '../ajax/pueblo.php', {op:'read'}, function (response) {
+          console.log('resultado'+response)
+          data = JSON.parse(response);
+        templateListas(data,"#listas")
+    })
   });
   // btn licenciatura
   $('#btn_lic').click(function () {
