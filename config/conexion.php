@@ -24,15 +24,19 @@ if(!function_exists('ejecutarConsulta')){
     }
         
     function ejecutarConsultaResultados($sql){//sql string,arr_datos array
-        // $conexion =conexion();
-        // $statement=$conexion->prepare($sql);
-        // $statement->execute();
-        // $resultado=$statement->fetchAll();
-        // return $resultado;
-          if (!$conexion) {
+           if (!$conexion) {
         // Si la conexión falla, retorna un mensaje de error
         return ['error' => 'Error de conexión a la base de datos'];
-    }
+           }else{
+               $conexion =conexion();
+               $statement=$conexion->prepare($sql);
+               $statement->execute();
+               $resultado=$statement->fetchAll();
+               return $resultado;
+
+           }
+       
+    
     }
 
     function obtenerIdConsulta($sql){
