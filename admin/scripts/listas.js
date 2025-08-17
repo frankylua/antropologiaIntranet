@@ -25,7 +25,11 @@ function clickListas(nom) {
   click();
 
   if (nom == 'pueb') {
-    cargarListas('pueb');
+    $.post( '../ajax/pueblo.php', {op:'read'}, function (response) {
+          console.log('resultado'+response)
+          data = JSON.parse(response);
+        templateListas(data,"#listas")
+    })
   }
   if (nom == 'lic') {
     cargarListas('lic');
