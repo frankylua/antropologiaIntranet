@@ -5,9 +5,9 @@ define('RUTA', '/antropologiaIntranet/');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ob_start();
-if (strlen(session_id()) < 1) {
+
     session_start();//Validamos si existe o no la sesión
-}
+
 
 
 // $id = $_SESSION['admin'];
