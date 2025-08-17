@@ -1,11 +1,4 @@
-function ajaxListas(id, url, op, tipo) {
-  $.ajax({
-    async:true,
-    url: url,
-    type: "POST",
-    data: { op: op, tipo: tipo },
-    success: function (response) {
-      let listas = JSON.parse(response);
+function templateListas(listas,id) {
       let template = "";
       listas.forEach((list) => {
         template += `
@@ -23,21 +16,13 @@ function ajaxListas(id, url, op, tipo) {
       </div>
       </li>
       `;
-      });
-      $(id).html(template);
-     },
-  });
+    });
+    $(id).html(template);
 }
 
 
-function ajaxSelect(id, url, titulo, op, tipo) {
-  $.ajax({
-    async:false,
-    url: url,
-    type: "POST",
-    data: { op, tipo },
-    success: function (response) {
-      let listas = JSON.parse(response);
+function templateSelect(listas,id) {
+
       let template = "";
       template = `<option value="0">${titulo}</option>`;
       listas.forEach((p) => {
@@ -47,8 +32,7 @@ function ajaxSelect(id, url, titulo, op, tipo) {
         template += '<option value="otro">Otro</option>';
       }
       $(id).html(template);
-    },
-  });
+
 
 }
 function cargarListas(n_input) {
@@ -63,7 +47,7 @@ function cargarListas(n_input) {
       // //   console.log('la respuesta es ')
       // //   console.log(response)
       // // let listas = JSON.parse(response);
-        $.post( '../ajax/pueblo.php', {op}, function (response) {
+        $.post( '/ajax/pueblo.php', {op}, function (response) {
         let template = "";
         console.log(response)
         response.forEach((list) => {
