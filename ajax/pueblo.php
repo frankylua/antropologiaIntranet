@@ -22,7 +22,7 @@ switch($op){
         break;
     case 'read':
         $respuesta=$pueblo->mostrar();
-         echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
+         echo json_encode(['mensaje' => 'hola desde ajax'], JSON_UNESCAPED_UNICODE);
          break;
     case'delete':
         $respuesta=$pueblo->eliminar($id_pueblo);
