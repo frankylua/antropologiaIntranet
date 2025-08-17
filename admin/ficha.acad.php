@@ -1,8 +1,5 @@
 <?php
-    ob_start();
-    if (strlen(session_id()) < 1){
-        session_start();//Validamos si existe o no la sesión
-    }
+
     if(!isset($_SESSION['admin']) && !isset($_SESSION['comite'])){
         header('Location:../index.php');
     }else
@@ -213,5 +210,5 @@ aproximaciones a la producción y el consumo de cerámica durante el Período
 ?>
 <?php
 }
-ob_end_flush();
+
 ?>

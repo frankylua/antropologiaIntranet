@@ -1,7 +1,4 @@
 <?php
-if (strlen(session_id()) < 1) {
-    session_start();
-}
 require ("../model/Login_.php");
 //require('validaciones.php');
 $login= new Login();

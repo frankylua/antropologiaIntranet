@@ -1,5 +1,5 @@
 <?php
-session_start();
+
 require "validaciones.php";
 require ("../model/Grado.php");
 $titulo=isset($_POST['titulo'])?(int)$_POST['titulo']:'';

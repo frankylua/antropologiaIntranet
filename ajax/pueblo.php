@@ -1,9 +1,6 @@
 <?php
 
 
-ob_start();
-session_start();
-
 require "../model/Pueblo.php";
 require "validaciones.php";
 $pueblo=new Pueblo();
@@ -34,7 +31,7 @@ switch($op){
 
         break;
         }
-        ob_end_flush();
+
 ?>
 
 
