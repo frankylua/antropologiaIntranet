@@ -49,7 +49,7 @@ $miperfil = isset($_SESSION['docente']) ? RUTA . 'form-doc/info.docente.php' : (
 
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow ml-2">
             <div class="container">
-                <!-- <a class=" nav-link text-secondary"  href="#"><?php echo ucwords($user['nombre']); ?></a> -->
+                <!-- <a class=" nav-link text-secondary"  href="#"></a> -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Mostrar/Ocultar Menu">
                     <span class="navbar-toggler-icon"></span>
