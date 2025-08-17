@@ -2,11 +2,11 @@
 
 $(document).ready(function(){
 
-$.post('/ajax/login.php', {op:'pais'}, function (response) {
+$.post('../ajax/pais.php', {op:'pais'}, function (response) {
         mensaje = JSON.parse(response);
         templateSelect(listas,'#pais_nac')
 })
-$.post('/ajax/pais.php', login, function (response) {
+$.post('../ajax/pais.php', {op:'pais'}, function (response) {
         mensaje = JSON.parse(response);
         templateSelect(listas,'#pais_res')
 })
