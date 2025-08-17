@@ -1,4 +1,10 @@
 <?php
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
+
+ob_start();
+session_start();
+
 require_once "../model/Pueblo.php";
 require "validaciones.php";
 $pueblo=new Pueblo();
@@ -29,6 +35,7 @@ switch($op){
 
         break;
         }
+        ob_end_flush();
 ?>
 
 
