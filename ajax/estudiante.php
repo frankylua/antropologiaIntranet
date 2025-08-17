@@ -1,7 +1,7 @@
 <?php
 
 require "usuario.php";
-require ("../model/Estudiante.php");
+require "../model/Estudiante.php";
 $est = new Estudiante();
 $promedio = isset($_POST['promedio']) ? floatval($_POST['promedio']) : '';
 $trabaja = isset($_POST['trabaja']) ? (int) $_POST['trabaja'] : '';

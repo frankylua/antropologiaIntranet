@@ -6,7 +6,7 @@ if (strlen(session_id()) < 1) {
 if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSION['aceptado'])) {
     header('Location:../index.php');
 } else {
-    require ('header.php');
+    require 'header.php';
     ?>
     <div class="container mt-5">
         <div class="row m mb-5">
@@ -30,7 +30,7 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSIO
         </div>
     </div>
     <?php
-    require ('footer.php');
+    require 'footer.php';
 }
 
 ?>

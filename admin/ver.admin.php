@@ -148,7 +148,7 @@ if (!isset($_SESSION['admin'])) {
 
 
     <?php
-    require ('../form-doc/footer.php')
+    require '../form-doc/footer.php';
         ?>
     <script src="scripts/admin.js"></script>
     <?php

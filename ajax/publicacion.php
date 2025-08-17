@@ -1,6 +1,6 @@
 <?php
 require "validaciones.php";
-require ("../model/Publicacion.php");
+require "../model/Publicacion.php";
 $usuario=isset($_POST['usuario'])?(int)$_POST['usuario']:'';
 $tipo=isset($_POST['tipo'])?(int)$_POST['tipo']:'';
 $anio=isset($_POST['anio'])?(int)$_POST['anio']:'';

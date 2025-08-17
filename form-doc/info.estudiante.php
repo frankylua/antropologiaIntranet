@@ -6,7 +6,7 @@ if (strlen(session_id()) < 1) {
 if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSION['estudiante'])) {
     header('Location:../index.php');
 } else {
-    require ('header.php');
+    require 'header.php';
     $id_estudiante=$_SESSION['estudiante'];
     ?>
     <!-- <span class="loadPage">

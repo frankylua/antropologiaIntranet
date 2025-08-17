@@ -8,8 +8,8 @@
   </div>
   <div class="col-12" id="id_usuario" name="0">
     <?php
-    require ('../form-doc/agr.form.dat.acad.php');
-    require ('../form-doc/agr.form.beca.php');
+    require '../form-doc/agr.form.dat.acad.php';
+    require '../form-doc/agr.form.beca.php';
     ?>
 
   </div>
@@ -116,7 +116,7 @@
 
       <div class="row">
         <?php
-        require ('../form-doc/lineaInv.php');
+        require '../form-doc/lineaInv.php';
         ?>
         
       </div>

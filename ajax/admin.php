@@ -1,5 +1,5 @@
 <?php
-require ("../model/Admin.php");
+require "../model/Admin.php";
 require "validaciones.php";
 $admin=new Admin();
 $nombre=isset($_POST['nombre'])?limpiar_datos($_POST['nombre']):'';

@@ -6,7 +6,7 @@ if (strlen(session_id()) < 1) {
 if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
     header('Location:../index.php');
 } else {
-    require ('../form-doc/header.php');
+    require '../form-doc/header.php';
     ?>
     <div class="container mt-2">
         <div class="row">

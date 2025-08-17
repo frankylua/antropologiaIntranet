@@ -7,7 +7,7 @@ if (strlen(session_id()) < 1) {
         header('Location:../index.php');
     }else
     {
-    require('../form-doc/header.php');
+    require '../form-doc/header.php';
 ?>
 <div class="container mt-2">
     <div class="row">
@@ -69,7 +69,7 @@ if (strlen(session_id()) < 1) {
 
 
 <?php
-    require('../form-doc/footer.php');
+    require '../form-doc/footer.php';
     ?>
     <?php
 }

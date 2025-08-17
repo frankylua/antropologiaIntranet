@@ -1,7 +1,7 @@
 <?php
 
 require "validaciones.php";
-require ("../model/Grado.php");
+require "../model/Grado.php";
 $titulo=isset($_POST['titulo'])?(int)$_POST['titulo']:'';
 $inst=isset($_POST['inst'])?(int)$_POST['inst']:'';
 $usuario=isset($_POST['usuario'])?(int)$_POST['usuario']:'';

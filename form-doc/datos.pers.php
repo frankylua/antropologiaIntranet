@@ -2,7 +2,7 @@
 if (strlen(session_id()) < 1) {
     session_start();//Validamos si existe o no la sesión
 }
-   require('header.php');
+   require 'header.php';
    ?>
    <span class="loadPage" id="loadPageEst">
       <img src="../img/loadPage.gif" alt="" width="20%" height="20%">

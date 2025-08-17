@@ -2,7 +2,7 @@
 if (strlen(session_id()) < 1) {
     session_start();//Validamos si existe o no la sesión
 }
-    require('../form-doc/header.php');
+    require '../form-doc/header.php';
 ?>
 <div class="container mt-5">
     <div class="row m mb-5">
@@ -31,7 +31,7 @@ if (strlen(session_id()) < 1) {
 </div> 
 
 <?php
-    require('../form-doc/footer.php');
+    require '../form-doc/footer.php';
 
 ?>
 </html>

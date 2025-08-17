@@ -12,8 +12,8 @@
   </div>
   <div class="col-12" id="id_usuario" name="0">
     <?php
-    require ('../form-doc/agr.form.dat.acad.php');
-    require ('../form-doc/agr.form.tesis.php');
+    require '../form-doc/agr.form.dat.acad.php';
+    require '../form-doc/agr.form.tesis.php';
     ?>
 
   </div>
@@ -23,7 +23,7 @@
   <div class="col" id="login" name="0">
     <h3 class="mb-5 text-center" id="text-tit">EDITAR INFORMACIÓN PERSONAL</h3>
     <form class="form" id="form_edit_pers">
-      <?php require ('../form-doc/agr.form.dat.pers.php'); ?>
+      <?php require '../form-doc/agr.form.dat.pers.php'; ?>
 
 
       <div class="row justify-content-center " id="mnsj_row_per_doc">
@@ -47,7 +47,7 @@
   <div class="col" id="log" name="0">
     <h3 class="mb-5 text-center" id="text-tit">EDITAR INFORMACIÓN PROGRAMA</h3>
     <form class="form" id="form_edit_prog">
-      <?php require ('../form-doc/agr.form.dat.prog.doc.php'); ?>
+      <?php require '../form-doc/agr.form.dat.prog.doc.php'; ?>
 
       <div class="row mt-5 justify-content-between ">
         <div class="col-md-4 mb-3">

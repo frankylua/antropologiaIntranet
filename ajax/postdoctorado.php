@@ -1,6 +1,6 @@
 <?php
 require "validaciones.php";
-require ("../model/Postdoctorado.php");
+require "../model/Postdoctorado.php";
 $prof=isset($_POST['prof'])?limpiar_datos($_POST['prof']):'';
 $inst=isset($_POST['inst'])?(int)$_POST['inst']:'';
 $usuario=isset($_POST['usuario'])?(int)$_POST['usuario']:'';

@@ -6,7 +6,7 @@ if (strlen(session_id()) < 1) {
 if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
   header('Location:../index.php');
 } else {
-  require ('../form-doc/header.php');
+  require '../form-doc/header.php';
   ?>
 
   <div class="container mt-5">
@@ -85,7 +85,7 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
 
     <?php
     require '../form-doc/ficha.estudiante.php';
-    require ('../form-doc/footer.php');
+    require '../form-doc/footer.php';
     ?>
     <script src="../form-doc/scripts/ficha.estudiante.js"></script>
     <script src="scripts/ver.estudiante.js"></script>
