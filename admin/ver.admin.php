@@ -1,5 +1,7 @@
 <?php
-
+if (strlen(session_id()) < 1) {
+    session_start();//Validamos si existe o no la sesión
+}
 if (!isset($_SESSION['admin'])) {
     header('Location:../index.php');
 } else {
