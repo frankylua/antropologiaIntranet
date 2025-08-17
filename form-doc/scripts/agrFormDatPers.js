@@ -20,7 +20,9 @@ $.post('../ajax/pais.php', {op:'pais'}, function (response) {
   $('#si').click(function(){
     $('#p').remove()
     $('#row_pueb').append('<div class="col-md-6 mb-3" id="p"><label for="pueb_ind" class="form-label" >Pueblo Indígena</label><select id="select_pueb" name="select_pueb" class="form-select"></select></div>')
-    ajaxSelect('#select_pueb',ruta+'ajax/pueblo.php','Seleccione','read');
+    $.post('../ajax/pueblo.php', {op:'read'}, function (response) {
+        data = JSON.parse(response);
+        templateSelect(data,'#select_pueb')
   });
   $('#no').click(function(){
     $('#p').remove()
