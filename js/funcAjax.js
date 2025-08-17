@@ -47,7 +47,7 @@ function cargarListas(n_input) {
       // //   console.log('la respuesta es ')
       // //   console.log(response)
       // // let listas = JSON.parse(response);
-        $.post( '/ajax/pueblo.php', {op}, function (response) {
+        $.post( '../ajax/pueblo.php', {op}, function (response) {
         let template = "";
         console.log(response)
         response.forEach((list) => {
