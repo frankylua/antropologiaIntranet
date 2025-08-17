@@ -1,5 +1,5 @@
 <?php
-require_once "../model/Titulo.php";
+require "../model/Titulo.php";
 require "validaciones.php";
 $titulo=new Titulo();
 $nombre=isset($_POST['nombre'])?limpiar_datos($_POST['nombre']):"";
