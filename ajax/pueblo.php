@@ -1,4 +1,5 @@
 <?php
+ob_start();
 header('Content-Type: application/json');
 require "../model/Pueblo.php";
 require "validaciones.php";
@@ -24,8 +25,8 @@ switch($op){
          array_walk_recursive($respuesta, function(&$item) {
         $item = mb_convert_encoding($item, 'UTF-8', 'auto');
         });
-        $respuesta= trim($respuesta);
-        echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
+        $jsonRespuesta = json_encode($respuesta, JSON_UNESCAPED_UNICODE);
+        echo trim($jsonRespuesta);
         break;
     case'delete':
         $respuesta=$pueblo->eliminar($id_pueblo);
@@ -33,6 +34,7 @@ switch($op){
         echo json_encode($pueblor, JSON_UNESCAPED_UNICODE);
         break;
         }
+    ob_end_flush();
 ?>
 
 

@@ -13,7 +13,6 @@ function conexion(){
 
 
     function ejecutarConsulta($sql){//sql string,arr_datos array
-
         $conexion =conexion();
         $statement=$conexion->prepare($sql);
         $statement->execute();
