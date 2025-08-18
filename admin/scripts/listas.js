@@ -26,7 +26,7 @@ function clickListas(nom) {
 
   if (nom == 'pueb') {
     $.post( '../ajax/pueblo.php', {op:'read'}, function (response) {
-          console.log('resultado'+response)
+          console.log(response)
           data = JSON.parse(response);
         templateListas(data,"#listas")
     })
