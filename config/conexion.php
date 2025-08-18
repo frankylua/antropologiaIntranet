@@ -3,7 +3,7 @@ require "global.php";
 function conexion(){
     try {
         $conexion = new PDO('mysql:host=localhost;dbname='.DB_NAME,DB_USERNAME,DB_PASS);
-        // $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $conexion->exec("SET NAMES 'utf8'");
         return $conexion;
     } catch (PDOException $e) {
         echo 'Error de conexión: ' . $e->getMessage();
