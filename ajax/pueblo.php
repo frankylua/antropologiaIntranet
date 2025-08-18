@@ -1,5 +1,4 @@
 <?php
-
 header('Content-Type: application/json');
 require "../model/Pueblo.php";
 require "validaciones.php";
@@ -22,19 +21,14 @@ switch($op){
         break;
     case 'read':
         $respuesta=$pueblo->mostrar();
-        // var_dump('respuesta de pueblo');
-        // var_dump($respuesta);
-        header('Content-Type: application/json');
          echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
          break;
     case'delete':
         $respuesta=$pueblo->eliminar($id_pueblo);
         $respuesta ? $pueblor="Pueblo Eliminado" : $pueblor="Pueblo no ha sido eliminado";
         echo json_encode($pueblor, JSON_UNESCAPED_UNICODE);
-
         break;
         }
-
 ?>
 
 
