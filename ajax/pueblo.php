@@ -24,13 +24,9 @@ switch($op){
          array_walk_recursive($respuesta, function(&$item) {
         $item = mb_convert_encoding($item, 'UTF-8', 'auto');
         });
-    // Asegúrate de que sea un array antes de intentar convertirlo
-    if (is_array($respuesta)) {
-        echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
-    } else {
-        echo json_encode(["error" => "Formato de datos incorrecto"], JSON_UNESCAPED_UNICODE);
-    }
-    break;
+        $jsonRespuesta = json_encode($respuesta, JSON_UNESCAPED_UNICODE);
+        echo trim($jsonRespuesta);
+        break;
     case'delete':
         $respuesta=$pueblo->eliminar($id_pueblo);
         $respuesta ? $pueblor="Pueblo Eliminado" : $pueblor="Pueblo no ha sido eliminado";
