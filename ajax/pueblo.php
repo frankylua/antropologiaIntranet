@@ -24,8 +24,8 @@ switch($op){
          array_walk_recursive($respuesta, function(&$item) {
         $item = mb_convert_encoding($item, 'UTF-8', 'auto');
         });
-        $jsonRespuesta = json_encode($respuesta, JSON_UNESCAPED_UNICODE);
-        echo trim($jsonRespuesta);
+        $respuesta= trim($respuesta);
+        echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
         break;
     case'delete':
         $respuesta=$pueblo->eliminar($id_pueblo);
