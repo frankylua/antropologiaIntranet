@@ -26,6 +26,8 @@ switch($op){
         break;
     case 'read':
         $respuesta=$postdoc->mostrar($usuario);
+        var_dump('respuesta de pueblo');
+        var_dump($respuesta);
          echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
          break;
     case'delete':
