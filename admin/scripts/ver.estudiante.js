@@ -332,7 +332,10 @@ $("#buscar_est").keyup(function () {
 
 function init(){
   listaEst()
-    ajaxSelect('#tipo_est_edit','../ajax/estudiante.php','Seleccione','read_tipo')
+    $.post('../ajax/estudiante.php', {op:'read_tipo'}, function (response) {
+        data = JSON.parse(response);
+        templateSelect(data,'#tipo_est_edit')
+})
 
      $('#tipo_est').append('<option value="0" selected>Todos(as)</option>')
      cargarEst()
