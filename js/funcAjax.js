@@ -39,11 +39,10 @@ function cargarListas(n_input) {
   $("#oculto").val("");
   op = "read";
   if (n_input == "pueb") {
-        $.post( '../ajax/pueblo.php', {op:op}, function (response) {
+        $.post('../ajax/pueblo.php', {op:op}, function (response) {
           console.log('resultado'+response)
           data = JSON.parse(response);
         templateListas(data,"#listas")
-
       })
 
   }

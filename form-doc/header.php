@@ -5,27 +5,7 @@ if (strlen(session_id()) < 1) {
 }
 $id_profesor=0;
 $id_estudiante=0;
-// define('RUTA', '/localhost/doctoradoantropologia')
-
-// error_reporting(E_ALL);
-// ini_set('display_errors', 1);
-
-
-
-
-
-// $id = $_SESSION['admin'];
-// $user = mostrar_perfil_admin($conexion,$id); 
 $miperfil = isset($_SESSION['docente']) ?  'form-doc/info.docente.php' : (isset($_SESSION['estudiante']) ?  'form-doc/info.estudiante.php' : '../admin/perfil.php');
-// if(isset($_SESSION['profesor'])){
-//     $miperfil = RUTA . 'form-doc/info.docente.php';
-// }else if(isset($_SESSION['estudiante'])){
-//     $miperfil = RUTA .'form-doc/info.estudiante';
-// }else if(isset($_SESSION['admin'])|| isset($_SESSION['admin'])){
-//     $miperfil = RUTA .'admin/perfil.php';
-// }else{
-
-// }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -41,7 +21,6 @@ $miperfil = isset($_SESSION['docente']) ?  'form-doc/info.docente.php' : (isset(
     <script src="https://kit.fontawesome.com/50f392008f.js" crossorigin="anonymous"></script>
     <title>Doctorado Antropolgía UCN UTA</title>
 </head>
-
 <body>
     <header class="fixed-top">
         <div class="row justify-content-between bg-white">
@@ -52,8 +31,6 @@ $miperfil = isset($_SESSION['docente']) ?  'form-doc/info.docente.php' : (isset(
                 <img src="<?php echo RUTA; ?>img/logo-ucn.jpg" class="img-fluid" alt="...">
             </div>
         </div>
-
-
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow ml-2">
             <div class="container">
                 <!-- <a class=" nav-link text-secondary"  href="#"></a> -->
@@ -102,8 +79,7 @@ $miperfil = isset($_SESSION['docente']) ?  'form-doc/info.docente.php' : (isset(
                                     <?php if (isset($_SESSION['admin'])): ?>
                                         <li><a href="<?php echo RUTA; ?>admin/ver.admin.php" class="dropdown-item">Comite
                                                 Académico</a></li>
-                                    <?php endif; ?>
-                                    
+                                    <?php endif; ?>                                    
                                     <?php if (isset($_SESSION['admin']) || isset($_SESSION['comite']) || isset($_SESSION['aceptado'])): ?>
                                     <li><a href="<?php echo RUTA; ?>form-doc/calend.acad.php"
                                             class="dropdown-item">Calendario Académico</a></li>
@@ -129,8 +105,7 @@ $miperfil = isset($_SESSION['docente']) ?  'form-doc/info.docente.php' : (isset(
                             <?php endif; ?>
                             <li class="nav-item mx-2">
                                 <a class="nav-link " href="<?php echo RUTA; ?>form-doc/cerrar.php">Salir</a>
-                            </li>
-                        
+                            </li>                        
                     </ul>
                 </div>
             </div>
