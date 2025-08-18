@@ -21,7 +21,9 @@ switch($op){
         break;
     case 'read':
         $respuesta=$pueblo->mostrar();
-         var_dump($respuesta); 
+         array_walk_recursive($respuesta, function(&$item) {
+        $item = mb_convert_encoding($item, 'UTF-8', 'auto');
+        });
     // Asegúrate de que sea un array antes de intentar convertirlo
     if (is_array($respuesta)) {
         echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
