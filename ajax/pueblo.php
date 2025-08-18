@@ -1,6 +1,6 @@
 <?php
 ob_start();
-header('Content-Type: application/json');
+
 require "../model/Pueblo.php";
 require "validaciones.php";
 $pueblo=new Pueblo();
@@ -22,9 +22,6 @@ switch($op){
         break;
     case 'read':
         $respuesta=$pueblo->mostrar();
-         array_walk_recursive($respuesta, function(&$item) {
-        $item = mb_convert_encoding($item, 'UTF-8', 'auto');
-        });
         $jsonRespuesta = json_encode($respuesta, JSON_UNESCAPED_UNICODE);
         echo trim($jsonRespuesta);
         break;
