@@ -21,8 +21,14 @@ switch($op){
         break;
     case 'read':
         $respuesta=$pueblo->mostrar();
-         echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
-         break;
+         var_dump($respuesta); 
+    // Asegúrate de que sea un array antes de intentar convertirlo
+    if (is_array($respuesta)) {
+        echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
+    } else {
+        echo json_encode(["error" => "Formato de datos incorrecto"], JSON_UNESCAPED_UNICODE);
+    }
+    break;
     case'delete':
         $respuesta=$pueblo->eliminar($id_pueblo);
         $respuesta ? $pueblor="Pueblo Eliminado" : $pueblor="Pueblo no ha sido eliminado";
