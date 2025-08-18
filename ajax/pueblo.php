@@ -22,7 +22,6 @@ switch($op){
         break;
     case 'read':
         $respuesta=$pueblo->mostrar();
-        header('Content-Type: application/json');
         $jsonRespuesta = json_encode($respuesta, JSON_UNESCAPED_UNICODE);
         echo trim($jsonRespuesta);
         break;

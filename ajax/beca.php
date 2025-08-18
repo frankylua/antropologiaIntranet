@@ -58,11 +58,8 @@ switch($op){
         $respuesta=$beca->mostrarNomBeca($tipo_beca);
         echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
     break;
-    case 'read_lista':
-        
+    case 'read_lista':      
         $respuesta=$beca->mostrarLista($tipo_int);
-        var_dump('respuesta de pueblo');
-        var_dump($respuesta);
          echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
          break;
     // case'delete':
