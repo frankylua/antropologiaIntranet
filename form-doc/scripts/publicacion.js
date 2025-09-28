@@ -543,15 +543,19 @@ $("body").on("click", ".eliminarPub", function () {
         type: "POST",
         data: { id_postdoc, op: "delete" },
         success: function (response) {
-            cargarFichaDoc(usu);
+            if($('lista_doc')=='true'){
+                cargarFichaDoc(usu)
+            }else{
+                cargarFichaEst(usu) 
+            }           
             let mensaje = JSON.parse(response);
             $("html, body").animate({ scrollTop: $('#ant_acad_doc').offset().top}, 100);
-          $("#mnsj_row_acad_doc").show();
-          $("#mnsj_acad_doc").addClass("alert-success");
-          $("#mnsj_acad_doc").html(mensaje);
-          setTimeout(function () {
-            $("#mnsj_row_acad_doc").fadeOut(1500);
-          }, 3000);
+            $("#mnsj_row_acad_doc").show();
+            $("#mnsj_acad_doc").addClass("alert-success");
+            $("#mnsj_acad_doc").html(mensaje);
+            setTimeout(function () {
+                $("#mnsj_row_acad_doc").fadeOut(1500);
+            }, 3000);
         },
       });
   
@@ -683,9 +687,9 @@ $('#form_publicacion').submit(function(e){
         }
         Object.assign(publicacion,{tipo_lib,rol_libro,ref_ext,traduccion,editorial,lugar})       
     }else{
-        tipo_otra_pub=$('#tipo_otra_pub').val();
+        tipo_pub=$('#tipo_otra_pub').val();
         desc_pub=$('#desc_pub').val();
-        publicacion={op,tipo,tipo_otra_pub,desc_pub,usuario};
+        publicacion={op,tipo,tipo_pub,desc_pub,usuario};
         ingrPub=true
     }
     //cargarPub(usuario)
