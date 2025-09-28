@@ -45,7 +45,6 @@ $('body').on('click', '.listProy', function () {
     folio = $(this).attr('name');
     $('#folio_proy').attr('name', id);
     $('#list_proy').hide();
-    console.log($('#folio_proy').attr('name'))
     if ($('#folio_proy').attr('name') !== 0) {
         $.ajax({
             async: false,

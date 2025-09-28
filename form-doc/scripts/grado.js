@@ -1,6 +1,6 @@
 //Agregar grado académico
 //se construye el contenedor para edit grado
-function formGrado(contenedor) {
+function formGrado(contenedor,valorPorDefecto = null) {
     $(contenedor).append('<div class="row " id="grad_row"><div class="col-md-6 mb-3"><label class="form-label" for="grad_acad">Tipo Grado</label><select id="grad_acad" class="form-select grado"><option selected value="0">Seleccione tipo</option><option value="1">Pregrado</option><option value="2">Postgrado</option></select></div><div class="col-md-6 mb-3" id="grado_ac"><label class="form-label" for="">Grado Académico</label><select id="grado" class="form-select tit post" name="grado"><option value="0"></option></select></div></div>');
     $(contenedor).append('<div class="row" id="tit_row"><div class="col-md-6 mb-3" id="id_inst" name="0"><label class="form-label" for="grad_acad">Institución</label><select  class="form-select inst" id="inst_grado"></select></div><div class="col-md-6 mb-3" id="titulo" name="0"><label class="form-label" for="s_tit">Título Grado</label><select id="s_tit" class="form-select titulos"><option value="0"></option></select></div></div>');
     $(contenedor).append('<div class="row" ><div class="col-md-6 " id="institucion"></div><div class="col-md-6 " id="otro_titulo"></div></div>')
@@ -9,6 +9,17 @@ function formGrado(contenedor) {
     $.post('../ajax/institucion.php', {op:'read',tipo:'inst'}, function (response) {
         data = JSON.parse(response);
         templateSelect(data,'#inst_grado')
+        if (valorPorDefecto) {
+            $('#inst_grado').val(valorPorDefecto).trigger('change');
+            $('#inst_grado').attr('name', valorPorDefecto)
+            if($('lista_doc')=='true'){
+                btn_editar_acad('#campos_grado', $('#info_doc').attr('name'))
+                editAcadDoc()
+            }else{
+                btn_editar_acad('#campos_grado', $('#info_est').attr('name'))
+                editAcadEst() 
+    }
+        }
 })
 
     $('#mnsj_row_grad').hide();
@@ -164,11 +175,9 @@ function cargarGrado(usuario, id) {
 }
 $("body").on("click", ".editarGrado", function () {
     id_grado = $(this).attr("id");
+    console.log(id_grado)
     $('#edit_academicos').attr('name', id_grado)
-    $('#campos_grado').append('<h3 class="mb-5 text-center" id="text-tit">EDITAR GRADO ACADÉMICO</h3>')
-    formGrado('#campos_grado')
-    btn_editar_acad('#campos_grado', $('#info_doc').attr('name'))
-    editAcadDoc()
+    $('#campos_grado').append('<h3 class="mb-5 text-center" id="text-tit">EDITAR GRADO ACADÉMICO</h3>')    
     $.ajax({
         async: false,
         url: "../ajax/grado.php",
@@ -176,17 +185,21 @@ $("body").on("click", ".editarGrado", function () {
         data: { op: "read_grado_id", id_grado },
         success: function (response) {
             let grado = JSON.parse(response);
+            formGrado('#campos_grado',grado[0]['inst_grado'])
+            console.log(grado)
             tipo = grado[0]['tipo_grado']
             $('#grad_acad').val(tipo == 1 || tipo == 2 ? 1 : 2)
             $('#grad_acad').attr('name', tipo == 1 || tipo == 2 ? 1 : 2)
-            $('#inst_grado').val(grado[0]['inst_grado'])
-            $('#inst_grado').attr('name', grado[0]['inst_grado'])
             $('#fech_grado').val(grado[0]['fech_graduacion'])
             $('#fech_grado').attr('name', grado[0]['fech_graduacion'])
             $('#grado').html('<option selected value="0">Seleccione</option')
             tipo_tit = tipo == 1 ? 'lic' : tipo == 2 ? 'un' : tipo == 3 ? 'mag' : 'doc'
-            ajaxSelect('#s_tit', ruta + 'ajax/titulo.php', 'Seleccione', 'read', tipo_tit)
-            $('#s_tit').val(grado[0]['tit_grado'])
+            // ajaxSelect('#s_tit', ruta + 'ajax/titulo.php', 'Seleccione', 'read', tipo_tit)
+            $.post('../ajax/titulo.php', {op:'read',tipo:tipo_tit}, function (response) {
+                data = JSON.parse(response);
+                templateSelect(data,'#s_tit')
+                $('#s_tit').val(grado[0]['tit_grado'])
+            })
             $('#s_tit').attr('name', grado[0]['tit_grado'])
             if (tipo == 1 || tipo == 2) {
                 $('#grado').append('<option value="1">Licenciatura</option><option selected value="2">Título Universitario</option>')
@@ -214,7 +227,11 @@ $("body").on("click", ".eliminarGrado", function () {
         success: function (response) {
             let mensaje = JSON.parse(response);
             if ($("#tipo_usuario").attr('name') == 'prof') {
-                cargarFichaDoc($("#info_doc").attr('name'));
+                if($('lista_doc')=='true'){
+                rcargarFichaDoc($("#info_doc").attr('name'))
+            }else{
+                cargarFichaEst($("#info_doc").attr('name')) 
+            }
                 $("#mnsj_row_acad_doc").show();
                 $("#mnsj_acad_doc").addClass("alert-success");
                 $("#mnsj_acad_doc").html(mensaje);
@@ -355,14 +372,16 @@ $('#form_edit_grado').submit(function (e) {
     console.log(grado_arr)
     $.post('../ajax/grado.php', grado_arr, function (response) {
         let dato = JSON.parse(response);
-        console.log(dato);
         $('#mnsj_row_grad').show();
         $('#mnsj_grad').removeClass('alert-danger');
         $('#mnsj_grad').addClass('alert-success');
         $('#mnsj_grad').html(dato);
         setTimeout(function () {
-            reiniciarInfoDoc()
-            $('#campos_grado').html('')
+            if($('lista_doc')=='true'){
+                reiniciarInfoDoc()
+            }else{
+                reiniciarInfoEst()
+            }
             $("#mnsj_row_grad").fadeOut(1500);
         }, 3000);
     })

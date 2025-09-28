@@ -243,7 +243,6 @@ $("#buscar_doc").keyup(function () {
 //boton ver ficha academica
 $("body").on("click", ".verFicha", function () {
   id_usu = $(this).attr("id");
-  console.log('aca esta ek id usuario'+id_usu)
   fichaDoc();
   cargarFichaDoc(id_usu);
   //reinicio los campos para editar antecedentes academicos
@@ -275,6 +274,7 @@ $("body").on("click", ".eliminarDoc", function () {
 });
 function init() {
   listaDoc();
+  $('#lista_doc').attr('name','true')
   cargarDocentes($("#tipo_doc").val());
   $("#box-pass").hide();
   $("#mnsj_row_per").hide();

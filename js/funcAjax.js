@@ -19,8 +19,6 @@ function templateListas(listas,id) {
     });
     $(id).html(template);
 }
-
-
 function templateSelect(listas,id) {
 
       let template = "";

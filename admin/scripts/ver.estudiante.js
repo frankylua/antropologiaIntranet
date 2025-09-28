@@ -157,7 +157,6 @@ $('#cong_est').html('')
 $('#proy_est').html('')
 $('#pasant_est').html('')
 
-
 cargarGrado($("#info_est").attr("name"), "#grado_est");
 cargarPostdoc($("#info_est").attr("name"), "#postdoc_est");
 cargarPub($("#info_est").attr("name"), "#publi_est");
@@ -264,7 +263,11 @@ function cargarEst(tipo,busqueda){
                 `
                 $('#table_est').html(template)
                 $('#permisos').val(estado)
-                ajaxSelect(`tipo-estudiante${est['id_usuario']}`,'../ajax/estudiante.php', 'Seleccione', 'read_tipo')
+                // ajaxSelect(`tipo-estudiante${est['id_usuario']}`,'../ajax/estudiante.php', 'Seleccione', 'read_tipo')
+                $.post('../ajax/estudiante.php', {op:'read_tipo'}, function (response) {
+                      data = JSON.parse(response);
+                      templateSelect(data,`tipo-estudiante${est['id_usuario']}`)
+        })
             
         });
         }
@@ -284,8 +287,6 @@ $('body').on('click','.cambiarTipoEst',function(){
         
         
     })
-
-
 // cambiar lista de estudiantes con la opcion select
 
   $('body').on('click','.permiso',function(){
@@ -326,10 +327,6 @@ $("#buscar_est").keyup(function () {
     }
   });
 
-
-   
-
-
 function init(){
   listaEst()
     $.post('../ajax/estudiante.php', {op:'read_tipo'}, function (response) {
@@ -348,5 +345,6 @@ function init(){
     $("#mnsj_row_permisos_acad_est").hide();
     $("#mnsj_row_encabezado").hide();
     $('.loadPage').fadeOut();
+    $('#lista_est').attr('name','true')
 }
 init()

@@ -1,5 +1,5 @@
 // agregar postdoctorado
-function formPostdoc(contenedor) {
+function formPostdoc(contenedor,valorPorDefecto = null) {
     $(contenedor).append('<div class="row " id="postdoc_row"><div class="col-md-6 mb-3"><label class="form-label" for="prof_postdoc">Profesor/a Patrocinante</label><input class="form-control" type="text" id="prof_postdoc" maxlength="60"></div><div class="col-md-6 mb-3" id="id_instpostdoc" name="0"><label class="form-label" for="inst_postdoc">Institución</label><select id="inst_postdoc" class="form-select"></select></div></div>');
     $(contenedor).append('<div class="row "> <div class="col-md-6 mb-3"><label for="fech_in_postdoc" class="form-label">Fecha Inicio</label><input type="date" class="form-control" id="fech_in_postdoc" ></div><div class="col-md-6 mb-3"><label for="fech_ter_postdoc" class="form-label">Fecha Término</label><input type="date" class="form-control" id="fech_ter_postdoc" name="fecha_ter"> </div></div>');
     $(contenedor).append(' <div class="row justify-content-center " id="mnsj_row_postdoc"><div class="col-lg-8 alert  text-center alert-danger" role="alert" id="mnsj_postdoc"></div></div>')
@@ -7,6 +7,10 @@ function formPostdoc(contenedor) {
      $.post('../ajax/institucion.php', {op:'read'}, function (response) {
         data = JSON.parse(response);
         templateSelect(data,'#inst_postdoc')
+        $('#inst_postdoc').val(valorPorDefecto)
+        $('#inst_postdoc').attr('name', valorPorDefecto)
+        
+        
         })
 
 }
@@ -28,7 +32,6 @@ $(document).on('click', '#close_postdoc', function () {
     $('#ingresar_postdoc').remove();
     $('#boton_postdoc').show();
 });
-
 function cargarPostdoc(usuario, id) {
     op = 'read'
     $.ajax({
@@ -37,6 +40,7 @@ function cargarPostdoc(usuario, id) {
         url: '../ajax/postdoctorado.php',
         data: { op, usuario },
         success: function (response) {
+            console.log(response)
             let postdocs = JSON.parse(response);
             let template = '';
             let con = 1
@@ -94,9 +98,7 @@ $("body").on("click", ".editarPostdoc", function () {
     id_postdoc = $(this).attr("id");
     $('#edit_academicos').attr('name', id_postdoc)
     $('#campos_postdoc').append('<h3 class="mb-5 text-center" id="text-tit">EDITAR POSTDOCTORADO</h3>')
-    formPostdoc('#campos_postdoc')
-    btn_editar_acad('#campos_postdoc', $('#info_doc').attr('name'))
-    editAcadDoc()
+    
     $.ajax({
         async: false,
         url: "../ajax/postdoctorado.php",
@@ -104,10 +106,18 @@ $("body").on("click", ".editarPostdoc", function () {
         data: { op: "read_postdoc_id", id_postdoc },
         success: function (response) {
             let postdoc = JSON.parse(response);
+            console.log(postdoc)
+            formPostdoc('#campos_postdoc',postdoc[0]['id_inst'])
+            btn_editar_acad('#campos_postdoc', $('#info_doc').attr('name'))
+            if($('lista_doc')=='true'){
+                btn_editar_acad('#campos_post_doc', $('#info_doc').attr('name'))
+                editAcadDoc()
+            }else{
+                btn_editar_acad('#campos_post_doc', $('#info_est').attr('name'))
+                editAcadEst() 
+            }
             $('#prof_postdoc').val(cadenaMay(postdoc[0]['prof']))
-            $('#prof_postdoc').attr('name', cadenaMay(postdoc[0]['prof']))
-            $('#inst_postdoc').val(postdoc[0]['inst_postdoc'])
-            $('#inst_postdoc').attr('name', postdoc[0]['inst_postdoc'])
+            $('#prof_postdoc').attr('name',cadenaMay( postdoc[0]['prof']))
             $('#fech_in_postdoc').val(postdoc[0]['fecha_inicio'])
             $('#fech_in_postdoc').attr('name', postdoc[0]['fecha_inicio'])
             $('#fech_ter_postdoc').val(postdoc[0]['fecha_termino'])
@@ -123,7 +133,11 @@ $("body").on("click", ".eliminarPostdoc", function () {
         type: "POST",
         data: { id_postdoc, op: "delete" },
         success: function (response) {
-            cargarFichaDoc(usu);
+            if($('lista_doc')=='true'){
+                cargarFichaDoc(usu)
+            }else{
+                cargarFichaEst(usu) 
+            }
             let mensaje = JSON.parse(response);
             $("html, body").animate({ scrollTop: $('#ant_acad_doc').offset().top }, 100);
             $("#mnsj_row_acad_doc").show();
@@ -218,7 +232,11 @@ $('#form_edit_postdoc').submit(function (e) {
         $('#mnsj_postdoc').addClass('alert-success');
         $('#mnsj_postdoc').html(dato);
         setTimeout(function () {
-            reiniciarInfoDoc()
+            if($('lista_doc')=='true'){
+                reiniciarInfoDoc()
+            }else{
+                reiniciarInfoEst() 
+            }
             $('#campos_postdoc').html('')
             $("#mnsj_row_postdoc").fadeOut(1500);
         }, 3000);

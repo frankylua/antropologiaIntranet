@@ -252,7 +252,7 @@ function init(){
       $.post('../ajax/estudiante.php', {op:'_tipo'}, function (response) {
         data = JSON.parse(response);
         templateSelect(data,'#tipo_est')
-})
+        })
     //AntecAcad();
     $('.loadPage').fadeOut();
     infoPers();

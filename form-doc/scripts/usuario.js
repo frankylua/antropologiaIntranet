@@ -252,8 +252,6 @@ function limpiarCampos(){
     limpiarInput('#otro_pueb');
 }
 
-
-
 $('body').click(function(){
     $('#mnsj_row_grad').hide()
     $('#mnsj_row_pub').hide()

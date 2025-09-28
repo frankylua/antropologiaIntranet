@@ -292,7 +292,15 @@ function leerDatProgEst() {
     return datProg
 
 }
-
+  function editAcadEst() {
+    $("#lista_est").fadeOut();
+    $("#info_est").fadeOut();
+    $("#ficha_acad").fadeOut();
+    $("#acad_est").fadeOut();
+    $("#edit_pers_est").fadeOut();
+    $("#edit_acad_est").fadeIn();
+    // cargarGrado($('#id_usuario').attr('name'), '#grados_card')
+  }
 function reiniciarInfoEst() {
     $('#box-pass').show()
     $("html, body").animate({ scrollTop: 0 }, 100);
