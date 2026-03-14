@@ -27,6 +27,7 @@ function ajaxListas(id, url, op, tipo) {
      },
   });
 }
+<<<<<<< Updated upstream
 
 
 function ajaxSelect(id, url, titulo, op, tipo) {
@@ -37,6 +38,10 @@ function ajaxSelect(id, url, titulo, op, tipo) {
     data: { op, tipo },
     success: function (response) {
       let listas = JSON.parse(response);
+=======
+function templateSelect(listas,id) {
+
+>>>>>>> Stashed changes
       let template = "";
       template = `<option value="0">${titulo}</option>`;
       listas.forEach((p) => {

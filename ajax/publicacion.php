@@ -22,6 +22,7 @@ $desc_pub=isset($_POST['desc_pub'])?$_POST['desc_pub']:'';
 $busqueda=isset($_POST['busqueda'])?$_POST['busqueda']:'';
 $libro=isset($_POST['libro'])?$_POST['libro']:'';
 $id_pub=isset($_POST['id_pub'])?$_POST['id_pub']:0;
+// $tipo_otra_pub=isset($_POST['tipo_otra_pub'])?$_POST['tipo_otra_pub']:'';
 $pub= new Publicacion();
 $op=isset($_POST['op'])?$_POST['op']:'';
 switch($op){

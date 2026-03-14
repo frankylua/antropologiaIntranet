@@ -228,7 +228,11 @@
             </h2>
             <div id="collapseGrado" class="accordion-collapse collapse" data-bs-parent="#accordionEst">
               <div class="accordion-body">
+<<<<<<< Updated upstream
                 <div class="col-12" id="grado_est"></div>
+=======
+                <div class="col-12" id="grado_est" name="0"></div>
+>>>>>>> Stashed changes
               </div>
             </div>
           </div>

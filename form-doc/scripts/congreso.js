@@ -236,8 +236,7 @@ function cargarCong(usuario,id){
                     <table class="table table-striped" id="part${cong['id_congreso']}">
                     <thead>
                     <tr >
-                    <th class="col-md-4 titulo_acad"><H5>CONGRESO</H5></th>
-                    <th class="p-0"><button type="button" class="btn btn-link ps-1 link-secondary" id="${cong['id_congreso']}">Editar Congreso</button></th>
+                    <th class="col-md-4 titulo_acad"><H5>CONGRESO</H5><th class="row justify-content-end ps-0 botones"><button type="button" class="col-auto btn btn-link link-success ps-1 editarPub" id="${cong['id_congreso']}" name="">Editar</button><button type="button" class="col-auto btn btn-link link-danger ps-1 eliminarPub" id="${cong['id_congreso']}">Eliminar</button></th>
                     </tr>
                     </thead>
                     <tbody>
