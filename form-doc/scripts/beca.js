@@ -2,7 +2,7 @@
 $('#btn_beca').click(function(){
     $('#boton_beca').hide();
     $('#beca').append('<div class="card mb-3" id="ingresar_beca"><div class="card-body" id="card_beca"> </div></div>');
-    $('#card_beca').append('<div class="row justify-content-between"><div class="col-auto mb-3"><h4 class="card-title">Beca</h4></div><div class="col-auto"><button type="button"  id=""  class="btn btn-close btn-sm borrar_beca"></button></div></div>');
+    $('#card_beca').append('<div class="row justify-content-between"><div class="col-auto mb-3"><h4 class="card-title">Beca</h4></div><div class="col-auto"><button type="button"  id="eliminar_beca"  class="btn btn-close btn-sm borrar_beca"></button></div></div>');
     $('#card_beca').append('<div class="row" id="row_nombre"><div class="col-md-6 mb-3"><label for="tipo_beca" class="form-label">Tipo Beca</label><select class="form-select" id="tipo_beca"><option selected value="0">Seleccione</option><option value="1">Beca Interna</option><option value="2">Beca Externa</option></select></div><div class="col-md-6 mb-3" id="id_nom_beca" name="0"><label for="nom_beca" class="form-label">Nombre Beca</label><select class="form-select" id="nom_beca"><option value="0"></option></select></div></div>');
     $('#card_beca').append('<div class="row" id="row_inst"><div class="col-md-6 mb-3" id="id_inst_beca" name="0"><label for="inst" class="form-label">Institución</label><select class="form-select" id="inst_beca"></select></div><div class="col-md-6"></div></div>');
     $('#card_beca').append('<div class="row "> <div class="col-md-6 mb-3"><label for="fech_in_beca" class="form-label">Fecha Inicio</label><input type="date" class="form-control" id="fech_in_beca" ></div><div class="col-md-6 mb-3"><label for="fech_ter_beca" class="form-label">Fecha Término</label><input type="date" class="form-control" id="fech_ter_beca" name="fecha_ter"> </div></div>');
@@ -40,7 +40,6 @@ $('#btn_beca').click(function(){
    $('#ingresar_beca').remove();
    $('#boton_beca').show();
   });
-
   function cargarBeca(usuario,id){
     op='read'
     $.ajax({
@@ -97,7 +96,6 @@ $('#btn_beca').click(function(){
         }
     })
 }
-
 $('#form_beca').submit(function(e){
     e.preventDefault();
     $('#tipo_beca').click(function(){limpiarSelect('#tipo_beca');})
@@ -159,7 +157,7 @@ $('#form_beca').submit(function(e){
             nombre=$('#id_nom_beca').attr('name')
         }
         console.log(inst+'+++++'+nombre)
-        op='insert-update';
+        op='insert-beca';
         becas={inst,nombre,tipo,fecha_in,fecha_ter,usuario,op};
         console.log(becas)
         $.post('../ajax/beca.php',becas,function(response){

@@ -106,8 +106,8 @@ $("body").on("click", ".editarPostdoc", function () {
                 btn_editar_acad('#campos_post_doc', $('#info_doc').attr('name'))
                 editAcadDoc()
             }else{
-                btn_editar_acad('#campos_post_doc', $('#info_est').attr('name'))
-                editAcadEst() 
+                // btn_editar_acad('#campos_post_doc', $('#info_est').attr('name'))
+                // editAcadEst() 
             }
             $('#prof_postdoc').val(cadenaMay(postdoc[0]['prof']))
             $('#prof_postdoc').attr('name',cadenaMay( postdoc[0]['prof']))

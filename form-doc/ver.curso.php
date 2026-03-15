@@ -9,7 +9,7 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSIO
   require ('header.php');
   ?>
   <span class="loadPage">
-    <img src="../img/loadPage.gif" alt="" width="20%" height="20%">
+    <img src="../img/loadPage.gif" alt="" width="10%" height="10%">
   </span>
 
   <div class="container mt-5">

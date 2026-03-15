@@ -42,7 +42,7 @@ switch($op){
             if(($id_beca == 0) ){
                 $respuesta=$beca->insertarList($nombre,$tipo_int);
                 $respuesta ? $mensaje="Beca registrada" : $mensaje="Error: Beca no ha sido registrada";
-                echo json_encode($nombre, JSON_UNESCAPED_UNICODE);
+                echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
              }
             else{
                 $respuesta=$beca->editar($id_inst,$nombre);
