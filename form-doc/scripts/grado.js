@@ -191,7 +191,13 @@ function cargarGrado(usuario, id) {
     })
 }
 $("body").on("click", ".editarGrado", function () {
-    editAcadDoc()
+     $('#campos_grado').empty();
+    if($('#ficha_acad').attr('name')=='doc'){
+        editAcadDoc()
+    }else{
+        editAcadEst()
+    }
+
     id_grado = $(this).attr("id");
     console.log(id_grado)
     $('#edit_academicos').attr('name', id_grado)
@@ -244,7 +250,7 @@ $("body").on("click", ".editarGrado", function () {
             }
 
             //boton volver y editar
-            $('#campos_grado').append('<div class="row mt-5 justify-content-between "><div class="col-6 col-md-4 mb-3"><button type="button" class="col-12 btn btn-dark col-6" id="volverAcad">Cancelar</button></div><div class="col-6 col-md-4 mb-3 "><button type="submit" class="col-12 btn btn-dark col-6">Guardar</button></div></div>');
+            $('#campos_grado').append('<div class="row mt-5 justify-content-between "><div class="col-6 col-md-4 mb-3"><button type="button" class="col-12 btn btn-dark col-6" id="volverAcad">Cancelar</button></div><div class="col-6 col-md-4 mb-3 "><button type="submit" class="col-12 btn btn-dark col-6">Editar</button></div></div>');
         },
     });
 });
@@ -257,27 +263,26 @@ $("body").on("click", ".eliminarGrado", function () {
         data: { id_grado, op: "delete" },
         success: function (response) {
             let mensaje = JSON.parse(response);
-            if ($("#tipo_usuario").attr('name') == 'prof') {
-                if($('lista_doc')=='true'){
-                rcargarFichaDoc($("#info_doc").attr('name'))
-            }else{
-                cargarFichaEst($("#info_doc").attr('name'))
-            }
+            if ($('#ficha_acad').attr('name')=='doc') {
+                
                 $("#mnsj_row_acad_doc").show();
                 $("#mnsj_acad_doc").addClass("alert-success");
                 $("#mnsj_acad_doc").html(mensaje);
                 setTimeout(function () {
                     $("#mnsj_row_acad_doc").fadeOut(1500);
+                    cargarFichaDoc($("#info_doc").attr('name'))
                 }, 3000);
-            } else if ($("#tipo_usuario").attr('name') == 'est') {
-                cargarFichaEst($("#info_est").attr('name'))
-                $("#mnsj_row_elim_acad_est").show();
-                $("#mnsj_row_elim_acad_est").addClass("alert-success");
-                $("#mnsj_elim_acad_est").html(mensaje);
+            }else{
+                $("#mnsj_row_acad_est").show();
+                $("#mnsj_acad_est").addClass("alert-success");
+                $("#mnsj_acad_est").html(mensaje);
                 setTimeout(function () {
-                    $("#mnsj_row_elim_acad_est").fadeOut(1500);
+                    $("#mnsj_row_acad_est").fadeOut(1500);
                 }, 3000);
+                cargarFichaEst($("#info_est").attr('name'))
             }
+                
+            
         },
     });
 
@@ -408,11 +413,12 @@ $('#form_edit_grado').submit(function (e) {
         $('#mnsj_grad').addClass('alert-success');
         $('#mnsj_grad').html(dato);
         setTimeout(function () {
-            if($('lista_doc')=='true'){
+            if($('#ficha_acad').attr('name')=='doc'){
                 reiniciarInfoDoc()
             }else{
                 reiniciarInfoEst()
             }
+            
             $("#mnsj_row_grad").fadeOut(1500);
         }, 3000);
     })

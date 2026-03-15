@@ -1,4 +1,4 @@
-<div class="row" id="ficha_acad">
+<div class="row" id="ficha_acad" name="doc">
   <h3 class=" text-center ">FICHA ACADÉMICA</h3>
   <div class="col">
   </div>

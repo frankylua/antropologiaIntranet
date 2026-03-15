@@ -1,4 +1,5 @@
 // agregar postdoctorado
+var docente = $('#ficha_acad').attr('name')=='doc';
 function formPostdoc(contenedor,valorPorDefecto = null) {
     $(contenedor).append('<div class="row " id="postdoc_row"><div class="col-md-6 mb-3"><label class="form-label" for="prof_postdoc">Profesor/a Patrocinante</label><input class="form-control" type="text" id="prof_postdoc" maxlength="60"></div><div class="col-md-6 mb-3" id="id_instpostdoc" name="0"><label class="form-label" for="inst_postdoc">Institución</label><select id="inst_postdoc" class="form-select"></select></div></div>');
     $(contenedor).append('<div class="row "> <div class="col-md-6 mb-3"><label for="fech_in_postdoc" class="form-label">Fecha Inicio</label><input type="date" class="form-control" id="fech_in_postdoc" ></div><div class="col-md-6 mb-3"><label for="fech_ter_postdoc" class="form-label">Fecha Término</label><input type="date" class="form-control" id="fech_ter_postdoc" name="fecha_ter"> </div></div>');
@@ -88,6 +89,13 @@ function leerDatosPostdoc() {
     return { prof, inst, fech_in, fech_ter, usuario }
 }
 $("body").on("click", ".editarPostdoc", function () {
+    var docente = $('#ficha_acad').attr('name')=='doc';
+     $('#campos_postdoc').empty();
+    if(docente){
+        editAcadDoc()
+    }else{
+        editAcadEst()
+    }
     id_postdoc = $(this).attr("id");
     $('#edit_academicos').attr('name', id_postdoc)
     $('#campos_postdoc').append('<h3 class="mb-5 text-center" id="text-tit">EDITAR POSTDOCTORADO</h3>')
@@ -101,14 +109,18 @@ $("body").on("click", ".editarPostdoc", function () {
             let postdoc = JSON.parse(response);
             console.log(postdoc)
             formPostdoc('#campos_postdoc',postdoc[0]['id_inst'])
-            btn_editar_acad('#campos_postdoc', $('#info_doc').attr('name'))
-            if($('lista_doc')=='true'){
-                btn_editar_acad('#campos_post_doc', $('#info_doc').attr('name'))
+            $('#campos_postdoc').append('<div class="row mt-5 justify-content-between "><div class="col-6 col-md-4 mb-3"><button type="button" class="col-12 btn btn-dark col-6" id="volverAcad">Cancelar</button></div><div class="col-6 col-md-4 mb-3 "><button type="submit" class="col-12 btn btn-dark col-6">Editar</button></div></div>');
+
+            // btn_editar_acad('#campos_postdoc', $('#info_doc').attr('name'))
+            if(docente){
+                // btn_editar_acad('#campos_post_doc', $('#info_doc').attr('name'))
                 editAcadDoc()
             }else{
                 // btn_editar_acad('#campos_post_doc', $('#info_est').attr('name'))
-                // editAcadEst() 
+                editAcadEst() 
             }
+            
+            $('#inst_postdoc').val(postdoc[0]['id_inst'])
             $('#prof_postdoc').val(cadenaMay(postdoc[0]['prof']))
             $('#prof_postdoc').attr('name',cadenaMay( postdoc[0]['prof']))
             $('#fech_in_postdoc').val(postdoc[0]['fecha_inicio'])
@@ -126,19 +138,26 @@ $("body").on("click", ".eliminarPostdoc", function () {
         type: "POST",
         data: { id_postdoc, op: "delete" },
         success: function (response) {
-            if($('lista_doc')=='true'){
+            let mensaje = JSON.parse(response);
+            if($('#ficha_acad').attr('name')=='doc'){
                 cargarFichaDoc(usu)
+                $("html, body").animate({ scrollTop: $('#ant_acad_doc').offset().top }, 100);
+                $("#mnsj_row_acad_doc").show();
+                $("#mnsj_acad_doc").addClass("alert-success");
+                $("#mnsj_acad_doc").html(mensaje);
+                setTimeout(function () {
+                    $("#mnsj_row_acad_doc").fadeOut(1500);
+                }, 3000);
             }else{
                 cargarFichaEst(usu) 
+                $("html, body").animate({ scrollTop: $('#ant_acad_est').offset().top }, 100);
+                $("#mnsj_row_acad_est").show();
+                $("#mnsj_acad_est").addClass("alert-success");
+                $("#mnsj_acad_est").html(mensaje);
+                setTimeout(function () {
+                    $("#mnsj_row_acad_est").fadeOut(1500);
+                }, 3000);
             }
-            let mensaje = JSON.parse(response);
-            $("html, body").animate({ scrollTop: $('#ant_acad_doc').offset().top }, 100);
-            $("#mnsj_row_acad_doc").show();
-            $("#mnsj_acad_doc").addClass("alert-success");
-            $("#mnsj_acad_doc").html(mensaje);
-            setTimeout(function () {
-                $("#mnsj_row_acad_doc").fadeOut(1500);
-            }, 3000);
         },
     });
 
@@ -150,6 +169,7 @@ $('#form_postdoc').submit(function (e) {
     $('#fech_in_postdoc').click(function () { limpiarSelect('#fech_in_postdoc'); })
     $('#fech_ter_postdoc').click(function () { limpiarSelect('#fech_ter_postdoc'); })
     lista = leerDatosPostdoc()
+    console.log(lista)
     if (lista['prof'] == '' || lista['fech_in'] == '' || lista['inst'] == '0' || lista['fech_ter'] == '0') {
         validCampoVacio('#prof_postdoc');
         validSelect('#inst_postdoc');
@@ -195,6 +215,7 @@ $('#form_postdoc').submit(function (e) {
 $('#form_edit_postdoc').submit(function (e) {
     e.preventDefault();
     let datos_postdoc = leerDatosPostdoc()
+    console.log(datos_postdoc)
     //validar campos vacios (retorna valor base de datos)
     datos_postdoc['inst'] = $('#inst_postdoc').val() == 0 ? $('#inst_postdoc').attr('name') : datos_postdoc['inst'];
     datos_postdoc['prof'] = $('#prof_postdoc').val() == '' ? $('#prof_postdoc').attr('name') : datos_postdoc['prof'];
@@ -220,12 +241,13 @@ $('#form_edit_postdoc').submit(function (e) {
     console.log(datos_postdoc)
     $.post('../ajax/postdoctorado.php', datos_postdoc, function (response) {
         let dato = JSON.parse(response);
+        console.log(response)
         $('#mnsj_row_postdoc').show();
         $('#mnsj_postdoc').removeClass('alert-danger');
         $('#mnsj_postdoc').addClass('alert-success');
         $('#mnsj_postdoc').html(dato);
         setTimeout(function () {
-            if($('lista_doc')=='true'){
+            if($('#ficha_acad').attr('name')=='doc'){
                 reiniciarInfoDoc()
             }else{
                 reiniciarInfoEst() 

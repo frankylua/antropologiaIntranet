@@ -154,9 +154,12 @@
         url : '../ajax/publicacion.php',
         data : {op:'read_articulos',usuario},
         success : function(response) {
+        if( response && response.trim() !== ""){
+
+           
             let publis = JSON.parse(response);
             let template ='';
-      publis.forEach(pub => {
+         publis.forEach(pub => {
         tipo=pub['tipo']==1?'Artículo':'Edición de Revista Temática'
         fact_imp=pub['factor_impacto']==0?'No tiene factor de Impacto':pub['factor_impacto']
         template += `
@@ -222,7 +225,8 @@
     
  
     $(id).append(template);
-
+    
+        }
         }
     })    
     //cargar Libros
@@ -232,6 +236,7 @@
         url : '../ajax/publicacion.php',
         data : {op:'read_libros',usuario},
         success : function(response) {
+            if( response && response.trim() !== ""){
             let libros = JSON.parse(response);
             let template ='';
       libros.forEach(libro => {
@@ -301,6 +306,7 @@
             url : '../ajax/publicacion.php',
             data : {op:'read_edit_libro',libro:libro['id_libro']},
             success : function(response) {
+                if( response && response.trim() !== ""){
                 let editoriales = JSON.parse(response);
                 let cadenaEditorial=''
                 let coma=''
@@ -314,12 +320,14 @@
                     </tr>`
 
             }
+        }
 
             })
         template+=` </tbody>
                 </table>    
             </div>
         </div>`
+
     });
     
     
@@ -327,6 +335,7 @@
     $(id).append(template);
 
         }
+    }
     })
     //cargar otra publicacion
     $.ajax({
@@ -335,6 +344,7 @@
         url : '../ajax/publicacion.php',
         data : {op:'read_otro_art',usuario},
         success : function(response) {
+            if( response && response.trim() !== ""){
             let publis = JSON.parse(response);
             let template ='';
       publis.forEach(pub => {
@@ -368,7 +378,7 @@
     
     $(id).append(template);
     
- 
+}
 
         }
     })

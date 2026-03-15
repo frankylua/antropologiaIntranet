@@ -266,7 +266,14 @@ function cargarEst(tipo,busqueda){
                 // ajaxSelect(`tipo-estudiante${est['id_usuario']}`,'../ajax/estudiante.php', 'Seleccione', 'read_tipo')
                 $.post('../ajax/estudiante.php', {op:'read_tipo'}, function (response) {
                       data = JSON.parse(response);
-                      templateSelect(data,`tipo-estudiante${est['id_usuario']}`)
+                      // templateSelect(data,`tipo-estudiante${est['id_usuario']}`)
+                      let est = $('#tipo_est');
+                      est.empty();
+                      data.forEach(function(item){
+                          est.append(
+                              `<option value="${item.id_tipo}">${item.tipo}</option>`
+                          );
+                      });
         })
             
         });
