@@ -47,7 +47,18 @@ Class Congreso {
     //     return ejecutarConsulta($sql);
     // }
     public function mostrar($usuario){
-         $sql="SELECT * FROM congreso c INNER JOIN participacion p ON c.id_congreso=p.congreso  WHERE  p.id_aut='$usuario' OR p.id_coaut='$usuario' order by c.nombre";
+         $sql="SELECT *
+         FROM congreso c 
+         INNER JOIN participacion p ON c.id_congreso=p.congreso  
+         WHERE  p.id_aut='$usuario' OR p.id_coaut='$usuario' order by c.nombre";
+         return ejecutarConsultaResultados($sql);
+    }
+    public function mostrarById($id_congreso,$usuario){
+         $sql="SELECT c.id_congreso,c.nombre,c.ciudad,c.fecha_inicio,c.fecha_termino,p.id_participacion,p.tipo_part
+         ,p.tipo_cong,p.otros_org,p.nombre_mesa,p.coment_ponenc,p.nom_aut,p.id_aut,p.id_coaut,p.congreso
+         FROM congreso c 
+         INNER JOIN participacion p ON c.id_congreso=p.congreso 
+         WHERE  p.id_aut='$usuario' OR p.id_coaut='$usuario' AND id_congreso = $id_congreso order by c.nombre";
          return ejecutarConsultaResultados($sql);
     }
     public function mostrarAutor($usuario){

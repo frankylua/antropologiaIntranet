@@ -65,6 +65,10 @@ switch($op){
         $respuesta=$cong->mostrar($usuario);
          echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
          break;
+    case 'read-id':
+    $respuesta=$cong->mostrarById($id_cong,$usuario);
+    echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
+    break;
     case 'read-usu':
     $respuesta=$cong->mostrarAutor($usu);
         echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);

@@ -109,7 +109,6 @@ function llenarFormProgEst(id_usu) {
             let usu = JSON.parse(response);
             console.log(usu)
             $.ajax({
-                async: false,
                 url: "../ajax/estudiante.php",
                 type: "POST",
                 data: { op: "read_nom_prof", id_usu_prof: usu[0]['prof_guia'] },

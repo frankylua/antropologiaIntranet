@@ -214,7 +214,6 @@ $("body").on("click", ".editarGrado", function () {
             //carga gradoacademico
             tipo = grado[0]['tipo_grado']
             $('#grad_acad').val(tipo == 1 || tipo == 2 ? 1 : 2)
-
             $('#grad_acad').attr('name', tipo == 1 || tipo == 2 ? 1 : 2)
             $('#fech_grado').val(grado[0]['fech_graduacion'])
             $('#fech_grado').attr('name', grado[0]['fech_graduacion'])

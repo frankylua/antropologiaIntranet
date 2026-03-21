@@ -1,14 +1,14 @@
 //Agregar Congreso
-$('#btn_congreso').click(function(){
-    $('#boton_congreso').hide();
-    $('#congreso').append('<div class="card mb-3" id="ingresar_congreso"><div class="card-body" id="cong_card"> </div></div>');
-    $('#cong_card').append('<div class="row justify-content-between"><div class="col-auto mb-3""><h4>Congreso</h4></div><div class="col-auto"><button type="button" name="add" id="" class="btn btn-close btn-sm borrar_congreso"></button></div></div>');   
-    $('#cong_card').append('<div class="row "> <div class="col-md-6 mb-3"><label for="nom_cong" class="form-label">Nombre</label><input type="text" class="form-control" id="nom_cong" name="0" autocomplete="off" ><ul class="list-group" id="list_cong"></ul></div><div class="col-md-6 mb-3"><label for="ciudad_cong" class="form-label">Ciudad</label><input type="text" class="form-control" id="ciudad_cong" maxlength="45"></div></div>');
-    $('#cong_card').append('<div class="row "> <div class="col-md-6 mb-3"><label for="fech_in_cong" class="form-label">Fecha Inicio</label><input type="date" class="form-control" id="fech_in_cong" name="fecha_inicio" maxlength="60"><div class="row" id="val_fech_in_cong"></div></div><div class="col-md-6 mb-3"><label for="fech_ter_cong" class="form-label">Fecha Término</label><input type="date" class="form-control" id="fech_ter_cong" name="fecha_ter"> </div></div>');
-    $('#cong_card').append('<div class="row mt-2 "><div class="col-12 my-3 "><select id="cong" name="cong" class="form-select cong"><option selected value="0">Participación</option><option value="1">Coordinación</option><option value="2">Expositor/a</option><option value="3">Presentación Póster</option></select></div>');
-    $('#cong_card').append('<div class="col" id="id_cong"></div>')
-    $('#cong_card').append(' <div class="row justify-content-center " id="mnsj_row_cong"><div class="col-lg-8 alert  text-center alert-danger" role="alert" id="mnsj_cong"></div></div>')
-    $('#cong_card').append('<div class="row justify-content-center" id="guardar_cong" ><div class="col-md-6 mt-3 d-grid gap-2"><button type="submit" class="btn btn-dark">Guardar Congreso</button></div></div>');
+var isEdit = false,idCong=0;
+function formCongreso(contenedor){
+    
+  
+    $(contenedor).append('<div class="row "> <div class="col-md-6 mb-3"><label for="nom_cong" class="form-label">Nombre</label><input type="text" class="form-control" id="nom_cong" name="0" autocomplete="off" ><ul class="list-group" id="list_cong"></ul></div><div class="col-md-6 mb-3"><label for="ciudad_cong" class="form-label">Ciudad</label><input type="text" class="form-control" id="ciudad_cong" maxlength="45"></div></div>');
+    $(contenedor).append('<div class="row "> <div class="col-md-6 mb-3"><label for="fech_in_cong" class="form-label">Fecha Inicio</label><input type="date" class="form-control" id="fech_in_cong" name="fecha_inicio" maxlength="60"><div class="row" id="val_fech_in_cong"></div></div><div class="col-md-6 mb-3"><label for="fech_ter_cong" class="form-label">Fecha Término</label><input type="date" class="form-control" id="fech_ter_cong" name="fecha_ter"> </div></div>');
+    $(contenedor).append('<div class="row mt-2 "><div class="col-12 my-3 "><select id="cong" name="cong" class="form-select cong"><option selected value="0">Participación</option><option value="1">Coordinación</option><option value="2">Expositor/a</option><option value="3">Presentación Póster</option></select></div>');
+    $(contenedor).append('<div class="col" id="id_cong"></div>')
+    $(contenedor).append(' <div class="row justify-content-center " id="mnsj_row_cong"><div class="col-lg-8 alert  text-center alert-danger" role="alert" id="mnsj_cong"></div></div>')
+    
     $('#guardar_cong').hide();
     $('#mnsj_row_cong').hide();
     anios('#anio_cong',1960)
@@ -36,9 +36,8 @@ $('#btn_congreso').click(function(){
     
       }    
     })
-    
-})
-$(document).on('change','.cong',function(){
+}
+function formParticipacion(){
     $('#part').remove();
       if($('#cong').val() == '1'){
         campo1='Nombre Mesa/Simposio';
@@ -103,8 +102,69 @@ $(document).on('change','.cong',function(){
       
         }    
       })
+}
+function cargarParticipante(id){
+    var usuario = $('#id_usuario').attr('name');
+    limpiarCamposPart()
+  $.ajax({
+            url: '../ajax/congreso.php',
+            type: 'POST',
+            data: {op:'carg_part',id},
+            success: function(response){
+            let part = JSON.parse(response);
+            console.log(part)
+            let template ='';
+            //$('#prof_guia').attr('name','');
+            if(part[0]['tipo_part']==1||part[0]['tipo_part']==2){
+                $('#coment_ponenc').val(cadenaMay(part[0]['coment_ponenc']));
+            }
+            $('#tipo_cong').val(part[0]['tipo_cong']);
+            $('#coautores').val(part[0]['otros_org']==null?'':mostrarAutores(part[0]['otros_org']));
+            if(isEdit){
+                $('#nom_mesa').val(part[0]['nombre_mesa'])
+                if(part[0]['id_aut'] == usuario){
+                    $('#rol_cong').val(2) 
+                }
+            if($('#rol_cong').val(2)){
+                $('#aut').val(cong[0]['nom_aut']==null?"":$('#aut').val(cadenaMay(cong[0]['nom_aut'])))
+            }
+            }else{
+                $('#tipo_cong').prop('disabled',true);
+                $('#coautores').prop('disabled',true);
+                $('#coment_ponenc').prop('disabled',true);
+                part.forEach(p => {
+                    if(p['id_aut']==null){
+                        $('#rol_cong').val(1);
+                        $('#rol_cong').prop('disabled',true);
+                        $('#rol_cong').attr('name',p['id_participacion']);
+                    }else{
+                        $('#rol_cong').val(2);
+                        $('#rol_cong').prop('disabled',true);
+                        $('#rol_cong').attr('name',p['id_participacion']);
+                    }
     
-    });
+                })
+
+            }
+        }
+    })
+}
+
+$('#btn_congreso').click(function(){
+    isEdit = false;
+    $('#boton_congreso').hide();
+    $('#congreso').append('<div class="card mb-3" id="ingresar_congreso"><div class="card-body" id="cong_card"> </div></div>');
+    $('#cong_card').append('<div class="row justify-content-between"><div class="col-auto mb-3""><h4>Congreso</h4></div><div class="col-auto"><button type="button" name="add" id="" class="btn btn-close btn-sm borrar_congreso"></button></div></div>'); 
+    formCongreso('#cong_card') ;
+    $('#cong_card').append('<div class="row justify-content-center" id="guardar_cong" ><div class="col-md-6 mt-3 d-grid gap-2"><button type="submit" class="btn btn-dark">Guardar Congreso</button></div></div>');  
+})
+$(document).on('change','.cong',function(){
+   formParticipacion()  
+   if(isEdit){
+    cargarParticipante(idCong);
+    console.log(idCong)
+   }  
+});
     //agregar campo organizador mesa
 $(document).on('change','.coord',function(){
     $('#aut').remove();
@@ -118,6 +178,60 @@ $(document).on('click', '.borrar_congreso', function(){
     
     $('#boton_congreso').show();
 });
+
+$("body").on("click", ".editarCong", function () {
+    isEdit = true;
+     $('#campos_congreso').empty();
+    if($('#ficha_acad').attr('name')=='doc'){
+        editAcadDoc()
+    }else{
+        editAcadEst()
+    }
+
+    id_cong = $(this).attr("id");
+    
+    $('#edit_academicos').attr('name', id_cong)
+    $('#campos_congreso').append('<h3 class="mb-5 text-center" id="text-tit">EDITAR CONGRESO</h3>')
+    var usuario = $('#id_usuario').attr('name');
+    $.ajax({
+        async: false,
+        url: "../ajax/congreso.php",
+        type: "POST",
+        data: { op: "read-id", id_cong,usuario },
+        success: function (response) {
+            
+            let cong = JSON.parse(response);
+            console.log(cong)
+            console.log(cong)
+            formCongreso('#campos_congreso')
+            //cargar congreso
+            idCong = cong[0]['id_participacion']
+            $('#nom_cong').val(cong[0]['nombre'])
+            $('#ciudad_cong').val(cong[0]['ciudad'])
+            $('#cong').val( cong[0]['tipo_part'])
+            $('#fech_in_cong').val(cong[0]['fecha_inicio'])
+            $('#fech_ter_cong').val( cong[0]['fecha_termino'])
+            $('#rol_cong').val( cong[0]['tipo_cong'])
+            formParticipacion()
+            $('#nom_mesa').val( cong[0]['nombre_mesa'])
+            $('#coment_ponenc').val( cong[0]['coment_ponenc'])
+            $('#tipo_cong').val( cong[0]['tipo_cong'])
+            if(cong[0]['id_aut'] == usuario){
+                $('#rol_cong').val(1) 
+            }
+            if($('#rol_cong').val(2)){
+                $('#aut').val(cong[0]['nom_aut'])
+            }
+            $('#coautores').val( cong[0]['otro'])
+            
+            
+            
+
+            //boton volver y editar
+            $('#campos_congreso').append('<div class="row mt-5 justify-content-between "><div class="col-6 col-md-4 mb-3"><button type="button" class="col-12 btn btn-dark col-6" id="volverAcad">Cancelar</button></div><div class="col-6 col-md-4 mb-3 "><button type="submit" class="col-12 btn btn-dark col-6">Editar</button></div></div>');
+        },
+    });
+});
 function cargarCong(usuario,id){
     op='read'
     $.ajax({
@@ -126,7 +240,9 @@ function cargarCong(usuario,id){
         url : '../ajax/congreso.php',
         data : {op,usuario},
         success : function(response) {
+            
             let congrs = JSON.parse(response);
+            console.log(congrs)
             let tabla_cong ='';
             let tabla_part ='';
             let id_cong
@@ -236,7 +352,7 @@ function cargarCong(usuario,id){
                     <table class="table table-striped" id="part${cong['id_congreso']}">
                     <thead>
                     <tr >
-                    <th class="col-md-4 titulo_acad"><H5>CONGRESO</H5><th class="row justify-content-end ps-0 botones"><button type="button" class="col-auto btn btn-link link-success ps-1 editarPub" id="${cong['id_congreso']}" name="">Editar</button><button type="button" class="col-auto btn btn-link link-danger ps-1 eliminarPub" id="${cong['id_congreso']}">Eliminar</button></th>
+                    <th class="col-md-4 titulo_acad"><H5>CONGRESO</H5><th class="row justify-content-end ps-0 botones"><button type="button" class="col-auto btn btn-link link-success ps-1 editarCong" id="${cong['id_congreso']}" name="">Editar</button><button type="button" class="col-auto btn btn-link link-danger ps-1 eliminarPub" id="${cong['id_congreso']}">Eliminar</button></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -278,6 +394,14 @@ function limpiarCamposCong(){
         limpiarInput('#fech_in_cong');
         limpiarInput('#fech_ter_cong');
 }
+function limpiarCamposPart(){
+        $("#nom_mesa").val("");
+        $("#coment_ponec").val("");
+        $("#tipo_cong").val(0);
+        $("#rol_cong").val(0);
+        $("#aut").val("");
+        $("#coautores").val("");
+}
 $('body').on('click','.listCong',function(){
     id=$(this).attr('id');
     nom_cong=$(this).attr('name');
@@ -317,36 +441,7 @@ $('body').on('click','.listPart',function(){
     $('#list_part').hide();
     console.log($('#nom_mesa').attr('name'))
     if($('#nom_mesa').attr('name')!==0){
-        $.ajax({
-            url: '../ajax/congreso.php',
-            type: 'POST',
-            data: {op:'carg_part',id},
-            success: function(response){
-            let part = JSON.parse(response);
-            let template ='';
-            //$('#prof_guia').attr('name','');
-            if(part[0]['tipo_part']==1||part[0]['tipo_part']==2){
-                $('#coment_ponenc').val(cadenaMay(part[0]['coment_ponenc']));
-            }
-            $('#coment_ponenc').prop('disabled',true);
-            $('#tipo_cong').val(part[0]['tipo_cong']);
-            $('#tipo_cong').prop('disabled',true);
-            $('#coautores').val(part[0]['otros_org']==null?'':mostrarAutores(part[0]['otros_org']));
-            $('#coautores').prop('disabled',true);
-            part.forEach(p => {
-                if(p['id_aut']==null){
-                    $('#rol_cong').val(1);
-                    $('#rol_cong').prop('disabled',true);
-                    $('#rol_cong').attr('name',p['id_participacion']);
-                }else{
-                    $('#rol_cong').val(2);
-                    $('#rol_cong').prop('disabled',true);
-                    $('#rol_cong').attr('name',p['id_participacion']);
-                }
-
-            })
-        }
-    })
+       cargarParticipante(id)
 }
 
 })    

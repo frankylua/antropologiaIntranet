@@ -551,7 +551,7 @@ $("body").on("click", ".eliminarPub", function () {
     $.ajax({
         url: "../ajax/publicacion.php",
         type: "POST",
-        data: { id_postdoc, op: "delete" },
+        data: { id_pub, op: "delete" },
         success: function (response) {
             if($('lista_doc')=='true'){
                 cargarFichaDoc(usu)
