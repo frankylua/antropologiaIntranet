@@ -34,6 +34,14 @@ Class Congreso {
         return ejecutarConsultaResultados($sql);        
     }
     //update
+    public function editarCong($id_congreso,$nombre,$ciudad,$fech_in,$fech_ter){
+        $sql="UPDATE congreso SET nombre='$nombre', ciudad='$ciudad', fecha_inicio='$fech_in', fecha_termino='$fech_ter' WHERE id_congreso='$id_congreso' ";
+        return ejecutarConsulta($sql);
+    }
+    public function editarPart($id_part,$id_cong,$tipo_part,$tipo_cong,$coautores,$nom_mesa,$comen_pon,$autor,$id_autor,$id_coautor){
+        $sql="UPDATE participacion SET tipo_part='$tipo_part', tipo_cong='$tipo_cong', otros_org='$coautores', nombre_mesa='$nom_mesa', coment_ponenc='$comen_pon', nom_aut='$autor', id_aut='$id_autor', id_coaut='$id_coautor', congreso='$id_cong' WHERE id_participacion='$id_part' ";
+        return ejecutarConsulta($sql);
+    }
     public function editarAutor($id_autor,$part){
         $sql="UPDATE participacion SET nom_aut=NULL, id_aut='$id_autor' WHERE id_participacion='$part' ";
         return ejecutarConsulta($sql);

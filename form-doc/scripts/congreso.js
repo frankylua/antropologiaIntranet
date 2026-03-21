@@ -64,7 +64,7 @@ function formParticipacion(){
         $('#guardar_cong').hide();
       }else{
         $('#guardar_cong').show();
-        $('#id_cong').append('<div class="row justify-content-between" id="part"><div class="col" id="coord_col"></div></div>');    
+        $('#id_cong').append('<div class="row justify-content-between" id="part" name="0"><div class="col" id="coord_col"></div></div>');    
         $('#coord_col').append('<div class="row"><div class="col-md-6 mb-3"><label for="nom_mesa" class="form-label" >'+campo1+'</label><input type="text" class="form-control" id="nom_mesa" name="0" autocomplete="off" maxlength="45"><ul class="list-group" id="list_part"></ul></div><div class="col-md-6 mb-3" id="segundo_campo"><label for="coment_ponenc" class="form-label">'+campo2+'</label><input type="text" class="form-control" id="coment_ponenc" name="comentarista" maxlength="80"></div></div>');
         $('#coord_col').append('<div class="row" id="rol_c"><div class="col-md-6 "><label class="form-label" for="tipo_cong">Tipo</label><select class="form-select" id="tipo_cong"><option selected value="0">Seleccione</option><option value="1">Mesa</option><option value="2">Simposio</option></select></div><div class="col-md-6 mb-3 "><label for="rol_cong" class="form-label">Rol</label><select id="rol_cong" class="form-select coord"><option selected value="0">Rol</option><option value="1">'+rol1+'</option><option value="2">'+rol2+'</option></select></div></div>');
         $('#coord_col').append('<div class="row"><div class="col mb-3"><div class="card"><div class="card-body"><div class="row justify-content-between"><div class="col-auto mb-3"> <h6 class="card-title fs-5">'+coaut+'</h6></div></div> <div class="row"><div class="col-md-12 mb-3"><label for="coautores" class="form-label">(Ingresar nombres separados por una coma)</label><textarea class="form-control" id="coautores" rows="3" maxlength="300"></textarea></div> </div> </div> </div></div></div>');
@@ -206,6 +206,7 @@ $("body").on("click", ".editarCong", function () {
             formCongreso('#campos_congreso')
             //cargar congreso
             idCong = cong[0]['id_participacion']
+            $('#part').attr('name',cong[0]['id_participacion'])
             $('#nom_cong').val(cong[0]['nombre'])
             $('#ciudad_cong').val(cong[0]['ciudad'])
             $('#cong').val( cong[0]['tipo_part'])
@@ -457,6 +458,7 @@ $('#form_congreso').submit(function(e){
     $('#autor').click(function(){limpiarInput('#autor');})
     $('#nom_mesa').click(function(){limpiarInput('#nom_mesa');})
     $('#coment_ponenc').click(function(){limpiarInput('#coment_ponenc');})
+    let id_cong = $('#edit_academicos').attr('name')
     let nombre=guardar($('#nom_cong').val());
     let ciudad=guardar($('#ciudad_cong').val());
     let fech_in=$('#fech_in_cong').val();
@@ -500,7 +502,8 @@ $('#form_congreso').submit(function(e){
     if(validarCong()){
     if($('#nom_cong').attr('name')==0){
             op='insert-update';
-            congreso={nombre,ciudad,fech_in,fech_ter,tipo_part,rol,tipo_cong,nom_autor,coautor,nom_mesa,comen_pon,autor,coautores,op};
+            cong=$('#nom_cong').attr('name');
+            congreso={cong,nombre,ciudad,fech_in,fech_ter,tipo_part,rol,tipo_cong,nom_autor,coautor,nom_mesa,comen_pon,autor,coautores,op};
             console.log(congreso)     
             $.post('../ajax/congreso.php',congreso,function(response){
                 let dato = JSON.parse(response);
@@ -518,7 +521,7 @@ $('#form_congreso').submit(function(e){
             })
         }else{
             if($('#nom_mesa').attr('name')==0){
-                cong=$('#nom_cong').attr('name');
+                
                 op='insert-part';
                 congreso={tipo_part,rol,tipo_cong,nom_autor,coautor,nom_mesa,comen_pon,autor,coautores,op,cong};
                 $.post('../ajax/congreso.php',congreso,function(response){
@@ -547,6 +550,130 @@ $('#form_congreso').submit(function(e){
                         $('#ingresar_congreso').remove();
                         $('#boton_congreso').show();
                         cargarCong($('#id_usuario').attr('name'),'#congreso_card')
+                        $("#mnsj_row_cong").fadeOut(1500);
+                    },3000);
+                })
+                
+                
+
+            }
+
+        }
+    }
+}) 
+$('#form_edit_congreso').submit(function(e){
+    e.preventDefault();
+    cong=$('#edit_academicos').attr('name');
+    part=$('#part').attr('name');
+    $('#nom_cong').click(function(){limpiarInput('#nom_cong');})
+    $('#ciudad_cong').click(function(){limpiarInput('#ciudad_cong');})
+    $('#fech_in_cong').click(function(){limpiarInput('#fech_in_cong');})
+    $('#fech_ter_cong').click(function(){limpiarInput('#fech_ter_cong');})
+    $('#rol_cong').click(function(){limpiarSelect('#rol_cong');})
+    $('#tipo_cong').click(function(){limpiarSelect('#tipo_cong');})
+    $('#autor').click(function(){limpiarInput('#autor');})
+    $('#nom_mesa').click(function(){limpiarInput('#nom_mesa');})
+    $('#coment_ponenc').click(function(){limpiarInput('#coment_ponenc');})
+    let nombre=guardar($('#nom_cong').val());
+    let ciudad=guardar($('#ciudad_cong').val());
+    let fech_in=$('#fech_in_cong').val();
+    let fech_ter=$('#fech_ter_cong').val();
+    let tipo_part=$('#cong').val();
+    let rol=$('#rol_cong').val();
+    let autor=rol==1?$('#id_usuario').attr('name'):'';
+    let coautor=rol==2?$('#id_usuario').attr('name'):'';
+    let tipo_cong=$('#tipo_cong').val();
+    let nom_autor=document.getElementById("autor")==null?'':guardar($('#autor').val());
+    let coautores=guardarAutores($('#coautores').val());
+    let nom_mesa=guardar($('#nom_mesa').val());
+    let comen_pon=tipo_part==3?'':guardar($('#coment_ponenc').val());
+    
+    
+    //agragar nuevo congreso y participacion(si no existe congreso)
+    function validarCong(){
+        
+        if(nombre=='' || ciudad==''|| fech_in=='' || fech_ter==''||rol=='0'||$('#autor').val()==''||$('#coment_ponenc').val()==''||nom_mesa==''||tipo_cong=='0'){
+            console.log('entra al if');
+            validCampoVacio('#nom_cong');
+            validCampoVacio('#ciudad_cong');
+            validCampoVacio('#fech_in_cong');
+            validCampoVacio('#fech_ter_cong');
+            validCampoVacio('#autor');
+            validCampoVacio('#nom_mesa');
+            validCampoVacio('#coment_ponenc');
+            validSelect('#rol_cong');
+            validSelect('#anio_cong');
+            validSelect('#tipo_cong');
+            $('#mnsj_row_cong').show();
+            $('#mnsj_cong').html('Rellene todos los campos requeridos')
+            if($('#nom_cong').attr('name')!=0){
+            limpiarCamposCong();
+            }
+            return false;
+        }else{
+            return true;
+        }
+    }
+    if(validarCong()){
+        console.log($('#nom_cong').attr('name'))
+    if($('#nom_cong').attr('name')==0){
+            op='insert-update';
+            
+            congreso={cong,part,nombre,ciudad,fech_in,fech_ter,tipo_part,rol,tipo_cong,nom_autor,coautor,nom_mesa,comen_pon,autor,coautores,op};
+            console.log(congreso)     
+            $.post('../ajax/congreso.php',congreso,function(response){
+                console.log(response)
+                let dato = JSON.parse(response);
+                console.log(dato);
+                    $('#mnsj_row_cong').show();
+                    $('#mnsj_cong').removeClass('alert-danger');
+                    $('#mnsj_cong').addClass('alert-success');
+                    $('#mnsj_cong').html(dato);
+                    setTimeout(function() {
+                       if($('#ficha_acad').attr('name')=='doc'){
+                            reiniciarInfoDoc()
+                        }else{
+                            reiniciarInfoEst()
+                        }
+                        
+                $("#mnsj_row_cong").fadeOut(1500);
+            },3000);
+            })
+        }else{
+            if($('#nom_mesa').attr('name')==0){
+                
+                op='insert-part';
+                congreso={tipo_part,rol,tipo_cong,nom_autor,coautor,nom_mesa,comen_pon,autor,coautores,op,cong};
+                $.post('../ajax/congreso.php',congreso,function(response){
+                    let dato = JSON.parse(response);
+                    $('#mnsj_row_cong').show();
+                    $('#mnsj_cong').removeClass('alert-danger');
+                    $('#mnsj_cong').addClass('alert-success');
+                    $('#mnsj_cong').html(dato);
+                    setTimeout(function() {
+                        if($('#ficha_acad').attr('name')=='doc'){
+                            reiniciarInfoDoc()
+                        }else{
+                            reiniciarInfoEst()
+                        }
+                                    $("#mnsj_row_cong").fadeOut(1500);
+                    },3000);
+                })
+            }else{
+                op='update-rol';
+                part=$('#rol_cong').attr('name');
+                $.post('../ajax/congreso.php',{autor,op,part,rol,coautor},function(response){
+                    let dato = JSON.parse(response);
+                    $('#mnsj_row_cong').show();
+                    $('#mnsj_cong').removeClass('alert-danger');
+                    $('#mnsj_cong').addClass('alert-success');
+                    $('#mnsj_cong').html(dato);
+                    setTimeout(function() {
+                        if($('#ficha_acad').attr('name')=='doc'){
+                            reiniciarInfoDoc()
+                        }else{
+                            reiniciarInfoEst()
+                        }
                         $("#mnsj_row_cong").fadeOut(1500);
                     },3000);
                 })

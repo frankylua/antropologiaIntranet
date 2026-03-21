@@ -19,6 +19,7 @@ $nom_mesa=isset($_POST['nom_mesa'])?$_POST['nom_mesa']:'';
 $comen_pon=isset($_POST['comen_pon'])?$_POST['comen_pon']:'';
 $busqueda=isset($_POST['busqueda'])?$_POST['busqueda']:'';
 $id_congreso=isset($_POST['cong'])?(int)$_POST['cong']:'';
+$id_part=isset($_POST['part'])?(int)$_POST['part']:'';
 $part=isset($_POST['part'])?(int)$_POST['part']:'';
 $id_cong=0;
 $id=isset($_POST['id'])?$_POST['id']:'';
@@ -43,17 +44,18 @@ switch($op){
         break;    
     //insertar publicaciones
     case 'insert-update':
-        if(($id_cong == 0) ){        
+        if(($id_congreso == 0) ){        
             $congreso=$cong->insertarCong($nombre,$ciudad,$fech_in,$fech_ter);
             $respuesta=$cong->insertarPart($tipo_part,$tipo_cong,$coautores,$nom_mesa,$comen_pon,$congreso,$autor,$id_autor,$id_coautor);
             $respuesta ? $mensaje="Congreso registrado" : $mensaje="Congreso no ha sido registrado";
             echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);           
         }
-        //else{
-        //     $respuesta=$institucion->editar($id_inst,$nombre);
-        //     $respuesta ? $mensaje="Pueblo Editado" : $mensaje="Pueblo no ha sido editado";
-        //      echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
-        // }
+        else{
+            $respuesta=$cong->editarCong($id_congreso,$nombre,$ciudad,$fech_in,$fech_ter);
+            $respuesta=$cong->editarPart($id_part,$id_congreso,$tipo_part,$tipo_cong,$coautores,$nom_mesa,$comen_pon,$autor,$id_autor,$id_coautor);
+            $respuesta ? $mensaje="Congreso Editado" : $mensaje="Congreso no ha sido editado";
+             echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
+        }
         break;
         case 'insert-part':
             $respuesta=$cong->insertarPart($tipo_part,$tipo_cong,$coautores,$nom_mesa,$comen_pon,$id_congreso,$autor,$id_autor,$id_coautor);            
