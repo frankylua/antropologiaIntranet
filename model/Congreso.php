@@ -33,6 +33,10 @@ Class Congreso {
         $sql="SELECT * FROM participacion  WHERE id_participacion='$id'";
         return ejecutarConsultaResultados($sql);        
     }
+    public function cargarPartCong($id,$nom_mesa){        
+        $sql="SELECT * FROM participacion p INNER JOIN congreso c ON p.congreso=c.id_congreso  WHERE c.id_congreso='$id' AND p.nombre_mesa='$nom_mesa'";
+        return ejecutarConsultaResultados($sql);        
+    }
     //update
     public function editarCong($id_congreso,$nombre,$ciudad,$fech_in,$fech_ter){
         $sql="UPDATE congreso SET nombre='$nombre', ciudad='$ciudad', fecha_inicio='$fech_in', fecha_termino='$fech_ter' WHERE id_congreso='$id_congreso' ";

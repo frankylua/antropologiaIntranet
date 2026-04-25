@@ -41,7 +41,11 @@ switch($op){
     case'carg_part':
         $resp=$cong->cargarPart($id);
         echo json_encode($resp, JSON_UNESCAPED_UNICODE);
-        break;    
+        break;
+    case'carg_part_cong':
+    $resp=$cong->cargarPartCong($id,$nom_mesa);
+    echo json_encode($resp, JSON_UNESCAPED_UNICODE);
+    break; 
     //insertar publicaciones
     case 'insert-update':
         if(($id_congreso == 0) ){        
@@ -52,7 +56,12 @@ switch($op){
         }
         else{
             $respuesta=$cong->editarCong($id_congreso,$nombre,$ciudad,$fech_in,$fech_ter);
-            $respuesta=$cong->editarPart($id_part,$id_congreso,$tipo_part,$tipo_cong,$coautores,$nom_mesa,$comen_pon,$autor,$id_autor,$id_coautor);
+            if($id_part == 0){
+               $respuesta=$cong->insertarPart($tipo_part,$tipo_cong,$coautores,$nom_mesa,$comen_pon,$congreso,$autor,$id_autor,$id_coautor);
+            }else{
+                $respuesta=$cong->editarPart($id_part,$id_congreso,$tipo_part,$tipo_cong,$coautores,$nom_mesa,$comen_pon,$autor,$id_autor,$id_coautor);
+
+            }
             $respuesta ? $mensaje="Congreso Editado" : $mensaje="Congreso no ha sido editado";
              echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
         }

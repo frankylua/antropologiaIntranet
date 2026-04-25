@@ -1,5 +1,5 @@
 //Agregar Congreso
-var isEdit = false,idCong=0;
+var isEdit = false,idCong=0,idPart=0,nomMesa;
 function formCongreso(contenedor){
     
   
@@ -103,32 +103,111 @@ function formParticipacion(){
         }    
       })
 }
-function cargarParticipante(id){
+function cargarParticipante(id,idPart,nom_mesa){ 
     var usuario = $('#id_usuario').attr('name');
+    console.log(nom_mesa)
+    console.log(idPart)
     limpiarCamposPart()
+if(isEdit){
   $.ajax({
             url: '../ajax/congreso.php',
             type: 'POST',
-            data: {op:'carg_part',id},
+            data: {op:'carg_part_cong',id,nom_mesa},
             success: function(response){
             let part = JSON.parse(response);
             console.log(part)
             let template ='';
             //$('#prof_guia').attr('name','');
-            if(part[0]['tipo_part']==1||part[0]['tipo_part']==2){
+            
+                part.forEach(p => {
+                    if($('#cong').val()==1 && p['tipo_part']==1){
+                        $('#nom_mesa').val(p['nombre_mesa'])
+                        $('#coment_ponenc').val(cadenaMay(p['coment_ponenc']));
+                        $('#tipo_cong').val(p['tipo_cong']);
+                        $('#coautores').val(p['otros_org']==null?'':mostrarAutores(p['otros_org']));
+                        if(p['id_aut'] == usuario){
+                        $('#rol_cong').val(1) 
+                        }
+                        if(p['id_coaut'] == usuario){
+                        $('#rol_cong').val(2) 
+                        }
+                        if($('#rol_cong').val(2)){
+                            $('#aut').val(p['nom_aut']==null?"":$('#aut').val(cadenaMay(p['nom_aut'])))
+                        }
+                        if(p['id_aut'] == usuario || p['id_coaut'] == usuario){
+                            $('#part').attr('name',p['id_participacion']); 
+                        
+                        }else{
+                            $('#part').attr('name',0); 
+                        }
+                    
+
+
+                }
+                if($('#cong').val()==2 && p['tipo_part']==2){
+                        $('#nom_mesa').val(p['nombre_mesa'])
+                        $('#coment_ponenc').val(cadenaMay(p['coment_ponenc']));
+                        $('#tipo_cong').val(p['tipo_cong']);
+                        $('#coautores').val(p['otros_org']==null?'':mostrarAutores(p['otros_org']));
+                        if(p['id_aut'] == usuario){
+                        $('#rol_cong').val(1) 
+                        }
+                        if(p['id_coaut'] == usuario){
+                        $('#rol_cong').val(2) 
+                        }
+                        if($('#rol_cong').val(2)){
+                            $('#aut').val(p['nom_aut']==null?"":$('#aut').val(cadenaMay(p['nom_aut'])))
+                        }
+                        if(p['id_aut'] == usuario || p['id_coaut'] == usuario){
+                            $('#part').attr('name',p['id_participacion']); 
+                        
+                    }
+                    
+
+
+                }
+                if($('#cong').val()==3 && p['tipo_part']==3){
+                        $('#nom_mesa').val(p['nombre_mesa'])
+                        $('#coment_ponenc').val(cadenaMay(p['coment_ponenc']));
+                        $('#tipo_cong').val(p['tipo_cong']);
+                        $('#coautores').val(p['otros_org']==null?'':mostrarAutores(p['otros_org']));
+                        if(p['id_aut'] == usuario){
+                        $('#rol_cong').val(1) 
+                        }
+                        if(p['id_coaut'] == usuario){
+                        $('#rol_cong').val(2) 
+                        }
+                        if($('#rol_cong').val(2)){
+                            $('#aut').val(p['nom_aut']==null?"":$('#aut').val(cadenaMay(p['nom_aut'])))
+                        }
+                        if(p['id_aut'] == usuario || p['id_coaut'] == usuario){
+                            $('#part').attr('name',p['id_participacion']); 
+                        
+                    }
+                    
+
+
+                }
+                })
+            }
+            })
+                
+            }else{
+            $.ajax({
+            url: '../ajax/congreso.php',
+            type: 'POST',
+            data: {op:'carg_part',id:idPart},
+            success: function(response){
+            let part = JSON.parse(response);
+            console.log(part)
+            if(part.length > 0){
+            let template ='';
+                 if(part[0]['tipo_part']==1||part[0]['tipo_part']==2){
                 $('#coment_ponenc').val(cadenaMay(part[0]['coment_ponenc']));
             }
+            $('#nom_mesa').val(part[0]['nombre_mesa']);
             $('#tipo_cong').val(part[0]['tipo_cong']);
             $('#coautores').val(part[0]['otros_org']==null?'':mostrarAutores(part[0]['otros_org']));
-            if(isEdit){
-                $('#nom_mesa').val(part[0]['nombre_mesa'])
-                if(part[0]['id_aut'] == usuario){
-                    $('#rol_cong').val(2) 
-                }
-            if($('#rol_cong').val(2)){
-                $('#aut').val(cong[0]['nom_aut']==null?"":$('#aut').val(cadenaMay(cong[0]['nom_aut'])))
-            }
-            }else{
                 $('#tipo_cong').prop('disabled',true);
                 $('#coautores').prop('disabled',true);
                 $('#coment_ponenc').prop('disabled',true);
@@ -142,13 +221,24 @@ function cargarParticipante(id){
                         $('#rol_cong').prop('disabled',true);
                         $('#rol_cong').attr('name',p['id_participacion']);
                     }
+
+                
     
                 })
+                if(part[0]['id_aut'] == usuario){
+                    $('#rol_cong').val(2) 
+                }
+                if($('#rol_cong').val(2)){
+                    $('#aut').val(cong[0]['nom_aut']==null?"":$('#aut').val(cadenaMay(cong[0]['nom_aut'])))
+                }
 
             }
         }
+        
     })
 }
+}
+
 
 $('#btn_congreso').click(function(){
     isEdit = false;
@@ -159,11 +249,15 @@ $('#btn_congreso').click(function(){
     $('#cong_card').append('<div class="row justify-content-center" id="guardar_cong" ><div class="col-md-6 mt-3 d-grid gap-2"><button type="submit" class="btn btn-dark">Guardar Congreso</button></div></div>');  
 })
 $(document).on('change','.cong',function(){
-   formParticipacion()  
-   if(isEdit){
-    cargarParticipante(idCong);
-    console.log(idCong)
-   }  
+    console.log('ANTES: '+$('.listPart').attr('id'))
+    
+    
+    var idPart= $('.listPart').attr('id')
+
+    formParticipacion();
+
+    cargarParticipante($('#edit_acadmicos').attr('name'),idPart,nomMesa);
+
 });
     //agregar campo organizador mesa
 $(document).on('change','.coord',function(){
@@ -194,7 +288,6 @@ $("body").on("click", ".editarCong", function () {
     $('#campos_congreso').append('<h3 class="mb-5 text-center" id="text-tit">EDITAR CONGRESO</h3>')
     var usuario = $('#id_usuario').attr('name');
     $.ajax({
-        async: false,
         url: "../ajax/congreso.php",
         type: "POST",
         data: { op: "read-id", id_cong,usuario },
@@ -205,18 +298,24 @@ $("body").on("click", ".editarCong", function () {
             console.log(cong)
             formCongreso('#campos_congreso')
             //cargar congreso
-            idCong = cong[0]['id_participacion']
             $('#part').attr('name',cong[0]['id_participacion'])
+            
+            
             $('#nom_cong').val(cong[0]['nombre'])
+            
             $('#ciudad_cong').val(cong[0]['ciudad'])
             $('#cong').val( cong[0]['tipo_part'])
             $('#fech_in_cong').val(cong[0]['fecha_inicio'])
             $('#fech_ter_cong').val( cong[0]['fecha_termino'])
             $('#rol_cong').val( cong[0]['tipo_cong'])
             formParticipacion()
+            $('#part').attr('name',cong[0]['id_participacion'])
             $('#nom_mesa').val( cong[0]['nombre_mesa'])
             $('#coment_ponenc').val( cong[0]['coment_ponenc'])
             $('#tipo_cong').val( cong[0]['tipo_cong'])
+            console.log('id part'+cong[0]['id_participacion'])
+            console.log($('#part').attr('name'));
+            // $('#cong').attr('disabled',true)
             if(cong[0]['id_aut'] == usuario){
                 $('#rol_cong').val(1) 
             }
@@ -226,7 +325,7 @@ $("body").on("click", ".editarCong", function () {
             $('#coautores').val( cong[0]['otro'])
             
             
-            
+            nomMesa=$('#nom_mesa').val();
 
             //boton volver y editar
             $('#campos_congreso').append('<div class="row mt-5 justify-content-between "><div class="col-6 col-md-4 mb-3"><button type="button" class="col-12 btn btn-dark col-6" id="volverAcad">Cancelar</button></div><div class="col-6 col-md-4 mb-3 "><button type="submit" class="col-12 btn btn-dark col-6">Editar</button></div></div>');
@@ -436,13 +535,22 @@ $('body').on('click','.listCong',function(){
 $('body').on('click','.listPart',function(){
     id=$(this).attr('id');
     nom_part=$(this).attr('name');
-    $('#nom_mesa').val(cadenaMay(nom_part));
-    $('#nom_mesa').prop('disabled',true);
-    $('#nom_mesa').attr('name',id);
-    $('#list_part').hide();
-    console.log($('#nom_mesa').attr('name'))
-    if($('#nom_mesa').attr('name')!==0){
-       cargarParticipante(id)
+    if(isEdit){
+
+        if($('#nom_mesa').attr('name')!==0){
+           cargarParticipante($('#edit_acadmicos').attr('name'),id,nom_part)
+
+    }else{
+        $('#nom_mesa').val(cadenaMay(nom_part));
+        $('#nom_mesa').prop('disabled',true);
+        $('#nom_mesa').attr('name',id);
+        $('#list_part').hide();
+        console.log($('#nom_mesa').attr('name'))
+        if($('#nom_mesa').attr('name')!==0){
+           cargarParticipante(null,id,nom_part)
+
+    }
+}
 }
 
 })    
@@ -587,6 +695,7 @@ $('#form_edit_congreso').submit(function(e){
     let coautores=guardarAutores($('#coautores').val());
     let nom_mesa=guardar($('#nom_mesa').val());
     let comen_pon=tipo_part==3?'':guardar($('#coment_ponenc').val());
+    console.log(part)
     
     
     //agragar nuevo congreso y participacion(si no existe congreso)
