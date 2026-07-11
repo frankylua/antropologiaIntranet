@@ -276,6 +276,179 @@ Los usuarios experimentarán menos inconsistencias, pérdidas parciales y result
 * La reversión técnica de una operación incompleta no destruye información válida preexistente.
 * No se requieren migraciones destructivas para completar la épica.
 
+## EPIC-008 — Gobierno del Modelo de Datos y Persistencia
+
+### Objetivo
+
+Establecer la capacidad de gobernar la evolución del modelo de datos compartido de la intranet de manera incremental, compatible, verificable y reversible, preservando la integridad y el significado de la información utilizada por autorización, identidad, módulos académicos, ficha académica y reportabilidad.
+
+La EPIC no define un nuevo modelo de datos ni una solución técnica de persistencia. Su propósito estratégico es establecer que la persistencia compartida constituye una línea propia de modernización.
+
+### Problema
+
+El modelo de datos es transversal a todo el sistema y presenta dependencias directas con:
+
+- cuentas e identidades;
+- permisos y estados académicos;
+- operaciones compuestas;
+- lógica PHP;
+- ficha académica;
+- reportabilidad;
+- módulos académicos.
+
+La evaluación arquitectónica confirmó que estos problemas no pueden gobernarse completamente desde una EPIC consumidora, porque ninguna de las EPIC existentes tiene como responsabilidad principal el gobierno y la evolución integral de la persistencia compartida.
+
+Además, se encuentran confirmados los siguientes riesgos relacionados:
+
+- operaciones compuestas sin transacciones;
+- posible pérdida de roles;
+- dependencia de la ficha académica respecto de múltiples entidades;
+- acoplamiento entre procesos PHP, PDO y MySQL;
+- necesidad de mantener compatibilidad funcional durante la modernización incremental.
+
+### Alcance
+
+La EPIC incluye, a nivel estratégico:
+
+- gobierno de la evolución del modelo de datos compartido;
+- preservación de relaciones e integridad entre entidades;
+- compatibilidad entre estructuras persistentes heredadas y módulos modernizados;
+- tratamiento incremental de dependencias entre módulos y persistencia;
+- capacidad de modificar el esquema de manera incremental sin exigir una sustitución completa;
+- coordinación de los datos utilizados por autorización, identidades, estados, antecedentes, ficha académica y reportabilidad;
+- criterios de reversión para cambios estructurales;
+- coexistencia temporal entre estructuras heredadas y evolucionadas cuando resulte necesaria;
+- consistencia semántica de las entidades y relaciones confirmadas;
+- reducción progresiva del acoplamiento directo entre procesos PHP y estructuras concretas de persistencia;
+- gobernar la evolución del modelo físico sin modificar el modelo conceptual validado del dominio, salvo decisión arquitectónica posterior expresamente aprobada.
+
+### Exclusiones
+
+La EPIC no incluye:
+
+- modernización general del código PHP, responsabilidad de EPIC-005;
+- definición de permisos, responsabilidad de EPIC-001;
+- gestión del ciclo de vida de cuentas, responsabilidad de EPIC-002;
+- definición de estados académicos y su relación con roles, responsabilidad de EPIC-003;
+- atomicidad de operaciones compuestas como objetivo principal, responsabilidad de EPIC-004;
+- construcción funcional de la ficha académica, responsabilidad de EPIC-006;
+- modernización de la interfaz, responsabilidad de EPIC-007;
+- definición institucional de reglas de negocio;
+- creación anticipada de un modelo de datos futuro;
+- selección de ORM, framework o patrón de acceso;
+- migraciones destructivas;
+- optimizaciones de rendimiento no sustentadas por evidencia;
+- diseño funcional de reportes concretos;
+- redefinir reglas de negocio;
+- redefinir el modelo conceptual validado del dominio;
+- redefinir los actores del dominio;
+- redefinir la ficha académica.
+
+### Dependencias
+
+**Relación con EPIC-001**
+
+Debe coordinar la evolución de las estructuras que soportan cuentas y permisos, pero no redefine el significado de los permisos.
+
+EPIC-001 entrega los criterios funcionales de autorización que la persistencia debe representar correctamente.
+
+**Relación con EPIC-002**
+
+Debe preservar las relaciones entre `login`, `usuario`, `profesor` y `estudiante`.
+
+EPIC-002 define el comportamiento funcional del ciclo de vida de identidades; EPIC-008 garantiza que la persistencia pueda soportarlo sin pérdida de relaciones.
+
+**Relación con EPIC-003**
+
+Debe soportar la separación persistente entre estados académicos y roles de acceso.
+
+EPIC-003 determina qué conceptos deben permanecer funcionalmente separados.
+
+**Relación con EPIC-004**
+
+Ambas son complementarias:
+
+- EPIC-004 protege la atomicidad y consistencia de una operación.
+- EPIC-008 protege la estructura y evolución del modelo persistente.
+
+EPIC-004 no debe absorber EPIC-008, ni EPIC-008 reemplazar la responsabilidad transaccional.
+
+**Relación con EPIC-005**
+
+EPIC-008 habilita parcialmente a EPIC-005.
+
+La modernización del backend debe consumir una persistencia cuya evolución esté gobernada y no crear modelos paralelos incompatibles.
+
+**Relación con EPIC-006**
+
+EPIC-008 habilita directamente el robustecimiento de la ficha académica, porque esta se construye desde múltiples entidades.
+
+EPIC-006 define la confiabilidad de la proyección; EPIC-008 protege la coherencia de sus fuentes persistentes.
+
+**Relación con EPIC-007**
+
+La dependencia es indirecta.
+
+La interfaz debe consumir procesos y datos estables, pero EPIC-007 no condiciona el diseño de la persistencia.
+
+### Beneficios
+
+- Evolución del modelo de datos sin reescritura completa.
+- Menor riesgo de inconsistencias entre módulos.
+- Reducción progresiva del acoplamiento entre PHP y estructuras concretas de MySQL.
+- Mayor seguridad para modernizar autorización e identidades.
+- Fuentes más confiables para la ficha académica.
+- Mejor base para reportabilidad futura.
+- Capacidad de aplicar cambios pequeños y reversibles.
+- Menor riesgo de que cada módulo adopte una interpretación distinta de las mismas entidades.
+- Posibilidad de separar la evolución del backend de la evolución estructural de la persistencia.
+- Mayor trazabilidad del impacto de los cambios sobre datos compartidos.
+
+### Riesgos
+
+- Alterar relaciones utilizadas por procesos heredados no identificados.
+- Introducir incompatibilidades entre módulos modernizados y heredados.
+- Provocar pérdida o reinterpretación de datos históricos.
+- Duplicar temporalmente estructuras sin controlar su sincronización.
+- Convertir la EPIC en una reestructuración completa del esquema.
+- Mezclar cambios estructurales con redefiniciones no autorizadas de reglas de negocio.
+- Diseñar el modelo únicamente desde las necesidades de un consumidor, como autorización o ficha académica.
+- Confundir modernización del modelo con optimización prematura.
+- Ejecutar cambios destructivos sin mecanismos de reversión.
+- Expandir excesivamente el alcance debido al carácter transversal de la persistencia.
+
+### Prioridad
+
+**Alta.**
+
+Debe situarse como la primera EPIC del grupo de prioridad alta, después de las cuatro EPIC críticas existentes y antes de EPIC-005.
+
+### Esfuerzo
+
+**XL.**
+
+El esfuerzo deriva de su alcance transversal y de la coordinación entre múltiples dominios funcionales, no de una intención de reestructurar toda la base de datos en un único ciclo.
+
+El esfuerzo XL corresponde a múltiples incrementos pequeños y reversibles; no implica una implementación monolítica.
+
+### Criterios de éxito
+
+La EPIC podrá considerarse finalizada cuando:
+
+- el modelo de datos pueda evolucionar mediante incrementos pequeños y reversibles;
+- los cambios estructurales preserven compatibilidad con los módulos que todavía permanezcan heredados;
+- las entidades centrales mantengan un significado coherente entre los distintos módulos;
+- las relaciones entre cuenta, identidad, perfiles, permisos y estados no se pierdan durante la evolución;
+- las fuentes de la ficha académica puedan modificarse sin producir pérdida o contradicción de antecedentes;
+- los cambios de persistencia dispongan de validaciones previas y posteriores;
+- exista una estrategia comprobable de reversión para cada incremento estructural;
+- no se requieran migraciones destructivas no autorizadas;
+- la lógica PHP pueda evolucionar sin depender de duplicar indefinidamente reglas de persistencia;
+- la reportabilidad pueda consumir datos coherentes sin redefinir el modelo transaccional desde cada reporte;
+- los módulos modernizados y heredados puedan coexistir durante la transición;
+- los cambios no introduzcan reglas de negocio no confirmadas;
+- la evolución de la persistencia pueda validarse independientemente de la interfaz y del backend que la consumen.
+
 ### EPIC-005 — Modernización incremental del backend PHP
 
 #### Objetivo
@@ -485,9 +658,10 @@ Es la épica con mayor visibilidad, aunque no debe ser la primera debido a sus d
 |     2 | EPIC-002 — Gestión de identidades y cuentas  | Crítica   | L        |
 |     3 | EPIC-003 — Estados académicos y roles        | Crítica   | L        |
 |     4 | EPIC-004 — Integridad transaccional          | Crítica   | L        |
-|     5 | EPIC-005 — Backend PHP                       | Alta      | XL       |
-|     6 | EPIC-006 — Ficha académica                   | Alta      | XL       |
-|     7 | EPIC-007 — Interfaz web                      | Media     | XL       |
+|     5 | EPIC-008 — Gobierno de datos y persistencia  | Alta      | XL       |
+|     6 | EPIC-005 — Backend PHP                       | Alta      | XL       |
+|     7 | EPIC-006 — Ficha académica                   | Alta      | XL       |
+|     8 | EPIC-007 — Interfaz web                      | Media     | XL       |
 
 El orden dentro del grupo crítico expresa la secuencia de reducción de riesgo, pero no obliga a completar íntegramente una épica antes de iniciar cualquier trabajo de la siguiente.
 
@@ -509,15 +683,19 @@ El cambio de estado es un riesgo explícito porque puede provocar pérdida de ro
 
 Las operaciones compuestas sin transacciones pueden dejar el sistema en estados parciales. Antes de ampliar cambios sobre backend, ficha académica o interfaz, las operaciones críticas necesitan garantías de integridad.
 
-## 5. Se moderniza el backend de forma gradual
+## 5. Se gobierna la evolución de la persistencia
+
+El modelo de datos compartido debe poder evolucionar de forma compatible, verificable y reversible antes de ampliar la modernización del backend y de sus módulos consumidores.
+
+## 6. Se moderniza el backend de forma gradual
 
 Una vez controlados acceso, identidad y consistencia, el backend puede evolucionar módulo por módulo con menor riesgo de alterar reglas transversales.
 
-## 6. Se fortalece la ficha académica
+## 7. Se fortalece la ficha académica
 
 La ficha concentra información de múltiples entidades. Abordarla antes de estabilizar sus fuentes y procesos aumentaría el riesgo de introducir inconsistencias difíciles de detectar.
 
-## 7. La interfaz se moderniza sobre procesos estables
+## 8. La interfaz se moderniza sobre procesos estables
 
 La modernización frontend tiene alto impacto visible, pero debe apoyarse en permisos y operaciones backend confiables. De lo contrario, se corre el riesgo de crear una presentación nueva sobre comportamientos aún frágiles.
 
@@ -532,7 +710,9 @@ EPIC-001 Autorización ─────┘         │
                                      │
 EPIC-004 Integridad transaccional ───┘
 
-EPIC-004 + EPIC-005 ───────────────────> EPIC-006 Ficha académica
+EPIC-008 Persistencia ──────────────────> EPIC-005 Backend
+
+EPIC-004 + EPIC-005 + EPIC-008 ────────> EPIC-006 Ficha académica
 
 EPIC-001 + EPIC-004 + EPIC-005 ───────> EPIC-007 Interfaz web
 ```
@@ -541,6 +721,7 @@ Las principales épicas habilitadoras son:
 
 * **EPIC-001**, porque los permisos atraviesan todo el sistema.
 * **EPIC-004**, porque protege la consistencia de las operaciones.
+* **EPIC-008**, porque gobierna la evolución de la persistencia compartida.
 * **EPIC-005**, porque proporciona la base para modernizar módulos funcionales y la interfaz de manera controlada.
 
 # Estrategia de ejecución incremental por olas
