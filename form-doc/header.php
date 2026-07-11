@@ -1,8 +1,10 @@
 <?php
-// define('RUTA', '/antropologiaIntranet/');
-define('RUTA', 'http://localhost/antropologiaIntranet/');
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+require_once __DIR__ . '/../config/global.php';
+// RUTA de la app (leída desde .env como APP_URL)
+if (!defined('RUTA')) {
+    define('RUTA', APP_URL);
+}
+// El manejo de errores ya se configuró en global.php según APP_ENV
 if (strlen(session_id()) < 1) {
     session_start();//Validamos si existe o no la sesión
 }

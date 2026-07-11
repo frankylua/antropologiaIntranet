@@ -1,0 +1,21 @@
+# Entorno
+.env
+.env.local
+.env.*.local
+
+# Dependencias
+/vendor/
+/node_modules/
+
+# Logs
+*.log
+error_log
+
+# IDE / SO
+.DS_Store
+Thumbs.db
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user

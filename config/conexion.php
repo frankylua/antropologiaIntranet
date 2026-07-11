@@ -1,11 +1,32 @@
 <?php
-require_once "global.php";
-function conexion(){
+declare(strict_types=1);
+require_once __DIR__ . "/global.php";
+
+/**
+ * Devuelve una conexión PDO singleton, con charset utf8mb4,
+ * excepciones habilitadas y modo emulación desactivado.
+ */
+function conexion(): PDO {
+    static $conexion = null;
+    if ($conexion instanceof PDO) {
+        return $conexion;
+    }
+    $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=' . DB_ENCODE;
+    $options = [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES   => false,
+    ];
     try {
-        $conexion = new PDO('mysql:host=localhost;dbname='.DB_NAME,DB_USERNAME,DB_PASS);
+        $conexion = new PDO($dsn, DB_USERNAME, DB_PASS, $options);
         return $conexion;
     } catch (PDOException $e) {
-        return false;
+        if (defined('APP_ENV') && APP_ENV === 'dev') {
+            throw $e; // en dev, ver el error real
+        }
+        error_log('[DB] ' . $e->getMessage());
+        http_response_code(500);
+        exit('Error de conexión a la base de datos.');
     }
 }
 
