@@ -1,6 +1,7 @@
 <?php
-require_once "../model/Permiso.php";
-require "validaciones.php";
+require_once __DIR__ . '/../vendor/autoload.php';
+use App\Model\Permiso;
+require 'validaciones.php';
 $permiso= new Permiso();
 $op=isset($_POST['op'])?$_POST['op']:'';
 switch($op){

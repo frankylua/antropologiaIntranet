@@ -1,6 +1,7 @@
 <?php
+declare(strict_types=1);
+namespace App\Model;
 
-require "Usuario_.php";
 class Estudiante extends Usuario{
     public function __construct(){
     }

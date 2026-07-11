@@ -1,6 +1,8 @@
 <?php
-require "../config/conexion.php";
-Class Postdoctorado {
+declare(strict_types=1);
+namespace App\Model;
+
+class Postdoctorado {
     public function __construct(){
     }
     public function insertar($usuario,$prof,$inst,$fech_in,$fech_ter){

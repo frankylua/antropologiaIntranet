@@ -1,7 +1,8 @@
 <?php
 session_start();
-require "usuario.php";
-require ("../model/Estudiante.php");
+require_once __DIR__ . '/../vendor/autoload.php';
+use App\Model\Estudiante;
+require 'usuario.php';
 $est = new Estudiante();
 $promedio = isset($_POST['promedio']) ? floatval($_POST['promedio']) : '';
 $trabaja = isset($_POST['trabaja']) ? (int) $_POST['trabaja'] : '';

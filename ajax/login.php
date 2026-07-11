@@ -1,8 +1,10 @@
 <?php
 if (strlen(session_id()) < 1) {
-    session_start();//Validamos si existe o no la sesión
+    session_start();
 }
-require ("../model/Login_.php");
+require_once __DIR__ . '/../vendor/autoload.php';
+use App\Model\Login;
+
 //require('validaciones.php');
 $login= new Login();
 $correo=isset($_POST['correo'])?$_POST['correo']:"";

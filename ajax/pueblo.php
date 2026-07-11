@@ -1,6 +1,7 @@
 <?php
-require_once "../model/Pueblo.php";
-require "validaciones.php";
+require_once __DIR__ . '/../vendor/autoload.php';
+use App\Model\Pueblo;
+require 'validaciones.php';
 $pueblo=new Pueblo();
 $nombre=isset($_POST['nombre'])?limpiar_datos($_POST['nombre']):"";
 $id_pueblo=isset($_POST['id'])?limpiar_datos($_POST['id']):"";

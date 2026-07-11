@@ -1,6 +1,8 @@
 <?php
-require "../config/conexion.php";
-Class Pais {
+declare(strict_types=1);
+namespace App\Model;
+
+class Pais {
     public function __construct(){
     }
     public function mostrarConsultaOrdenada(){

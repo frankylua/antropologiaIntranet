@@ -1,11 +1,12 @@
 <?php
-require "../config/conexion.php";
+declare(strict_types=1);
+namespace App\Model;
 
- class Login 
+class Login 
  {
   
     
-    public function __contruct(){
+    public function __construct(){
 
     }
     public function insertarLogin($correo,$pass){

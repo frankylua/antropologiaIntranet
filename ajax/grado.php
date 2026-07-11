@@ -1,7 +1,8 @@
 <?php
 session_start();
-require "validaciones.php";
-require ("../model/Grado.php");
+require_once __DIR__ . '/../vendor/autoload.php';
+use App\Model\Grado;
+require 'validaciones.php';
 $titulo=isset($_POST['titulo'])?(int)$_POST['titulo']:'';
 $inst=isset($_POST['inst'])?(int)$_POST['inst']:'';
 $usuario=isset($_POST['usuario'])?(int)$_POST['usuario']:'';

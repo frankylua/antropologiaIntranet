@@ -1,6 +1,8 @@
 <?php
-require "../config/conexion.php";
-Class Beca {
+declare(strict_types=1);
+namespace App\Model;
+
+class Beca {
     public function __construct(){
     }
     public function insertar($nombre,$tipo_beca,$inst,$fecha_in,$fecha_ter,$alumno){

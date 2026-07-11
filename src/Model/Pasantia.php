@@ -1,6 +1,8 @@
 <?php
-require "../config/conexion.php";
-Class Pasantia {
+declare(strict_types=1);
+namespace App\Model;
+
+class Pasantia {
     public function __construct(){
     }
     public function insertar($usuario,$prof,$inst,$fech_in,$fech_ter,$ciudad,$fondo,$pais){

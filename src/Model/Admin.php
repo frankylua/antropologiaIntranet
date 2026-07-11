@@ -1,6 +1,7 @@
 <?php
-require "Login_.php";
-//require "Login.php";
+declare(strict_types=1);
+namespace App\Model;
+
 class Admin extends Login {
     public function __construct(){
     }

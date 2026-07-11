@@ -1,7 +1,8 @@
 <?php
 session_start();
-require "usuario.php";
-require ("../model/Docente.php");
+require_once __DIR__ . '/../vendor/autoload.php';
+use App\Model\Docente;
+require 'usuario.php';
 $doc = new Docente();
 $busqueda = isset ($_POST['busqueda']) ? $_POST['busqueda'] : '';
 $inst = isset ($_POST['instTrab']) ? (int) $_POST['instTrab'] : '';

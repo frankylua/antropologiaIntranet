@@ -1,6 +1,7 @@
 <?php
-require "validaciones.php";
-require ("../model/Proyecto.php");
+require_once __DIR__ . '/../vendor/autoload.php';
+use App\Model\Proyecto;
+require 'validaciones.php';
 $usuario=isset($_POST['usuario'])?$_POST['usuario']:'';
 $folio=isset($_POST['folio'])?$_POST['folio']:'';
 $anio=isset($_POST['anio'])?(int)$_POST['anio']:'';

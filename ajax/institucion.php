@@ -1,7 +1,8 @@
 <?php
 session_start();
-require_once "../model/Institucion.php";
-require "validaciones.php";
+require_once __DIR__ . '/../vendor/autoload.php';
+use App\Model\Institucion;
+require 'validaciones.php';
 $institucion=new Institucion();
 $nombre=isset($_POST['nombre'])?$_POST['nombre']:"";
 $id_inst=isset($_POST['id'])?limpiar_datos($_POST['id']):"";

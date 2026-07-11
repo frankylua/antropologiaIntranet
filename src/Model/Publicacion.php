@@ -1,6 +1,8 @@
 <?php
-require "../config/conexion.php";
-Class Publicacion {
+declare(strict_types=1);
+namespace App\Model;
+
+class Publicacion {
     public function __construct(){
     }
     public function insertar($usuario,$nombre,$autores,$anio,$estado){

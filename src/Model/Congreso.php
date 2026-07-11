@@ -1,6 +1,8 @@
 <?php
-require "../config/conexion.php";
-Class Congreso {
+declare(strict_types=1);
+namespace App\Model;
+
+class Congreso {
     public function __construct(){
     }
     //insert

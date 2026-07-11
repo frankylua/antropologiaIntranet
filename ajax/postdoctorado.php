@@ -1,6 +1,7 @@
 <?php
-require "validaciones.php";
-require ("../model/Postdoctorado.php");
+require_once __DIR__ . '/../vendor/autoload.php';
+use App\Model\Postdoctorado;
+require 'validaciones.php';
 $prof=isset($_POST['prof'])?limpiar_datos($_POST['prof']):'';
 $inst=isset($_POST['inst'])?(int)$_POST['inst']:'';
 $usuario=isset($_POST['usuario'])?(int)$_POST['usuario']:'';

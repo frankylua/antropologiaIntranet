@@ -1,6 +1,7 @@
 <?php
-require "validaciones.php";
-require ("../model/Congreso.php");
+require_once __DIR__ . '/../vendor/autoload.php';
+use App\Model\Congreso;
+require 'validaciones.php';
 $usuario=isset($_POST['usuario'])?(int)$_POST['usuario']:'';
 $usu=isset($_POST['usu'])?(int)$_POST['usu']:'';
 $nombre=isset($_POST['nombre'])?$_POST['nombre']:'';

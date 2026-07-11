@@ -1,6 +1,8 @@
 <?php
-require "../config/conexion.php";
-Class Proyecto {
+declare(strict_types=1);
+namespace App\Model;
+
+class Proyecto {
     public function __construct(){
     }
     //insert

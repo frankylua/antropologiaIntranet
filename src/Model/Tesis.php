@@ -1,6 +1,8 @@
 <?php
-require "../config/conexion.php";
-Class Tesis  {
+declare(strict_types=1);
+namespace App\Model;
+
+class Tesis {
     public function __construct(){
     }
     //insert

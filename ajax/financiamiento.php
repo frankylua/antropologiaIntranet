@@ -1,6 +1,7 @@
 <?php
-require_once "../model/Financiamiento.php";
-require "validaciones.php";
+require_once __DIR__ . '/../vendor/autoload.php';
+use App\Model\Financiamiento;
+require 'validaciones.php';
 $financ=new Financiamiento();
 $nom_financ=isset($_POST['nombre'])?limpiar_datos($_POST['nombre']):"";
 $id_financ=isset($_POST['id'])?limpiar_datos($_POST['id']):0;

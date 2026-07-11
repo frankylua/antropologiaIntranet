@@ -1,6 +1,7 @@
 <?php
-require "validaciones.php";
-require ("../model/Tesis.php");
+require_once __DIR__ . '/../vendor/autoload.php';
+use App\Model\Tesis;
+require 'validaciones.php';
 $lugar=isset($_POST['lugar'])?(int)$_POST['lugar']:'';
 $grado=isset($_POST['grado'])?(int)$_POST['grado']:'';
 $anio=isset($_POST['anio'])?(int)$_POST['anio']:'';

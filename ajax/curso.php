@@ -1,6 +1,7 @@
 <?php
-require ("../model/Curso.php");
-require "validaciones.php";
+require_once __DIR__ . '/../vendor/autoload.php';
+use App\Model\Curso;
+require 'validaciones.php';
 $curso=new Curso();
 
 $nom_curso=isset($_POST['nombre'])?(int)$_POST['nombre']:'';

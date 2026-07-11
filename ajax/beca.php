@@ -1,6 +1,7 @@
 <?php
-require "validaciones.php";
-require ("../model/Beca.php");
+require_once __DIR__ . '/../vendor/autoload.php';
+use App\Model\Beca;
+require 'validaciones.php';
 $nombre=isset($_POST['nombre'])?$_POST['nombre']:'';
 $nueva_beca=isset($_POST['nueva_beca'])?$_POST['nueva_beca']:'';
 $tipo_beca=isset($_POST['tipo'])?$_POST['tipo']:'';

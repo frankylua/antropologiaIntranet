@@ -1,6 +1,8 @@
 <?php
-require "../config/conexion.php";
-Class Institucion {
+declare(strict_types=1);
+namespace App\Model;
+
+class Institucion {
     public function __construct(){
     }
     public function insertar($nombre){

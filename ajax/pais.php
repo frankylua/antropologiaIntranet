@@ -1,6 +1,7 @@
 <?php
-require_once "../model/Pais.php";
-require "validaciones.php";
+require_once __DIR__ . '/../vendor/autoload.php';
+use App\Model\Pais;
+require 'validaciones.php';
 $pais=new Pais();
 $op=isset($_POST['op'])?$_POST['op']:'';
 if($op){

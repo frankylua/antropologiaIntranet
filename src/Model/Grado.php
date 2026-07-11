@@ -1,6 +1,8 @@
 <?php
-require "../config/conexion.php";
-Class Grado {
+declare(strict_types=1);
+namespace App\Model;
+
+class Grado {
     public function __construct(){
     }
     public function insertar($usuario,$instituto,$titulo,$fecha){

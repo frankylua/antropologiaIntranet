@@ -1,6 +1,7 @@
 <?php
-require ("../model/Admin.php");
-require "validaciones.php";
+require_once __DIR__ . '/../vendor/autoload.php';
+use App\Model\Admin;
+require 'validaciones.php';
 $admin=new Admin();
 $nombre=isset($_POST['nombre'])?limpiar_datos($_POST['nombre']):'';
 $correo=isset($_POST['correo'])?limpiar_datos($_POST['correo']):'';

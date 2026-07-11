@@ -1,6 +1,6 @@
 <?php
-
-require "Login_.php";
+declare(strict_types=1);
+namespace App\Model;
 
 class Usuario extends Login {
     public function __construct(){
