@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../config/global.php';
+require_once __DIR__ . '/../src/Config/global.php';
 // RUTA de la app (leída desde .env como APP_URL)
 if (!defined('RUTA')) {
     define('RUTA', APP_URL);
