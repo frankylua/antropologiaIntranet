@@ -1,9 +1,12 @@
 <?php
+use App\Security\Authorization;
+
     ob_start();
     if (strlen(session_id()) < 1){
         session_start();//Validamos si existe o no la sesión
     }
-    if(!isset($_SESSION['admin']) && !isset($_SESSION['comite'])){
+    require_once __DIR__ . '/../vendor/autoload.php';
+    if(!Authorization::hasAny(['admin', 'comite'])){
         header('Location:../index.php');
     }else
     {
