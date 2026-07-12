@@ -37,8 +37,6 @@ function limpiar(){
   $('#pass').val('');
   $('#pass2').val('');
   $('#id_login').val('');
-  $('#id_admin').val('');
-  $('#id_per_log').val('');
   limpiarInput('#nom_admin','#col_nom_admin');
   limpiarInput('#correo','#col_correo');
   limpiarInput('#pass','#col_pass');
@@ -177,8 +175,6 @@ function cancelarform(){
         $("#box-pass").hide();
         $('#btn_cambiar_pass').show();
         $('#id_login').attr('value',admin['id_login']);
-        $('#id_admin').attr('value',admin['id_admin']);
-        $('#id_per_log').attr('value',admin['id_per_log']);
         $('#nom_admin').val(letraMay(admin['nombre']));
         $('#correo').val(admin['correo']);
         $('#permiso').val(admin['id_permiso']);
