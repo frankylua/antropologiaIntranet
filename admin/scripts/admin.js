@@ -13,12 +13,12 @@ function mostrarAdmin(){
       
       <tr>
       
-      <td >${cadenaMay(list[3])}</td>
-      <td>${list[4]}</td>
-      <td>${list[5]==1?'Administrador':'C.A.'}</td>
+      <td >${cadenaMay(list.nombre)}</td>
+      <td>${list.correo}</td>
+      <td>${list.id_permiso==1?'Administrador':'C.A.'}</td>
       <td><button type="button" class="btn btn-link link-success btn-sm " id="">Agregar Docencia</button></td>
-      <td><button type="button" class="btn btn-link link-success btn-sm editarAdmin" id="${list[0]}">Editar</button></td>
-      <td><button type="button" class="btn btn-link link-danger btn-sm eliminarAdmin" id="${list[0]}" >Eliminar</button></td>
+      <td><button type="button" class="btn btn-link link-success btn-sm editarAdmin" id="${list.id_login}">Editar</button></td>
+      <td><button type="button" class="btn btn-link link-danger btn-sm eliminarAdmin" id="${list.id_login}" >Eliminar</button></td>
       </tr>
    
       `});
