@@ -164,13 +164,65 @@ function cancelarform(){
   //editar admin
   $('body').on('click','.editarAdmin',function(){
     id_login = $(this).attr('id');
+    const mostrarErrorCarga = function(){
+      limpiar();
+      mostrarform(false);
+      $('#eliminado').removeClass('alert-success').addClass('alert-danger');
+      $('#eliminado').text('No fue posible cargar el usuario seleccionado.');
+      $('#mnsj_elim').show();
+      setTimeout(function(){
+        $('#mnsj_elim').fadeOut(1500, function(){
+          $('#eliminado').removeClass('alert-danger').addClass('alert-success');
+        });
+      },3000);
+    };
     $.ajax({
       url:'../ajax/admin.php',
       type: 'POST',
       data: {id_login:id_login,op:'query_id'},
       success: function(response){
-        let admin = JSON.parse(response); 
+        let admin;
+        try {
+          admin = JSON.parse(response);
+        } catch (error) {
+          console.error('Respuesta inválida al cargar el usuario.', error, {
+            responseType: typeof response,
+            responseLength: typeof response === 'string' ? response.length : null
+          });
+          mostrarErrorCarga();
+          return;
+        }
+
+        const propiedadesObligatorias = ['id_login','nombre','correo','id_permiso'];
+        const respuestaValida = typeof admin === 'object' &&
+          admin !== null &&
+          !Array.isArray(admin) &&
+          propiedadesObligatorias.every(function(propiedad){
+            return Object.prototype.hasOwnProperty.call(admin, propiedad);
+          }) &&
+          admin['id_login'] !== null &&
+          admin['id_login'] !== '' &&
+          typeof admin['nombre'] === 'string' &&
+          typeof admin['correo'] === 'string' &&
+          admin['id_permiso'] !== null &&
+          admin['id_permiso'] !== '';
+
+        if (!respuestaValida) {
+          const propiedadesFaltantes = typeof admin === 'object' && admin !== null && !Array.isArray(admin)
+            ? propiedadesObligatorias.filter(function(propiedad){
+                return !Object.prototype.hasOwnProperty.call(admin, propiedad);
+              })
+            : propiedadesObligatorias;
+          console.error('Respuesta incompleta al cargar el usuario.', {
+            responseType: admin === null ? 'null' : Array.isArray(admin) ? 'array' : typeof admin,
+            missingProperties: propiedadesFaltantes
+          });
+          mostrarErrorCarga();
+          return;
+        }
+
         console.log(admin);
+        limpiar();
         mostrarform(true);
         $("#box-pass").hide();
         $('#btn_cambiar_pass').show();
@@ -178,6 +230,16 @@ function cancelarform(){
         $('#nom_admin').val(letraMay(admin['nombre']));
         $('#correo').val(admin['correo']);
         $('#permiso').val(admin['id_permiso']);
+      },
+      error: function(xhr, textStatus, errorThrown){
+        console.error('Error HTTP al cargar el usuario.', {
+          status: xhr.status,
+          statusText: xhr.statusText,
+          textStatus: textStatus,
+          errorThrown: errorThrown,
+          responseLength: typeof xhr.responseText === 'string' ? xhr.responseText.length : null
+        });
+        mostrarErrorCarga();
       }
     })
   })
