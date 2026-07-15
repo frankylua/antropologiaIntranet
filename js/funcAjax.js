@@ -1,4 +1,4 @@
-function ajaxListas(id, url, op, tipo) {
+function ajaxListas(id, url, op, tipo, propiedadId, propiedadEtiqueta) {
   $.ajax({
     url: url,
     type: "POST",
@@ -7,16 +7,18 @@ function ajaxListas(id, url, op, tipo) {
       let listas = JSON.parse(response);
       let template = "";
       listas.forEach((list) => {
+        let idLista = propiedadId ? list[propiedadId] : list[0];
+        let etiquetaLista = propiedadEtiqueta ? list[propiedadEtiqueta] : list[1];
         template += `
         <li class='list-group-item'> 
         <div class='row justify-content-between'>
         <div class='col-auto '>
-        ${cadenaMay(list[1])} 
+        ${cadenaMay(etiquetaLista)}
         </div>
         <div class='col-auto p-0 m-0'>
         <button type="button" class='btn btn-link link-success btn-sm editar_lista' name='${
-          list[1]
-        }'  id='${list[0]}'>Editar</button>
+          etiquetaLista
+        }'  id='${idLista}'>Editar</button>
        
       </div>
       </div>
@@ -65,7 +67,14 @@ function cargarListas(n_input) {
     ajaxListas("#listas", "../ajax/titulo.php", op, n_input);
   }
   if (n_input == "inst") {
-    ajaxListas("#listas", "../ajax/institucion.php", "read");
+    ajaxListas(
+      "#listas",
+      "../ajax/institucion.php",
+      "read",
+      undefined,
+      "id_inst",
+      "inst"
+    );
   }
   if (n_input == "bec_ext" ||n_input == "bec_int" ) {
     ajaxListas("#listas", "../ajax/beca.php", 'read_lista', n_input);
