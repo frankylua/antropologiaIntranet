@@ -7,7 +7,7 @@ class Institucion {
     }
     public function insertar($nombre){
         $sql="INSERT INTO institucion (id_inst,inst) VALUES (NULL,'$nombre')";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
     public function insertarObtenerId($nombre){
         $sql="INSERT INTO institucion (id_inst,inst) VALUES (NULL,'$nombre')";
