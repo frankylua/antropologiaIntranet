@@ -31,7 +31,15 @@ function ajaxListas(id, url, op, tipo, propiedadId, propiedadEtiqueta) {
 }
 
 
-function ajaxSelect(id, url, titulo, op, tipo) {
+function ajaxSelect(
+  id,
+  url,
+  titulo,
+  op,
+  tipo,
+  propiedadId,
+  propiedadEtiqueta
+) {
   $.ajax({
     async:false,
     url: url,
@@ -42,7 +50,9 @@ function ajaxSelect(id, url, titulo, op, tipo) {
       let template = "";
       template = `<option value="0">${titulo}</option>`;
       listas.forEach((p) => {
-        template += `<option value="${p[0]}"> ${cadenaMay(p[1])}</option>`;
+        let idOpcion = propiedadId ? p[propiedadId] : p[0];
+        let etiquetaOpcion = propiedadEtiqueta ? p[propiedadEtiqueta] : p[1];
+        template += `<option value="${idOpcion}"> ${cadenaMay(etiquetaOpcion)}</option>`;
       });
       if (op !== "pais" && op !== "read_cursos") {
         template += '<option value="otro">Otro</option>';
