@@ -7,7 +7,7 @@ class Pueblo {
     }
     public function insertar($nombre){
         $sql="INSERT INTO pueblo (id_pueblo,pueblo) VALUES (NULL,'$nombre')";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
     public function editar($id,$nombre){
         $sql="UPDATE pueblo SET pueblo='$nombre' where id_pueblo='$id'";
