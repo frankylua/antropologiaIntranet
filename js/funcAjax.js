@@ -56,7 +56,7 @@ function cargarListas(n_input) {
   $("#oculto").val("");
   op = "read";
   if (n_input == "pueb") {
-    ajaxListas("#listas", "../ajax/pueblo.php", op);
+    ajaxListas("#listas", "../ajax/pueblo.php", op, undefined, "id_pueblo", "pueblo");
   }
   if (
     n_input == "lic" ||
