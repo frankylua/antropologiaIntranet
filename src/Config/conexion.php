@@ -71,4 +71,29 @@ if(!function_exists('ejecutarConsulta')){
 
         
 
+function ejecutarEscritura(
+    string $sql,
+    array $parametros = [],
+    bool $obtenerIdInsertado = false
+): array {
+    $pdo = conexion();
+    $statement = $pdo->prepare($sql);
+    $ejecutado = $statement->execute($parametros);
+
+    if ($ejecutado === false) {
+        throw new RuntimeException('No fue posible completar la operación de escritura.');
+    }
+
+    $idInsertado = null;
+
+    if ($obtenerIdInsertado === true) {
+        $ultimoIdInsertado = $pdo->lastInsertId();
+        $idInsertado = $ultimoIdInsertado === false ? null : $ultimoIdInsertado;
+    }
+
+    return [
+        'filasAfectadas' => $statement->rowCount(),
+        'idInsertado' => $idInsertado,
+    ];
+}
 ?>
