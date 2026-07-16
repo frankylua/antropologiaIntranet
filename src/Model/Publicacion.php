@@ -47,7 +47,7 @@ class Publicacion {
     }
     public function editarOtraPub($tipo_pub,$desc_pub,$id_pub){
         $sql="UPDATE otra_publicacion SET tipo='$tipo_pub', descripcion='$desc_pub' where id_otra_pub='$id_pub'";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
     //buscar editoriales
     public function cargarEditorial($busqueda){        
