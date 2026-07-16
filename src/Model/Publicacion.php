@@ -31,7 +31,7 @@ class Publicacion {
     }
     public function insertarOtraPub($tipo_pub,$desc_pub,$usuario){
         $sql="INSERT INTO otra_publicacion (id_otra_pub,tipo,descripcion,usuario) VALUES (NULL,'$tipo_pub','$desc_pub','$usuario')";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
     public function editar($nombre,$autores,$anio,$estado,$id_pub){
         $sql="UPDATE publicacion SET nombre='$nombre',otros_autores=" . (empty($autores)? "NULL":"'$autores'"). ",anio='$anio', estado='$estado' where id_publicacion='$id_pub'";
