@@ -12,7 +12,7 @@ function formCongreso(contenedor){
     $('#guardar_cong').hide();
     $('#mnsj_row_cong').hide();
     anios('#anio_cong',1960)
-    ajaxSelect('#pais_cong',ruta+'ajax/pais.php','Seleccione','pais');
+    ajaxSelect('#pais_cong',ruta+'ajax/pais.php','Seleccione','pais', undefined, 'id_pais', 'pais');
     //buscador nombre congreso
     $('#nom_cong').keyup(function(){    
       $('#list_cong').hide();
