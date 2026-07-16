@@ -95,7 +95,7 @@ class Publicacion {
     }
     public function eliminarOtraPub($id_pub){
         $sql="DELETE FROM otra_publicacion  WHERE id_otra_pub='$id_pub'";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
 }
 ?>
