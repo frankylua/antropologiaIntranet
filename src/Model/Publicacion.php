@@ -55,7 +55,7 @@ class Publicacion {
         return ejecutarConsultaResultados($sql);        
     }
     public function cargarEditLib($libro){
-        $sql="SELECT * FROM editorial e INNER JOIN libro_editorial l ON l.editorial=e.id_editorial WHERE l.libro='$libro'";
+        $sql="SELECT e.id_editorial, e.nombre FROM editorial e INNER JOIN libro_editorial l ON l.editorial=e.id_editorial WHERE l.libro='$libro'";
         return ejecutarConsultaResultados($sql);
     }
     public function mostrarArtRev($usuario){
