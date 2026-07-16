@@ -565,18 +565,25 @@ $("body").on("click", ".eliminarPub", function () {
         type: "POST",
         data: { id_pub, op: "delete" },
         success: function (response) {
-            if($('lista_doc')=='true'){
-                cargarFichaDoc(usu)
+            const esDocente=$('#ficha_acad').attr('name')=='doc';
+            const antAcad=esDocente?'#ant_acad_doc':'#ant_acad_est';
+            const filaMensaje=esDocente?'#mnsj_row_acad_doc':'#mnsj_row_acad_est';
+            const mensajeAcad=esDocente?'#mnsj_acad_doc':'#mnsj_acad_est';
+            if(esDocente){
+                cargarFichaDoc($('#id_usuario').attr('name'))
             }else{
-                cargarFichaEst(usu) 
-            }           
+                cargarFichaEst($('#id_usuario').attr('name'))
+            }
             let mensaje = JSON.parse(response);
-            $("html, body").animate({ scrollTop: $('#ant_acad_doc').offset().top}, 100);
-            $("#mnsj_row_acad_doc").show();
-            $("#mnsj_acad_doc").addClass("alert-success");
-            $("#mnsj_acad_doc").html(mensaje);
+            const posicion=$(antAcad).offset();
+            if(posicion){
+                $("html, body").animate({ scrollTop: posicion.top}, 100);
+            }
+            $(filaMensaje).show();
+            $(mensajeAcad).addClass("alert-success");
+            $(mensajeAcad).html(mensaje);
             setTimeout(function () {
-                $("#mnsj_row_acad_doc").fadeOut(1500);
+                $(filaMensaje).fadeOut(1500);
             }, 3000);
         },
       });
@@ -590,16 +597,23 @@ $("body").on("click", ".eliminarOtraPub", function () {
         type: "POST",
         data: { id_pub, op: "delete_otra_pub" },
         success: function (response) {
+            const esDocente=$('#ficha_acad').attr('name')=='doc';
+            const antAcad=esDocente?'#ant_acad_doc':'#ant_acad_est';
+            const filaMensaje=esDocente?'#mnsj_row_acad_doc':'#mnsj_row_acad_est';
+            const mensajeAcad=esDocente?'#mnsj_acad_doc':'#mnsj_acad_est';
             $('#publicacion_card').html('');
             cargarPub($('#id_usuario').attr('name'), '#publicacion_card');
             let mensaje = JSON.parse(response);
-            $("html, body").animate({ scrollTop: $('#ant_acad_doc').offset().top}, 100);
-          $("#mnsj_row_acad_doc").show();
-          $("#mnsj_acad_doc").addClass("alert-success");
-          $("#mnsj_acad_doc").html(mensaje);
-          setTimeout(function () {
-            $("#mnsj_row_acad_doc").fadeOut(1500);
-          }, 3000);
+            const posicion=$(antAcad).offset();
+            if(posicion){
+                $("html, body").animate({ scrollTop: posicion.top}, 100);
+            }
+            $(filaMensaje).show();
+            $(mensajeAcad).addClass("alert-success");
+            $(mensajeAcad).html(mensaje);
+            setTimeout(function () {
+                $(filaMensaje).fadeOut(1500);
+            }, 3000);
         },
       });
   
