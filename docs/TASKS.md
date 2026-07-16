@@ -1,0 +1,97 @@
+# Registro de TASK
+
+## TASK-FEATURE001-PERSIST-006
+
+### Identificación
+
+Nombre:
+TASK-FEATURE001-PERSIST-006
+
+FEATURE asociada:
+FEATURE-001 — Evolución de los Contratos de Persistencia
+
+EPIC asociada:
+EPIC-008 — Gobierno del Modelo de Datos y Persistencia
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Migrar `Publicacion::editarArtRev()` a contrato explícito de escritura.
+
+### Implementación
+
+Archivos modificados:
+`src/Model/Publicacion.php`
+
+Cambio realizado:
+Sustitución de `ejecutarConsulta($sql)` por `ejecutarEscritura($sql)`.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Validación funcional:
+Aprobada
+
+### Evidencia Git
+
+Commit:
+`0863b17b46c64070a2a808bd5b6562d0a7d80a1a`
+
+Fecha:
+2026-07-16T13:56:33-04:00
+
+### Observaciones
+
+Sin observaciones adicionales registradas.
+
+## TASK-FUNC-PUBLICACION-EDIT-001
+
+### Identificación
+
+Nombre:
+TASK-FUNC-PUBLICACION-EDIT-001
+
+FEATURE asociada:
+No registrada
+
+EPIC asociada:
+No registrada
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Corregir las referencias de estudiante y docente en la edición de publicaciones.
+
+### Implementación
+
+Archivos modificados:
+`form-doc/scripts/publicacion.js`
+
+Cambio realizado:
+Selección contextual entre `editAcadDoc()` y `editAcadEst()`, y entre `reiniciarInfoDoc()` y `reiniciarInfoEst()`.
+
+### Validación
+
+Validación técnica:
+No registrada
+
+Validación funcional:
+Flujos de estudiante y docente aprobados
+
+### Evidencia Git
+
+Commit:
+`956dbee8f72931f9d602770e6319cbbeb945996d`
+
+Fecha:
+2026-07-16T13:57:34-04:00
+
+### Observaciones
+
+Sin observaciones adicionales registradas.
