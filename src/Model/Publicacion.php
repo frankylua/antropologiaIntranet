@@ -39,7 +39,7 @@ class Publicacion {
     }
     public function editarArtRev($id_pub,$titulo,$indizacion,$fac_imp,$issn){
         $sql="UPDATE articulo_revista SET titulo='$titulo', issn='$issn', indizacion='$indizacion', factor_impacto='$fac_imp' where publicacion='$id_pub'";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
     public function editarLibro($id_pub,$tipo_lib,$rol,$ref_ext,$traduccion,$lugar){
         $sql="UPDATE libro SET tipo='$tipo_lib', rol='$rol', ref_ext='$ref_ext', traduccion='$traduccion', lugar='$lugar'  where publicacion='$id_pub'";
