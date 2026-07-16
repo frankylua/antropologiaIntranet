@@ -48,6 +48,51 @@ Fecha:
 
 Sin observaciones adicionales registradas.
 
+## TASK-FEATURE001-PERSIST-007
+
+### Identificación
+
+Nombre:
+TASK-FEATURE001-PERSIST-007
+
+FEATURE asociada:
+FEATURE-001 — Evolución de los Contratos de Persistencia
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Migrar `Publicacion::editarLibro()` a contrato explícito de escritura.
+
+### Implementación
+
+Archivos modificados:
+`src/Model/Publicacion.php`
+
+Cambio realizado:
+Sustitución de `ejecutarConsulta($sql)` por `ejecutarEscritura($sql)`.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Validación funcional:
+Aprobada
+
+### Evidencia Git
+
+Commit:
+`39d85a6904d41c41ec26b1f6745aa6cfb717730a`
+
+Fecha:
+2026-07-16T16:47:34-04:00
+
+### Observaciones
+
+Sin observaciones adicionales registradas.
+
 ## TASK-FUNC-PUBLICACION-EDIT-001
 
 ### Identificación
