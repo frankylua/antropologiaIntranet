@@ -11,7 +11,7 @@ class Pueblo {
     }
     public function editar($id,$nombre){
         $sql="UPDATE pueblo SET pueblo='$nombre' where id_pueblo='$id'";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
     public function mostrar(){
          //consultar pueblos
