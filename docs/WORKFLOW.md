@@ -85,6 +85,33 @@ Formato: `ADR-XXX: decisión`.
 
 `XXX` es un número correlativo de tres dígitos. Ejemplo: `ADR-001: conservar compatibilidad con el flujo heredado`.
 
+### Ramas Git
+
+La rama debe conservar la trazabilidad del trabajo desde su identificador hasta la integración:
+
+```text
+EPIC
+→ FEATURE
+→ AT
+→ TASK
+→ rama
+→ commit
+→ integración
+```
+
+Las ramas de fase agrupan incrementos arquitectónicos relacionados y usan el formato `refactor/fase-XX-nombre`, donde `XX` es un número correlativo de dos dígitos. Ejemplos: `refactor/fase-01-seguridad`, `refactor/fase-02-modelo-dominio` y `refactor/fase-03-persistencia`.
+
+El trabajo específico se realiza en una rama asociada a una tarea aprobada. Los segmentos descriptivos deben escribirse en minúsculas, sin tildes ni espacios, con palabras separadas por guiones; el identificador de tarea conserva su formato oficial. La rama debe seguir uno de estos formatos:
+
+- `feature/TASK-ID-descripcion`: incorporación de funcionalidad.
+- `fix/TASK-ID-modulo-descripcion`: corrección de comportamiento.
+- `refactor/TASK-ID-descripcion`: refactorización específica que no constituye una fase.
+- `docs/TASK-ID-tema`: actualización exclusivamente documental.
+
+`TASK-ID` representa el identificador completo de la tarea, por ejemplo `TASK-001` o `TASK-PUB-005`, cuando este último haya sido asignado formalmente. La rama de fase no reemplaza la rama de tarea: actúa como destino de integración de los trabajos de esa fase. Si un trabajo no pertenece a una fase, su destino de integración debe definirse en la tarea antes de implementar.
+
+No deben reutilizarse ramas para tareas distintas ni incluirse varios identificadores de tarea en un mismo nombre. Las ramas existentes no se renombran retroactivamente por la incorporación de esta convención.
+
 ### Commits
 
 Formato: `TASK-XXX: descripción del cambio lógico`.
