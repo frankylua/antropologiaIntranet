@@ -578,7 +578,8 @@ $("body").on("click", ".eliminarOtraPub", function () {
         type: "POST",
         data: { id_pub, op: "delete_otra_pub" },
         success: function (response) {
-            cargarFichaDoc(usu);
+            $('#publicacion_card').html('');
+            cargarPub($('#id_usuario').attr('name'), '#publicacion_card');
             let mensaje = JSON.parse(response);
             $("html, body").animate({ scrollTop: $('#ant_acad_doc').offset().top}, 100);
           $("#mnsj_row_acad_doc").show();
