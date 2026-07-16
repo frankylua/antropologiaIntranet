@@ -308,12 +308,20 @@
             success : function(response) {
                 if( response && response.trim() !== ""){
                 let editoriales = JSON.parse(response);
-                let cadenaEditorial=''
-                let coma=''
+                let editorialesProcesadas=[]
                 editoriales.forEach(ed => {
-                    cadenaEditorial+=coma+cadenaMay(ed['nombre'])
-                    coma=', ' 
+                    let nombreEditorial='Dato inválido'
+                    if(ed !== null && typeof ed === 'object' && Object.prototype.hasOwnProperty.call(ed,'nombre')){
+                        if(ed['nombre'] === null){
+                            nombreEditorial='No informado'
+                        }else if(typeof ed['nombre'] === 'string'){
+                            let nombreNormalizado=ed['nombre'].trim().replace(/\s+/g,' ')
+                            nombreEditorial=nombreNormalizado === ''?'No informado':cadenaMay(nombreNormalizado)
+                        }
+                    }
+                    editorialesProcesadas.push(nombreEditorial)
                 })
+                let cadenaEditorial=editorialesProcesadas.join(', ')
                 template+=`<tr>
                     <td>Editorial/es</td>
                     <td>${cadenaEditorial}</td>
