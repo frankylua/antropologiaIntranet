@@ -15,7 +15,7 @@ class Institucion {
     }
     public function editar($id,$nombre){
         $sql="UPDATE institucion SET inst='$nombre' where id_inst='$id'";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
     public function mostrarConsultaOrdenada(){
          //consultar pueblos
