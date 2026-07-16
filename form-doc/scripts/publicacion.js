@@ -179,27 +179,27 @@
                         </tr>
                         <tr>
                             <td>Titulo</td>
-                            <td>${letraMay(pub[5])}</td>
+                            <td>${letraMay(pub.titulo)}</td>
                         </tr> 
                         <tr>
                             <td>Año</td>
-                            <td>${pub[2]}</td>
+                            <td>${pub.anio}</td>
                         </tr>
                         <tr>
                             <td>Nombre Revista</td>
-                            <td>${letraMay(pub[0])}</td>
+                            <td>${letraMay(pub.nombre_revista)}</td>
                         </tr>
                         <tr>
                             <td>Indizacion</td>
-                            <td>${letraMay(pub[7])}</td>
+                            <td>${letraMay(pub.indizacion)}</td>
                         </tr>
                         <tr>
                             <td>Estado</td>
-                            <td>${letraMay(pub[3])}</td>
+                            <td>${letraMay(pub.estado_publicacion)}</td>
                         </tr> 
                         <tr>
                             <td>Issn</td>
-                            <td>${pub[6]}</td>
+                            <td>${pub.issn}</td>
                         </tr> 
                         <tr>
                             <td>Factor de Impacto</td>

@@ -60,7 +60,7 @@ class Publicacion {
     }
     public function mostrarArtRev($usuario){
          //consultar pueblos
-         $sql="SELECT p.nombre,p.otros_autores,p.anio,e.nombre,a.tipo,a.titulo,a.issn,i.nombre,a.factor_impacto,p.id_publicacion FROM publicacion p JOIN articulo_revista a ON p.id_publicacion=a.publicacion JOIN usuario u ON p.usuario=u.id_usuario JOIN indizacion i ON a.indizacion=i.id_ind JOIN estado_pub e ON p.estado=e.id_est_pub WHERE  p.usuario='$usuario' ";
+         $sql="SELECT p.nombre AS nombre_revista,p.otros_autores,p.anio,e.nombre AS estado_publicacion,a.tipo,a.titulo,a.issn,i.nombre AS indizacion,a.factor_impacto,p.id_publicacion FROM publicacion p JOIN articulo_revista a ON p.id_publicacion=a.publicacion JOIN usuario u ON p.usuario=u.id_usuario JOIN indizacion i ON a.indizacion=i.id_ind JOIN estado_pub e ON p.estado=e.id_est_pub WHERE  p.usuario='$usuario' ";
          return ejecutarConsultaResultados($sql);
     }
     // mostrar articulos por id
