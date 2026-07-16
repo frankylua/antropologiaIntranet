@@ -43,7 +43,7 @@ class Publicacion {
     }
     public function editarLibro($id_pub,$tipo_lib,$rol,$ref_ext,$traduccion,$lugar){
         $sql="UPDATE libro SET tipo='$tipo_lib', rol='$rol', ref_ext='$ref_ext', traduccion='$traduccion', lugar='$lugar'  where publicacion='$id_pub'";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
     public function editarOtraPub($tipo_pub,$desc_pub,$id_pub){
         $sql="UPDATE otra_publicacion SET tipo='$tipo_pub', descripcion='$desc_pub' where id_otra_pub='$id_pub'";
