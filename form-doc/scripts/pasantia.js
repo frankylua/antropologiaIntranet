@@ -57,11 +57,11 @@ function cargarPasantia(usuario, id) {
                         </tr>
                         <tr>
                             <td>Fecha Inicio</td>
-                            <td>${mostrarFecha(pas['fech_in'])}</td>
+                            <td>${fechaCivil(pas['fech_in']).presentacion}</td>
                         </tr> 
                         <tr>
                         <td>Fecha de Término</td>
-                        <td>${mostrarFecha(pas['fech_ter'])}</td>
+                        <td>${fechaCivil(pas['fech_ter']).presentacion}</td>
                     </tr> 
                     <tr>
                         <td>Fondo</td>

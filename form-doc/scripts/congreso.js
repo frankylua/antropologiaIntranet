@@ -466,11 +466,11 @@ function cargarCong(usuario,id){
                     </tr>
                     <tr>
                     <td>Fecha de Inicio</td>
-                    <td>${mostrarFecha(cong['fecha_inicio'])}</td>
+                    <td>${fechaCivil(cong['fecha_inicio']).presentacion}</td>
                     </tr>
                     <tr>
                     <td>Fecha de Término</td>
-                    <td>${mostrarFecha(cong['fecha_termino'])}</td>
+                    <td>${fechaCivil(cong['fecha_termino']).presentacion}</td>
                     </tr> 
                     <tr>
                     `

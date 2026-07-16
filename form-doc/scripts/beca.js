@@ -78,11 +78,11 @@ $('#btn_beca').click(function(){
                         </tr>
                         <tr>
                             <td>Fecha Inicio</td>
-                            <td>${mostrarFecha(beca['fech_in'])}</td>
+                            <td>${fechaCivil(beca['fech_in']).presentacion}</td>
                         </tr> 
                         <tr>
                         <td>Fecha Término</td>
-                        <td>${mostrarFecha(beca['fech_ter'])}</td>
+                        <td>${fechaCivil(beca['fech_ter']).presentacion}</td>
                     </tr> 
                     </tbody>
                 </table>    

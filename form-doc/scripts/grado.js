@@ -116,7 +116,7 @@ function cargarGrado(usuario, id) {
             let conpost = 1
             let template = '';
             grados.forEach(grado => {
-                fecha = mostrarFecha(grado['4']);
+                fecha = fechaCivil(grado['4']).presentacion;
                 if (grado[3] == 1 || grado[3] == 2) {
                     tipo_grado = 'Pregrado';
                     con = conpre;

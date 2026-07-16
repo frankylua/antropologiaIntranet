@@ -69,11 +69,11 @@ function cargarPostdoc(usuario, id) {
                         </tr>
                         <tr>
                             <td>Fecha Inicio</td>
-                            <td>${mostrarFecha(postdoc['fecha_inicio'])}</td>
+                            <td>${fechaCivil(postdoc['fecha_inicio']).presentacion}</td>
                         </tr> 
                         <tr>
                         <td>Fecha de Término</td>
-                        <td>${mostrarFecha(postdoc['fecha_termino'])}</td>
+                        <td>${fechaCivil(postdoc['fecha_termino']).presentacion}</td>
                     </tr>        
                     </tbody>
                 </table>    
