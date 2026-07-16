@@ -48,6 +48,180 @@ Fecha:
 
 Sin observaciones adicionales registradas.
 
+## TASK-UX-DELETE-CONFIRM-001
+
+### Identificación
+
+Nombre:
+TASK-UX-DELETE-CONFIRM-001
+
+Tipo:
+FUNC — Experiencia de usuario
+
+Componente:
+Confirmación de eliminación CRUD
+
+FEATURE asociada:
+No registrada
+
+EPIC asociada:
+No registrada
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Implementar un componente estándar de confirmación para operaciones de eliminación CRUD.
+
+### Implementación
+
+Archivos modificados:
+`js/components/confirmDelete.js`
+`js/funcAjax.js`
+`form-doc/footer.php`
+
+Cambio realizado:
+Incorporación de un modal Bootstrap reutilizable que delega la operación de eliminación al callback consumidor, e integración inicial en la administración de listas.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Validación funcional:
+Aprobada
+
+### Evidencia Git
+
+Commit:
+`0b8e29844dd1ad8edef61df87389e719132e232d`
+
+Mensaje commit:
+`feat(ux): introduce standard CRUD delete confirmation messages`
+
+Fecha:
+2026-07-16T19:29:45-04:00
+
+### Observaciones
+
+Sin observaciones adicionales registradas.
+
+## TASK-UX-DELETE-CONFIRM-002
+
+### Identificación
+
+Nombre:
+TASK-UX-DELETE-CONFIRM-002
+
+Tipo:
+GOV — Consistencia visual frontend
+
+Componente:
+Modal de confirmación de eliminación CRUD
+
+FEATURE asociada:
+No registrada
+
+EPIC asociada:
+No registrada
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Alinear visualmente el modal de confirmación de eliminación con el estándar Bootstrap de la aplicación.
+
+### Implementación
+
+Archivos modificados:
+`js/components/confirmDelete.js`
+
+Cambio realizado:
+Ajuste del título, contenido y botones del modal de confirmación de eliminación.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Validación funcional:
+Aprobada
+
+### Evidencia Git
+
+Commit:
+`0b8e29844dd1ad8edef61df87389e719132e232d`
+
+Mensaje commit:
+`feat(ux): introduce standard CRUD delete confirmation messages`
+
+Fecha:
+2026-07-16T19:29:45-04:00
+
+### Observaciones
+
+Sin observaciones adicionales registradas.
+
+## TASK-UX-MESSAGE-CRUD-001
+
+### Identificación
+
+Nombre:
+TASK-UX-MESSAGE-CRUD-001
+
+Tipo:
+ARQ — Estandarización de componente frontend
+
+Componente:
+Mensajes CRUD
+
+FEATURE asociada:
+No registrada
+
+EPIC asociada:
+No registrada
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Crear un helper estándar para mensajes CRUD Bootstrap y eliminar el uso de ventanas nativas del navegador en la eliminación de listas.
+
+### Implementación
+
+Archivos modificados:
+`js/mensajesCrud.js`
+`js/funcAjax.js`
+
+Cambio realizado:
+Incorporación de `mostrarMensajeCRUD()` para presentar mensajes `success` y `danger` con el patrón visual existente, e integración en el resultado AJAX de `eliminarLista()`.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Validación funcional:
+Aprobada
+
+### Evidencia Git
+
+Commit:
+`0b8e29844dd1ad8edef61df87389e719132e232d`
+
+Mensaje commit:
+`feat(ux): introduce standard CRUD delete confirmation messages`
+
+Fecha:
+2026-07-16T19:29:45-04:00
+
+### Observaciones
+
+`admin/act.list.php` no se registra porque no forma parte del commit asociado.
+
 ## TASK-FEATURE001-PERSIST-007
 
 ### Identificación
