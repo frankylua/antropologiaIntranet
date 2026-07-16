@@ -74,7 +74,14 @@ function cargarListas(n_input) {
     n_input == "mag" ||
     n_input == "doc"
   ) {
-    ajaxListas("#listas", "../ajax/titulo.php", op, n_input);
+    ajaxListas(
+      "#listas",
+      "../ajax/titulo.php",
+      op,
+      n_input,
+      "id_titulo",
+      "tit_grado"
+    );
   }
   if (n_input == "inst") {
     ajaxListas(
