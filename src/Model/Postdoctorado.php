@@ -7,7 +7,7 @@ class Postdoctorado {
     }
     public function insertar($usuario,$prof,$inst,$fech_in,$fech_ter){
         $sql="INSERT INTO postdoctorado (id_postdoc,inst_postdoc,fecha_inicio,fecha_termino,prof,usuario) VALUES (NULL,'$inst','$fech_in','$fech_ter','$prof','$usuario')";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
     // public function editar($id,$nombre){
     //     $sql="UPDATE pueblo SET nombre='$nombre' where id_pueblo='$id'";
