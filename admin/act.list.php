@@ -12,6 +12,10 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
         <div class="row">
             <div class="col g-3 m-5">
                 <h3 class="card-title mb-5 text-center">LISTAS PREDEFINIDAS</h3>
+                <div class="row justify-content-center d-none" id="mnsj_row_listas">
+                    <div class="col-lg-8 alert mt-3 text-center alert-danger" role="alert" id="mnsj_listas">
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-lg-4 mb-3">
                         <div class="list-group">
@@ -65,6 +69,7 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
     <?php
     require ('../form-doc/footer.php');
     ?>
+    <script src="../js/mensajesCrud.js"></script>
     <script src="scripts/listas.js"></script>
     <?php
 }

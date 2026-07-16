@@ -152,9 +152,9 @@ $(document).ready(function () {
   $('body').on('click', '.eliminar_lista', function () {
     id_elim = $(this).attr('id');
     n_lista = $('#dato_lista').attr('name');
+    const descripcion_elim = $(this).closest('li').find('.col-auto').first().text().trim();
     console.log('id eliminar' + n_lista)
-    eliminarLista(id_elim, n_lista);
-    cargarListas(n_lista);
+    eliminarLista(id_elim, n_lista, descripcion_elim);
   })
   $('#form_lista').submit(function (e) {
     e.preventDefault();
