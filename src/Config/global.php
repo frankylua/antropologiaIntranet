@@ -1,20 +1,20 @@
 <?php
 declare(strict_types=1);
 
-// Carga variables de entorno desde .env (no versionado)
-require_once __DIR__ . '/env.php';
+// Adaptador temporal para consumidores heredados.
+require_once dirname(__DIR__) . '/bootstrap/app.php';
 
 // Datos de conexión (leídos desde .env)
-define('DB_HOST',     env('DB_HOST', 'localhost'));
-define('DB_NAME',     env('DB_NAME', 'c1441353_antr_db'));
-define('DB_USERNAME', env('DB_USERNAME', 'root'));
-define('DB_PASS',     env('DB_PASS', ''));
-define('DB_ENCODE',   env('DB_ENCODE', 'utf8mb4'));
+defined('DB_HOST')     || define('DB_HOST', app_config('DB_HOST'));
+defined('DB_NAME')     || define('DB_NAME', app_config('DB_NAME'));
+defined('DB_USERNAME') || define('DB_USERNAME', app_config('DB_USERNAME'));
+defined('DB_PASS')     || define('DB_PASS', app_config('DB_PASS'));
+defined('DB_ENCODE')   || define('DB_ENCODE', app_config('DB_ENCODE'));
 
 // Metadatos del proyecto
-define('NOM_PRO',  env('APP_NAME', 'Doctorado Antropología'));
-define('APP_ENV',  env('APP_ENV', 'prod'));    // dev | prod
-define('APP_URL',  env('APP_URL', 'http://localhost/antropologiaIntranet/'));
+defined('NOM_PRO') || define('NOM_PRO', app_config('APP_NAME'));
+defined('APP_ENV') || define('APP_ENV', app_config('APP_ENV'));
+defined('APP_URL') || define('APP_URL', app_config('APP_URL'));
 
 // Manejo de errores según entorno
 if (APP_ENV === 'dev') {

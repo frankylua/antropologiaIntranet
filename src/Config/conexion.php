@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__ . "/global.php";
+require_once dirname(__DIR__) . '/bootstrap/app.php';
 
 /**
  * Devuelve una conexión PDO singleton, con charset utf8mb4,
@@ -11,17 +11,17 @@ function conexion(): PDO {
     if ($conexion instanceof PDO) {
         return $conexion;
     }
-    $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=' . DB_ENCODE;
+    $dsn = 'mysql:host=' . app_config('DB_HOST') . ';dbname=' . app_config('DB_NAME') . ';charset=' . app_config('DB_ENCODE');
     $options = [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES   => false,
     ];
     try {
-        $conexion = new PDO($dsn, DB_USERNAME, DB_PASS, $options);
+        $conexion = new PDO($dsn, app_config('DB_USERNAME'), app_config('DB_PASS'), $options);
         return $conexion;
     } catch (PDOException $e) {
-        if (defined('APP_ENV') && APP_ENV === 'dev') {
+        if (app_config('APP_ENV') === 'dev') {
             throw $e; // en dev, ver el error real
         }
         error_log('[DB] ' . $e->getMessage());

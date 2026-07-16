@@ -5,7 +5,7 @@ use App\Security\Authorization;
     if (strlen(session_id()) < 1){
         session_start();//Validamos si existe o no la sesión
     }
-    require_once __DIR__ . '/../vendor/autoload.php';
+    require_once __DIR__ . '/../src/bootstrap/app.php';
     if(!Authorization::hasAny(['admin', 'comite'])){
         header('Location:../index.php');
     }else

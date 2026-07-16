@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../src/bootstrap/app.php';
 use App\Model\Beca;
 require 'validaciones.php';
 $nombre=isset($_POST['nombre'])?$_POST['nombre']:'';

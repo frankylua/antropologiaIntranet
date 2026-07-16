@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../src/bootstrap/app.php';
 use App\Model\Pasantia;
 require 'validaciones.php';
 $prof=isset($_POST['prof'])?$_POST['prof']:'';

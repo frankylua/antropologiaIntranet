@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../src/bootstrap/app.php';
 use App\Model\Grado;
 require 'validaciones.php';
 $titulo=isset($_POST['titulo'])?(int)$_POST['titulo']:'';

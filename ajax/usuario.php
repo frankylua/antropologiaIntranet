@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../src/bootstrap/app.php';
 require 'validaciones.php';
 $nombres=isset($_POST['nombres'])?limpiar_datos($_POST['nombres']):"";
 $ap_mat=isset($_POST['ap_mat'])?limpiar_datos($_POST['ap_mat']):"";

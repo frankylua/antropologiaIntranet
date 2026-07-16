@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../src/bootstrap/app.php';
 use App\Model\Financiamiento;
 require 'validaciones.php';
 $financ=new Financiamiento();
