@@ -45,7 +45,7 @@ function cargarFichaDoc() {
         </tr>
         <tr>
         <td class="col-4" >fecha de Nacimiento</td>
-        <td class="col-8">${mostrarFecha(usu[0]["fecha_nac"])}</td>
+        <td class="col-8">${fechaCivil(usu[0]["fecha_nac"]).presentacion}</td>
         </tr>
         <tr>
         <td class="col-4" >Género</td>

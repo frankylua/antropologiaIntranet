@@ -33,7 +33,7 @@ function cargarFichaEst() {
         </tr>
         <tr>
         <td class="col-4" >fecha de Nacimiento</td>
-        <td class="col-8">${mostrarFecha(usu[0]['fecha_nac'])}</td>
+        <td class="col-8">${fechaCivil(usu[0]['fecha_nac']).presentacion}</td>
         </tr>
         <tr>
         <td class="col-4" >Género</td>
@@ -89,11 +89,11 @@ function cargarFichaEst() {
         </tr>
         <tr>
         <td class="col-4">Fecha de Ingreso</td>
-        <td class="col-8">${mostrarFecha(usu[0]['fech_ingr'])}</td>
+        <td class="col-8">${fechaCivil(usu[0]['fech_ingr']).presentacion}</td>
         </tr>
         <tr>
         <td class="col-4">Fecha de Egreso</td>
-        <td class="col-8">${usu[0]['fecha_egr'] == null ? '------' : mostrarFecha(usu[0]['fecha_egr'])}</td>
+        <td class="col-8">${fechaCivil(usu[0]['fecha_egr']).presentacion}</td>
         </tr>
         <tr>
         <td class="col-4">Promedio de Notas Pregrado</td>
