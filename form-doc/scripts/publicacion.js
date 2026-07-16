@@ -50,7 +50,7 @@
             //$('#prof_guia').attr('name','');
             editoriales.forEach(list => {
                 template += `
-                <li class='list-group-item listEdit' id='${list[0]}' name="${list[1]}"> ${list[1]}</li>`});
+                <li class='list-group-item listEdit' id='${list.id_editorial}' name="${list.nombre}"> ${list.nombre}</li>`});
                 $('#list_editorial').html(template);
                 $('#list_editorial').show();           
              }
@@ -90,7 +90,7 @@
                 //$('#prof_guia').attr('name','');
                 editoriales.forEach(list => {
                     template += `
-                    <li class='list-group-item listEditNew' id='${list[0]}' name="${list[1]}"> ${list[1]}</li>`});
+                    <li class='list-group-item listEditNew' id='${list.id_editorial}' name="${list.nombre}"> ${list.nombre}</li>`});
                     $('#list_editorial'+x).html(template);
                     $('#list_editorial'+x).show();           
                  }
