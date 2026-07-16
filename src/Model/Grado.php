@@ -11,7 +11,7 @@ class Grado {
     }
     public function editar($id_grado,$inst,$titulo,$fecha){
         $sql="UPDATE grado_academico SET inst_grado='$inst', tit_grado='$titulo',fech_graduacion='$fecha' where id_grado='$id_grado'";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
     public function mostrar($usuario){
          //consultar pueblos
