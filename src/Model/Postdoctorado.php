@@ -25,7 +25,7 @@ class Postdoctorado {
    }
     public function editarPostdoc($id_postdoc,$prof,$inst,$fech_in,$fech_ter){
         $sql="UPDATE postdoctorado SET inst_postdoc='$inst', fecha_inicio='$fech_in', fecha_termino='$fech_ter', prof='$prof' where id_postdoc='$id_postdoc'";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
 
    }
     public function eliminar($id){
