@@ -16,7 +16,7 @@ function formGrado(contenedor,valorInst = null) {
         let template = "";
         template = `<option value="0">Seleccionar...</option>`;
         listas.forEach((p) => {
-            template += `<option value="${p[0]}"> ${cadenaMay(p[1])}</option>`;
+            template += `<option value="${p.id_inst}"> ${cadenaMay(p.inst)}</option>`;
         });
         $('#inst_grado').html(template);
         if(valorInst){
@@ -87,7 +87,7 @@ $(document).on('change', '.tit', function () {
         let template = "";
         template = `<option value="0">Seleccionar...</option>`;
         listas.forEach((p) => {
-            template += `<option value="${p[0]}"> ${cadenaMay(p[1])}</option>`;
+            template += `<option value="${p.id_titulo}"> ${cadenaMay(p.tit_grado)}</option>`;
         });
         $('#s_tit').html(template);
         },
@@ -116,23 +116,23 @@ function cargarGrado(usuario, id) {
             let conpost = 1
             let template = '';
             grados.forEach(grado => {
-                fecha = fechaCivil(grado['4']).presentacion;
-                if (grado[3] == 1 || grado[3] == 2) {
+                fecha = fechaCivil(grado.fech_graduacion).presentacion;
+                if (grado.tipo_grado == 1 || grado.tipo_grado == 2) {
                     tipo_grado = 'Pregrado';
                     con = conpre;
-                    if (grado[3] == 1) {
+                    if (grado.tipo_grado == 1) {
                         grado_acad = 'Licenciatura'
                     }
-                    if (grado[3] == 2) {
+                    if (grado.tipo_grado == 2) {
                         grado_acad = 'Titulo Universitario'
                     }
                 } else {
                     con = conpost;
                     tipo_grado = 'Postgrado';
-                    if (grado[3] == 3) {
+                    if (grado.tipo_grado == 3) {
                         grado_acad = 'Magister'
                     }
-                    if (grado[3] == 4) {
+                    if (grado.tipo_grado == 4) {
                         grado_acad = 'Doctorado'
                     }
 
@@ -162,11 +162,11 @@ function cargarGrado(usuario, id) {
                         </tr>
                         <tr>
                             <td>Título</td>
-                            <td>${cadenaMay(grado[2])}</td>
+                            <td>${cadenaMay(grado.tit_grado)}</td>
                         </tr>
                         <tr>
                             <td>Institución</td>
-                            <td>${cadenaMay(grado[1])}</td>
+                            <td>${cadenaMay(grado.inst)}</td>
                         </tr>
                         <tr>
                         <td>Fecha de Graduación</td>
@@ -178,10 +178,10 @@ function cargarGrado(usuario, id) {
         </div>
         </div>
         `
-                if (grado[3] == 1 || grado[3] == 2) {
+                if (grado.tipo_grado == 1 || grado.tipo_grado == 2) {
                     conpre++
                 }
-                if (grado[3] == 3 || grado[3] == 4) {
+                if (grado.tipo_grado == 3 || grado.tipo_grado == 4) {
                     conpost++
                 }
 
