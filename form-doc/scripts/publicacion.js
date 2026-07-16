@@ -398,7 +398,11 @@ $("body").on("click", ".editarPub", function () {
     tipo_pub = $(this).attr("name");// tipo de publicacion
     $('#edit_academicos').attr('name',id_pub)
     //if articulo   
-    editAcadDoc()
+    if($('#ficha_acad').attr('name')=='doc'){
+        editAcadDoc()
+    }else{
+        editAcadEst()
+    }
     $('#campos_publicacion').append('<h3 class="mb-5 text-center" id="tipo_pub">EDITAR PUBLICACIÓN</h3>')
     if(tipo_pub==1||tipo_pub==2){
         formArtRev('#campos_publicacion')
@@ -782,7 +786,11 @@ $('#form_edit_publicacion').submit(function(e){
             $('#mnsj_pub').addClass('alert-success');
             $('#mnsj_pub').html(dato);
             setTimeout(function() {
-                reiniciarInfoDoc()
+                if($('#ficha_acad').attr('name')=='doc'){
+                    reiniciarInfoDoc()
+                }else{
+                    reiniciarInfoEst()
+                }
                 $('#campos_publicacion').html('')
         $("#mnsj_row_pub").fadeOut(1500);
     },3000);
