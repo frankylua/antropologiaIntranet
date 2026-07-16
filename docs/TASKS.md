@@ -140,3 +140,105 @@ Fecha:
 ### Observaciones
 
 Sin observaciones adicionales registradas.
+
+## TASK-FEATURE001-PERSIST-008
+
+### Identificación
+
+Nombre:
+TASK-FEATURE001-PERSIST-008
+
+FEATURE asociada:
+FEATURE-001 — Evolución de los Contratos de Persistencia
+
+EPIC asociada:
+EPIC-008 — Gobierno del Modelo de Datos y Persistencia
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Migrar `Titulo::editar()` a contrato explícito de escritura.
+
+### Implementación
+
+Archivos modificados:
+`src/Model/Titulo.php`
+
+Cambio realizado:
+Sustitución de `ejecutarConsulta($sql)` por `ejecutarEscritura($sql)`.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Validación funcional:
+Aprobada
+
+### Evidencia Git
+
+Commit:
+`dd0830e299c4552a82c99f3a41c8c6207d411eae`
+
+Fecha:
+2026-07-16T17:11:14-04:00
+
+### Observaciones
+
+Sin observaciones adicionales registradas.
+
+## TASK-FUNC-TITULO-LIST-001
+
+### Identificación
+
+Nombre:
+TASK-FUNC-TITULO-LIST-001
+
+Tipo:
+FUNC — Corrección funcional
+
+Componente:
+Carga administrativa de listas de títulos
+
+FEATURE asociada:
+No registrada
+
+EPIC asociada:
+No registrada
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Corregir el consumo posicional incompatible con el contrato asociativo en la carga administrativa de títulos.
+
+### Implementación
+
+Archivos modificados:
+`js/funcAjax.js`
+
+Cambio realizado:
+Incorporación de las propiedades explícitas `id_titulo` y `tit_grado` en la llamada a `ajaxListas()`.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Validación funcional:
+Aprobada
+
+### Evidencia Git
+
+Commit:
+`9eb3f5895ae9f7e2ec06caa5f936f612a56cd38b`
+
+Fecha:
+2026-07-16T17:11:30-04:00
+
+### Observaciones
+
+Sin observaciones adicionales registradas.
