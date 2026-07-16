@@ -1,4 +1,4 @@
-function ajaxListas(id, url, op, tipo, propiedadId, propiedadEtiqueta) {
+function ajaxListas(id, url, op, tipo, propiedadId, propiedadEtiqueta, permitirEliminar) {
   $.ajax({
     url: url,
     type: "POST",
@@ -19,6 +19,7 @@ function ajaxListas(id, url, op, tipo, propiedadId, propiedadEtiqueta) {
         <button type="button" class='btn btn-link link-success btn-sm editar_lista' name='${
           etiquetaLista
         }'  id='${idLista}'>Editar</button>
+        ${permitirEliminar ? `<button type="button" class='btn btn-link link-danger btn-sm eliminar_lista' id='${idLista}'>Eliminar</button>` : ""}
        
       </div>
       </div>
@@ -66,7 +67,7 @@ function cargarListas(n_input) {
   $("#oculto").val("");
   op = "read";
   if (n_input == "pueb") {
-    ajaxListas("#listas", "../ajax/pueblo.php", op, undefined, "id_pueblo", "pueblo");
+    ajaxListas("#listas", "../ajax/pueblo.php", op, undefined, "id_pueblo", "pueblo", true);
   }
   if (
     n_input == "lic" ||
@@ -80,7 +81,8 @@ function cargarListas(n_input) {
       op,
       n_input,
       "id_titulo",
-      "tit_grado"
+      "tit_grado",
+      true
     );
   }
   if (n_input == "inst") {
@@ -100,32 +102,48 @@ function cargarListas(n_input) {
     ajaxListas("#listas", "../ajax/financiamiento.php", "read");
   }
 }
-function eliminarLista(id, n_input) {
-  op = "delete";
-  const dato_lista = {
-    id: id,
-    op: op,
-  };
-  if (n_input == "pueb") {
-    $.post("../ajax/pueblo.php", dato_lista, function (response) {
-      cargarListas(n_input);
-    });
+function eliminarLista(id, n_input, descripcion) {
+  if (n_input !== "pueb" && !["lic", "un", "mag", "doc"].includes(n_input)) {
+    return;
   }
-  if (
-    n_input == "lic" ||
-    n_input == "un" ||
-    n_input == "mag" ||
-    n_input == "doc"
-  ) {
-    $.post("../ajax/titulo.php", dato_lista, function (response) {
-      cargarListas(n_input);
-    });
-  }
-  if (n_input == "inst") {
-    $.post("../ajax/institucion.php", dato_lista, function (response) {
-      cargarListas(n_input);
-    });
-  }
+  const tipoRegistro = n_input === "pueb" ? "Pueblo" : "Título académico";
+  const descripcionRegistro = typeof descripcion === "string" ? descripcion.trim() : "";
+  confirmarEliminacion({
+    tipo: tipoRegistro,
+    nombre: descripcionRegistro,
+    onConfirm: function () {
+      const dato_lista = {
+        id: id,
+        op: "delete",
+        tipo: n_input,
+      };
+      const endpoint = n_input === "pueb" ? "../ajax/pueblo.php" : "../ajax/titulo.php";
+      $.ajax({
+        url: endpoint,
+        type: "POST",
+        data: dato_lista,
+        dataType: "json",
+        success: function (response) {
+          mostrarMensajeCRUD({
+            contenedor: "#mnsj_row_listas",
+            mensaje: response.mensaje,
+            tipo: response.ok ? "success" : "danger",
+          });
+          if (response.ok) {
+            cargarListas(n_input);
+          }
+        },
+        error: function (xhr) {
+          const response = xhr.responseJSON;
+          mostrarMensajeCRUD({
+            contenedor: "#mnsj_row_listas",
+            mensaje: response && response.mensaje ? response.mensaje : "No fue posible eliminar el registro",
+            tipo: "danger",
+          });
+        },
+      });
+    },
+  });
 }
 function mostrarPais(id) {
   $.get("../ajax/pais.php", function (response) {

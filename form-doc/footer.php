@@ -16,6 +16,7 @@
 <script src="<?php echo RUTA;?>/dist/js/bootstrap.bundle.min.js?"></script>
 <script src="<?php echo RUTA;?>js/jquery-3.7.0.min.js"></script>
 <script src="<?php echo RUTA;?>js/fechaCivil.js"></script>
+<script src="<?php echo RUTA;?>js/components/confirmDelete.js"></script>
 <script src="<?php echo RUTA;?>js/funcAjax.js?d=@DateTime.Now.ToString("ddMMyyddmmsss")"></script>
 <script src="<?php echo RUTA;?>js/funcForm.js?d=@DateTime.Now.ToString("ddMMyyddmmsss")"></script>
 <script src="<?php echo RUTA;?>js/funcValid.js"></script>
