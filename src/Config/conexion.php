@@ -1,25 +1,15 @@
 <?php
 declare(strict_types=1);
-require_once dirname(__DIR__) . '/bootstrap/app.php';
+
+use App\Config\ConnectionAuthority;
 
 /**
  * Devuelve una conexión PDO singleton, con charset utf8mb4,
  * excepciones habilitadas y modo emulación desactivado.
  */
 function conexion(): PDO {
-    static $conexion = null;
-    if ($conexion instanceof PDO) {
-        return $conexion;
-    }
-    $dsn = 'mysql:host=' . app_config('DB_HOST') . ';dbname=' . app_config('DB_NAME') . ';charset=' . app_config('DB_ENCODE');
-    $options = [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES   => false,
-    ];
     try {
-        $conexion = new PDO($dsn, app_config('DB_USERNAME'), app_config('DB_PASS'), $options);
-        return $conexion;
+        return ConnectionAuthority::connection(app_config());
     } catch (PDOException $e) {
         if (app_config('APP_ENV') === 'dev') {
             throw $e; // en dev, ver el error real
