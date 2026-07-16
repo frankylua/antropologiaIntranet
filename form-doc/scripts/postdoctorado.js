@@ -69,11 +69,11 @@ function cargarPostdoc(usuario, id) {
                         </tr>
                         <tr>
                             <td>Fecha Inicio</td>
-                            <td>${mostrarFecha(postdoc[2])}</td>
+                            <td>${mostrarFecha(postdoc['fecha_inicio'])}</td>
                         </tr> 
                         <tr>
                         <td>Fecha de Término</td>
-                        <td>${mostrarFecha(postdoc[3])}</td>
+                        <td>${mostrarFecha(postdoc['fecha_termino'])}</td>
                     </tr>        
                     </tbody>
                 </table>    
@@ -178,7 +178,7 @@ $('#form_postdoc').submit(function (e) {
     $('#fech_ter_postdoc').click(function () { limpiarSelect('#fech_ter_postdoc'); })
     lista = leerDatosPostdoc()
     console.log(lista)
-    if (lista['prof'] == '' || lista['fech_in'] == '' || lista['inst'] == '0' || lista['fech_ter'] == '0') {
+    if (lista['prof'] == '' || lista['fech_in'] == '' || lista['inst'] == '0' || lista['fech_ter'] == '') {
         validCampoVacio('#prof_postdoc');
         validSelect('#inst_postdoc');
         validCampoVacio('#fech_in_postdoc');
