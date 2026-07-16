@@ -15,7 +15,7 @@ class Titulo {
     }
     public function editar($id,$nombre){
         $sql="UPDATE titulo_grado SET tit_grado='$nombre' where id_titulo='$id'";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
     public function mostrarPorGrado($tipo){
          //consultar pueblos
