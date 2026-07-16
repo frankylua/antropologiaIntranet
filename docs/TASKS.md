@@ -242,3 +242,105 @@ Fecha:
 ### Observaciones
 
 Sin observaciones adicionales registradas.
+
+## TASK-FEATURE001-PERSIST-009
+
+### Identificación
+
+Nombre:
+TASK-FEATURE001-PERSIST-009
+
+FEATURE asociada:
+FEATURE-001 — Evolución de los Contratos de Persistencia
+
+EPIC asociada:
+EPIC-008 — Gobierno del Modelo de Datos y Persistencia
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Migrar `Publicacion::eliminarOtraPub()` a contrato explícito de escritura.
+
+### Implementación
+
+Archivos modificados:
+`src/Model/Publicacion.php`
+
+Cambio realizado:
+Sustitución de `ejecutarConsulta($sql)` por `ejecutarEscritura($sql)`.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Validación funcional:
+Aprobada
+
+### Evidencia Git
+
+Commit:
+`d0ad69b64c734db91ca314c65a555d86758e88dd`
+
+Fecha:
+2026-07-16T17:32:13-04:00
+
+### Observaciones
+
+Sin observaciones adicionales registradas.
+
+## TASK-FUNC-PUBLICACION-CONTEXT-001
+
+### Identificación
+
+Nombre:
+TASK-FUNC-PUBLICACION-CONTEXT-001
+
+Tipo:
+FUNC — Corrección funcional
+
+Componente:
+Módulo Publicaciones
+
+FEATURE asociada:
+No registrada
+
+EPIC asociada:
+No registrada
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Corregir el flujo de eliminación de publicaciones diferenciando el contexto estudiante/docente.
+
+### Implementación
+
+Archivos modificados:
+`form-doc/scripts/publicacion.js`
+
+Cambio realizado:
+Selección dinámica de las referencias de scroll y mensajes para estudiante/docente en `.eliminarPub` y `.eliminarOtraPub`, corrigiendo el acceso a una posición inexistente.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Validación funcional:
+Aprobada
+
+### Evidencia Git
+
+Commit:
+`2df42e82480d8044d1ed812c5db224f9b1631c55`
+
+Fecha:
+2026-07-16T17:32:30-04:00
+
+### Observaciones
+
+Sin observaciones adicionales registradas.
