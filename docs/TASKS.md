@@ -920,3 +920,95 @@ Fecha:
 ### Observaciones
 
 La implementación se limita a la migración del helper utilizado por `Grado::insertar()`. No se incorporaron parametrización SQL, transacciones, nuevas excepciones, DAO, Repository ni cambios de infraestructura.
+
+## TASK-REG-A4-PASANTIA-INSERT-001
+
+### Identificación
+
+Nombre:
+TASK-REG-A4-PASANTIA-INSERT-001
+
+Tipo:
+Implementación backend incremental supervisada
+
+FEATURE asociada:
+FEATURE-001 — Evolución de los Contratos de Persistencia
+
+EPIC asociada:
+EPIC-008 — Gobierno del Modelo de Datos y Persistencia
+
+AT asociado:
+AT-REG-A4-PASANTIA-INSERT-001
+
+ADR asociado:
+ADR-001 — Contrato explícito para operaciones de escritura
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Migrar exclusivamente `Pasantia::insertar()` desde el contrato heredado `ejecutarConsulta()` hacia el contrato explícito `ejecutarEscritura()`, manteniendo el comportamiento observable existente.
+
+### Implementación
+
+Archivo modificado:
+`src/Model/Pasantia.php`
+
+Cambio realizado:
+Sustitución exclusiva de `ejecutarConsulta($sql)` por `ejecutarEscritura($sql)` dentro de `Pasantia::insertar()`.
+
+Contrato de persistencia:
+La operación `INSERT` de Pasantia utiliza el contrato explícito de escritura definido por FEATURE-001.
+
+Se preservaron sin cambios:
+- Firma `insertar($usuario,$prof,$inst,$fech_in,$fech_ter,$ciudad,$fondo,$pais)`.
+- SQL `INSERT` existente.
+- Parámetros, tabla, columnas y valores utilizados.
+- Flujo AJAX.
+- Respuesta observable y mensajes funcionales.
+
+No se realizaron cambios en:
+- `ajax/pasantia.php`.
+- `form-doc/scripts/pasantia.js`.
+- `src/Config/conexion.php`.
+- `src/Config/ConnectionAuthority.php`.
+- Otros modelos.
+- Otros métodos de Pasantia.
+- Base de datos.
+- Frontend.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Validación funcional:
+Aprobada
+
+Validaciones realizadas:
+- Sintaxis PHP validada.
+- Diff revisado.
+- Consumidores revisados.
+- Único consumidor confirmado: `ajax/pasantia.php`.
+- Retorno utilizado únicamente como condición booleana.
+- Sin dependencia de `PDOStatement`.
+- Firma y SQL preservados.
+- Endpoint y frontend sin cambios.
+- Mensaje funcional preservado.
+- Cambio reversible restaurando `ejecutarConsulta($sql)`.
+
+### Evidencia Git
+
+Commit:
+`f5589f8b5f617da955148db98516d852865155c4`
+
+Mensaje commit:
+`refactor(persistence): migrate pasantia insert to explicit write contract`
+
+Fecha:
+2026-07-16T21:39:34-04:00
+
+### Observaciones
+
+La implementación se limita a la migración del helper utilizado por `Pasantia::insertar()`. No se incorporaron parametrización SQL, transacciones, nuevas excepciones, DAO, Repository ni cambios de infraestructura.
