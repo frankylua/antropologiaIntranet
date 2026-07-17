@@ -7,7 +7,7 @@ class Pasantia {
     }
     public function insertar($usuario,$prof,$inst,$fech_in,$fech_ter,$ciudad,$fondo,$pais){
         $sql="INSERT INTO pasantia (id_pasantia,inst_pasant,fech_in,fech_ter,prof_patr,fondo,ciudad,pais_pasant,usuario) VALUES (NULL,'$inst','$fech_in','$fech_ter','$prof','$fondo','$ciudad','$pais','$usuario')";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
     // public function editar($id,$nombre){
     //     $sql="UPDATE pueblo SET nombre='$nombre' where id_pueblo='$id'";
