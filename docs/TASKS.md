@@ -1326,3 +1326,85 @@ Fecha:
 ### Observaciones
 
 La validación funcional quedó pendiente por ausencia de datos controlados. La implementación mantiene reversibilidad mediante la restauración de `ejecutarConsulta($sql)`.
+
+## TASK-TEC-CONGRESO-SELECT-CONTRATO-001
+
+### Identificación
+
+Nombre:
+TASK-TEC-CONGRESO-SELECT-CONTRATO-001
+
+Tipo:
+[Tec] Corrección frontend
+
+Origen:
+AT-TEC-CONGRESO-SELECT-CADENAMAY-001
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Corregir el consumidor frontend del buscador de Congreso para utilizar el contrato asociativo de la respuesta JSON.
+
+### Causa
+
+El consumidor frontend utilizaba índices posicionales (`list[0]`, `list[1]`) sobre una respuesta JSON asociativa.
+
+Respuesta real:
+
+```text
+{
+ id_congreso,
+ nombre
+}
+```
+
+### Implementación
+
+Archivo modificado:
+`form-doc/scripts/congreso.js`
+
+Cambio realizado:
+
+Antes:
+
+```text
+list[0]
+list[1]
+```
+
+Después:
+
+```text
+list.id_congreso
+list.nombre
+```
+
+### Validación
+
+Validaciones realizadas:
+- `git diff --check`: correcto.
+- Validación funcional `VF-TEC-01`: aprobada.
+- Lista de congresos cargada correctamente.
+- Error `cadenaMay(undefined)` resuelto.
+
+### Archivos afectados
+
+- `form-doc/scripts/congreso.js`.
+
+### Exclusiones
+
+- Backend sin cambios.
+- Modelo sin cambios.
+- SQL sin cambios.
+- Persistencia sin cambios.
+
+### Reversibilidad
+
+Restaurar el consumo posicional anterior.
+
+### Observaciones
+
+Estado final:
+Cerrada

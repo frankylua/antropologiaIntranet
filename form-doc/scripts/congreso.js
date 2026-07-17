@@ -28,7 +28,7 @@ function formCongreso(contenedor){
             //$('#prof_guia').attr('name','');
             nom_cong.forEach(list => {
                 template += `
-                <li class='list-group-item listCong' id='${list[0]}' name="${list[1]}"> ${cadenaMay(list[1])}</li>`});
+                <li class='list-group-item listCong' id='${list.id_congreso}' name="${list.nombre}"> ${cadenaMay(list.nombre)}</li>`});
                 $('#list_cong').html(template);
                 $('#list_cong').show();           
              }
