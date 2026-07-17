@@ -654,3 +654,85 @@ Fecha:
 ### Observaciones
 
 La implementación del CRUD seguro queda separada en TASK posteriores. No forman parte de esta TASK los modelos, endpoints AJAX, JavaScript ni frontend asociados a Pueblo y Título.
+
+## TASK-PUEBLO-DELETE-SECURE-001
+
+### Identificación
+
+Nombre:
+TASK-PUEBLO-DELETE-SECURE-001
+
+Tipo:
+Implementación eliminación CRUD segura de Pueblo
+
+Clasificación:
+[FUNC] Operación CRUD segura
+[TEC] Persistencia backend
+[GOV] Protección datos maestros
+
+AT principal:
+AT-DELETE-SECURE-DESIGN-001
+
+Análisis asociados:
+AT-DB-FK-DELETE-CATALOGO-001
+AT-AUTORIZACION-DELETE-CATALOGO-001
+
+Migración previa:
+TASK-DB-MIGRATION-DELETE-RESTRICT-001
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Implementar la eliminación segura de `pueblo`, autorizada para Administrador y Comité Académico, con validación previa de dependencias y respuesta JSON estándar integrada con los mensajes CRUD existentes.
+
+### Implementación
+
+Archivos modificados:
+`ajax/pueblo.php`
+`src/Model/Pueblo.php`
+
+Cambio realizado:
+- Validación de autorización para Administrador y Comité Académico.
+- Validación de existencia del pueblo solicitado.
+- Validación de la dependencia `usuario.pueblo` → `pueblo.id_pueblo`.
+- Bloqueo con resultado `TIENE_DEPENDENCIAS` cuando existen usuarios asociados.
+- Eliminación segura cuando el pueblo no tiene dependencias.
+- Respuesta JSON estándar consumida por el mensaje CRUD existente.
+
+Regla de integridad:
+No se permite eliminar un pueblo cuando existen usuarios asociados.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Validación funcional:
+Aprobada
+
+Validaciones realizadas:
+- Eliminación de pueblo sin dependencias aprobada.
+- Bloqueo de pueblo con usuarios asociados aprobado.
+- Usuarios asociados permanecen intactos.
+- Administrador autorizado.
+- Comité autorizado.
+- Usuarios sin permiso rechazados.
+- Contrato JSON validado.
+- Integración con mensaje CRUD validada.
+
+### Evidencia Git
+
+Commit:
+`8e369122098a2a44bae2a6079b4be21451dc9c57`
+
+Mensaje commit:
+`feat(crud): secure pueblo deletion with dependency validation`
+
+Fecha:
+2026-07-16T20:50:53-04:00
+
+### Observaciones
+
+La implementación se limita al endpoint y al modelo de Pueblo. Los cambios correspondientes a Título y al volcado SQL pertenecen a otras unidades de trabajo.
