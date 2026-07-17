@@ -24,21 +24,25 @@ switch($op){
          echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
          break;
     case'delete':
-        $respuesta=$pueblo->eliminar($id_pueblo);
-        $respuesta ? $pueblor="Pueblo Eliminado" : $pueblor="Pueblo no ha sido eliminado";
-        echo json_encode($pueblor, JSON_UNESCAPED_UNICODE);
-
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+        header('Content-Type: application/json; charset=utf-8');
+        if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
+            http_response_code(403);
+            echo json_encode(['ok' => false, 'codigo' => 'NO_AUTORIZADO', 'mensaje' => 'Usuario sin permisos para eliminar'], JSON_UNESCAPED_UNICODE);
+            break;
+        }
+        if ($id_pueblo <= 0) {
+            http_response_code(400);
+            echo json_encode(['ok' => false, 'codigo' => 'ID_INVALIDO', 'mensaje' => 'El identificador del pueblo no es válido'], JSON_UNESCAPED_UNICODE);
+            break;
+        }
+        $resultado = $pueblo->eliminar($id_pueblo);
+        if ($resultado['ok'] === false && $resultado['codigo'] === 'ERROR_ELIMINACION') {
+            http_response_code(500);
+        }
+        echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
         break;
         }
 ?>
-
-
-
-      
-        
-        
-    
-
-
-                
-            
