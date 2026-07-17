@@ -830,3 +830,93 @@ Fecha:
 ### Observaciones
 
 La implementación se limita al endpoint y al modelo de Título. No se modificaron la base de datos, la migración `TASK-DB-MIGRATION-DELETE-RESTRICT-001`, los componentes JavaScript ni la UX existente.
+
+## TASK-REG-A3-GRADO-INSERT-001
+
+### Identificación
+
+Nombre:
+TASK-REG-A3-GRADO-INSERT-001
+
+Tipo:
+Implementación backend incremental supervisada
+
+FEATURE asociada:
+FEATURE-001 — Evolución de los Contratos de Persistencia
+
+EPIC asociada:
+EPIC-008 — Gobierno del Modelo de Datos y Persistencia
+
+AT asociado:
+AT-REG-A3-003
+
+ADR asociado:
+ADR-001 — Contrato explícito para operaciones de escritura
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Migrar exclusivamente `Grado::insertar()` desde el contrato heredado `ejecutarConsulta()` hacia el contrato explícito `ejecutarEscritura()`, manteniendo el comportamiento observable existente.
+
+### Implementación
+
+Archivo modificado:
+`src/Model/Grado.php`
+
+Cambio realizado:
+Sustitución exclusiva de `ejecutarConsulta($sql)` por `ejecutarEscritura($sql)` dentro de `Grado::insertar()`.
+
+Contrato de persistencia:
+La operación `INSERT` de Grado utiliza el contrato explícito de escritura definido por FEATURE-001.
+
+Se preservaron sin cambios:
+- Firma `insertar($usuario,$instituto,$titulo,$fecha)`.
+- SQL `INSERT` existente.
+- Tablas y valores utilizados.
+- Reglas de negocio.
+- Flujo AJAX.
+- Endpoint y mensajes existentes.
+
+No se realizaron cambios en:
+- `ajax/grado.php`.
+- `form-doc/scripts/grado.js`.
+- `src/Config/conexion.php`.
+- `ConnectionAuthority`.
+- Otros modelos.
+- Base de datos.
+- Frontend.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Validación funcional:
+Aprobada
+
+Validaciones realizadas:
+- Sintaxis PHP validada.
+- Diff revisado.
+- Firma del método sin cambios.
+- SQL sin cambios.
+- Consumidor revisado.
+- Endpoint preservado.
+- Mensajes funcionales preservados.
+- Sin cambios de implementación fuera del alcance autorizado.
+
+### Evidencia Git
+
+Commit:
+`b28d7421d3e7fba43d8d9661fbc359b12aa63955`
+
+Mensaje commit:
+`refactor(persistence): migrate grado insert to explicit write contract`
+
+Fecha:
+2026-07-16T21:23:54-04:00
+
+### Observaciones
+
+La implementación se limita a la migración del helper utilizado por `Grado::insertar()`. No se incorporaron parametrización SQL, transacciones, nuevas excepciones, DAO, Repository ni cambios de infraestructura.
