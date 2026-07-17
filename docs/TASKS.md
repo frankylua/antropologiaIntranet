@@ -1223,3 +1223,106 @@ Fecha:
 ### Observaciones
 
 La validación funcional quedó pendiente por ausencia de datos controlados. La implementación mantiene reversibilidad mediante la restauración de `ejecutarConsulta()`.
+
+## TASK-REG-A8-TESIS-EDITARGUIA-001
+
+### Identificación
+
+Nombre:
+TASK-REG-A8-TESIS-EDITARGUIA-001
+
+Tipo:
+Implementación backend incremental supervisada
+
+FEATURE asociada:
+FEATURE-001 — Evolución de los Contratos de Persistencia
+
+EPIC asociada:
+EPIC-008 — Gobierno del Modelo de Datos y Persistencia
+
+AT asociado:
+AT-REG-A8-TESIS-EDITARGUIA-001
+
+ADR asociado:
+ADR-001 — Contrato explícito para operaciones de escritura
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Migrar exclusivamente `Tesis::editarGuia()` desde el contrato heredado `ejecutarConsulta()` hacia el contrato explícito `ejecutarEscritura()`, manteniendo el comportamiento observable existente.
+
+### Implementación
+
+Archivo modificado:
+`src/Model/Tesis.php`
+
+Método:
+`Tesis::editarGuia($guia,$id_tesis)`
+
+Cambio realizado:
+Sustitución exclusiva de `ejecutarConsulta($sql)` por `ejecutarEscritura($sql)` dentro de `Tesis::editarGuia()`.
+
+Contrato de persistencia:
+La operación `UPDATE` de `tesis` utiliza el contrato explícito de escritura definido por FEATURE-001.
+
+Se preservaron sin cambios:
+- Firma `editarGuia($guia,$id_tesis)`.
+- SQL `UPDATE` existente.
+- Parámetros `$guia` y `$id_tesis`.
+- Endpoint `ajax/tesis.php`.
+- Operación AJAX `update-guia`.
+- Flujo frontend `form-doc/scripts/tesis.js`.
+- Mensajes JSON y comportamiento observable.
+
+Quedaron fuera de alcance:
+- `Tesis::editarCoguia()`.
+- `Tesis::insertarTesis()`.
+- `Tesis::insertarCotutela()`.
+- CRUD general de Tesis.
+- Cambios SQL.
+- Cambios frontend.
+- Nuevas transacciones.
+- Correcciones funcionales.
+- Refactor general.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Validaciones realizadas:
+- `php -l src/Model/Tesis.php`: correcto.
+- `git diff --check`: correcto.
+- Único archivo de implementación modificado: `src/Model/Tesis.php`.
+- Consumidor confirmado: `ajax/tesis.php`.
+- Operación confirmada: `update-guia`.
+- Frontend confirmado: `form-doc/scripts/tesis.js`.
+- El retorno se consume únicamente como condición booleana.
+- No existe dependencia de `PDOStatement`, `fetch()`, `rowCount()` ni propiedades del retorno.
+- Firma, parámetros, SQL, endpoint, frontend y mensajes preservados.
+- `ejecutarEscritura($sql)` se utiliza sin solicitar identificador insertado.
+
+Validación funcional:
+Pendiente por falta de fixture controlado
+
+Motivo:
+No existe fixture controlado ni tesis/profesor autorizado para modificar.
+
+No se crearon datos artificiales ni se realizaron operaciones sobre la base de datos.
+
+### Evidencia Git
+
+Commit:
+`0337e3df8a9047be773b8a873a17549200f975a4`
+
+Mensaje commit:
+`refactor(persist): migrate tesis guia update to explicit write contract`
+
+Fecha:
+2026-07-16T23:00:24-04:00
+
+### Observaciones
+
+La validación funcional quedó pendiente por ausencia de datos controlados. La implementación mantiene reversibilidad mediante la restauración de `ejecutarConsulta($sql)`.
