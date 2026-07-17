@@ -588,3 +588,69 @@ Fecha:
 ### Observaciones
 
 Sin observaciones adicionales registradas.
+
+## TASK-DB-MIGRATION-DELETE-RESTRICT-001
+
+### Identificación
+
+Nombre:
+TASK-DB-MIGRATION-DELETE-RESTRICT-001
+
+Tipo:
+TEC — Migración controlada de esquema de base de datos
+
+Clasificación:
+[TEC] Migración base de datos
+[GOV] Integridad datos maestros
+[ARQ] Política persistencia
+
+AT asociado:
+AT-DB-MIGRATION-DELETE-RESTRICT-001
+
+AT origen:
+AT-DB-FK-DELETE-CATALOGO-001
+
+Diseño relacionado:
+AT-DELETE-SECURE-DESIGN-001
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Modificar la política referencial de eliminación de `ON DELETE CASCADE` a `ON DELETE RESTRICT` para `fk_pueblo` (`usuario.pueblo` → `pueblo.id_pueblo`) y `fk_titulo_grado` (`grado_academico.tit_grado` → `titulo_grado.id_titulo`).
+
+### Implementación
+
+Archivo incluido:
+`migrations/TASK-DB-MIGRATION-DELETE-RESTRICT-001.sql`
+
+Cambio realizado:
+- FK `fk_pueblo` modificada a `ON DELETE RESTRICT`.
+- FK `fk_titulo_grado` modificada a `ON DELETE RESTRICT`.
+- `ON UPDATE CASCADE` conservado en ambas relaciones.
+- No se realizaron cambios DML.
+- Rollback documentado en el script de migración.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Migración:
+Aprobada
+
+### Evidencia Git
+
+Commit:
+`4ae45a4fb132a499fd91f5971a53664d06636be5`
+
+Mensaje commit:
+`feat(db): enforce restrict delete on catalog foreign keys`
+
+Fecha:
+2026-07-16T20:38:29-04:00
+
+### Observaciones
+
+La implementación del CRUD seguro queda separada en TASK posteriores. No forman parte de esta TASK los modelos, endpoints AJAX, JavaScript ni frontend asociados a Pueblo y Título.
