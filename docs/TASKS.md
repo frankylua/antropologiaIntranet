@@ -222,6 +222,76 @@ Fecha:
 
 `admin/act.list.php` no se registra porque no forma parte del commit asociado.
 
+## TASK-UX-DELETE-LIST-INTEGRATION-001
+
+### Identificación
+
+Nombre:
+TASK-UX-DELETE-LIST-INTEGRATION-001
+
+Tipo:
+Regularización frontend incremental
+
+Origen:
+AT-UX-REGULARIZACION-001 — Inspección cambios UX residuales fuera de commit
+
+Componente:
+Administración de listas
+
+FEATURE asociada:
+No registrada
+
+EPIC asociada:
+No registrada
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Regularizar los cambios frontend que quedaron fuera del commit `0b8e29844dd1ad8edef61df87389e719132e232d`, completando la integración del flujo UX de eliminación en la administración de listas.
+
+### Implementación
+
+Archivos modificados:
+`admin/act.list.php`
+`admin/scripts/listas.js`
+
+Cambio realizado:
+Incorporación del contenedor Bootstrap para mensajes CRUD y carga de su helper, entrega de la descripción visible del registro al flujo de confirmación y eliminación de la recarga inmediata previa a la confirmación.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Validación funcional:
+Aprobada
+
+Cancelación:
+Modal mostrado. Cancelar no ejecuta AJAX. Lista permanece sin cambios.
+
+Confirmación exitosa:
+Confirmación ejecuta AJAX. Mensaje CRUD Bootstrap visible. Lista se actualiza después del éxito.
+
+Error funcional:
+Backend rechaza eliminación. Mensaje Bootstrap de error visible. Lista no se actualiza.
+
+### Evidencia Git
+
+Commit:
+`7d6fd409607915b7c0a655e406bdc6228de7d899`
+
+Mensaje commit:
+`fix(ux): complete admin list delete integration flow`
+
+Fecha:
+2026-07-16T19:58:58-04:00
+
+### Observaciones
+
+Regularización posterior al incremento UX de confirmación y mensajes CRUD estándar.
+
 ## TASK-FEATURE001-PERSIST-007
 
 ### Identificación
