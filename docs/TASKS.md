@@ -1012,3 +1012,106 @@ Fecha:
 ### Observaciones
 
 La implementación se limita a la migración del helper utilizado por `Pasantia::insertar()`. No se incorporaron parametrización SQL, transacciones, nuevas excepciones, DAO, Repository ni cambios de infraestructura.
+
+## TASK-REG-A6-PROYECTO-EDITARINV-001
+
+### Identificación
+
+Nombre:
+TASK-REG-A6-PROYECTO-EDITARINV-001
+
+Tipo:
+Implementación backend incremental supervisada
+
+FEATURE asociada:
+FEATURE-001 — Evolución de los Contratos de Persistencia
+
+EPIC asociada:
+EPIC-008 — Gobierno del Modelo de Datos y Persistencia
+
+AT asociado:
+AT-REG-A6-PROYECTO-EDITARINV-001
+
+ADR asociado:
+ADR-001 — Contrato explícito para operaciones de escritura
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Migrar exclusivamente `Proyecto::editarInv()` desde el contrato heredado `ejecutarConsulta()` hacia el contrato explícito `ejecutarEscritura()`, manteniendo el comportamiento observable existente.
+
+### Implementación
+
+Archivo modificado:
+`src/Model/Proyecto.php`
+
+Método:
+`Proyecto::editarInv($inv,$id_proy)`
+
+Cambio realizado:
+Sustitución exclusiva de `ejecutarConsulta($sql)` por `ejecutarEscritura($sql)` dentro de `Proyecto::editarInv()`.
+
+Contrato de persistencia:
+La operación `UPDATE` de `proyecto_investigacion` utiliza el contrato explícito de escritura definido por FEATURE-001.
+
+Se preservaron sin cambios:
+- Firma `editarInv($inv,$id_proy)`.
+- SQL `UPDATE` existente.
+- Parámetros, tabla, columnas y condición utilizados.
+- Endpoint `ajax/proyecto.php`.
+- Frontend.
+- Mensajes observables y comportamiento funcional esperado.
+
+No se realizaron cambios en:
+- `ajax/proyecto.php`.
+- `form-doc/scripts/proyecto.js`.
+- Otros métodos de Proyecto.
+- Otros modelos.
+- Base de datos.
+- SQL.
+- Frontend.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Validaciones realizadas:
+- `php -l src/Model/Proyecto.php`: correcto.
+- `git diff --check`: correcto.
+- Diff revisado: un único cambio funcional en `Proyecto::editarInv()`.
+
+Validación funcional:
+No ejecutada
+
+Motivo:
+No existe fixture controlado ni proyecto identificado como seguro para modificar.
+
+No se encontraron:
+- Datos semilla descartables.
+- Ambiente de prueba autorizado.
+- Identificadores aprobados.
+
+Compatibilidad funcional validada estáticamente mediante:
+- Revisión del flujo AJAX `update-inv`.
+- Revisión del endpoint `ajax/proyecto.php`.
+- Revisión del contrato de respuesta.
+- Confirmación de ausencia de dependencia de `PDOStatement`, `fetch()`, `rowCount()` o propiedades del retorno.
+- Confirmación de que el retorno se utiliza únicamente como condición booleana.
+
+### Evidencia Git
+
+Commit:
+`e3d3ce78566ecce9351e607758ee0757f425775a`
+
+Mensaje commit:
+`refactor(persistence): migrate proyecto editarInv to explicit write contract`
+
+Fecha:
+2026-07-16T22:32:20-04:00
+
+### Observaciones
+
+La validación funcional no fue ejecutada por ausencia de datos controlados. La implementación mantiene reversibilidad restaurando `ejecutarConsulta($sql)`.
