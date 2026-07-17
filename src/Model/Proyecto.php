@@ -24,7 +24,7 @@ class Proyecto {
     //update
     public function editarInv($inv,$id_proy){
         $sql="UPDATE proyecto_investigacion SET nom_inv=NULL, id_inv='$inv' WHERE id_proyecto='$id_proy'";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
     public function editarCoinv($coinv,$id_proy,$inst){
         $sql="UPDATE proyecto_investigacion SET nom_coinv=NULL, id_coinv='$coinv', inst_proy='$inst' WHERE id_proyecto='$id_proy'";
