@@ -28,7 +28,7 @@ class Proyecto {
     }
     public function editarCoinv($coinv,$id_proy,$inst){
         $sql="UPDATE proyecto_investigacion SET nom_coinv=NULL, id_coinv='$coinv', inst_proy='$inst' WHERE id_proyecto='$id_proy'";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
     // public function editar($id,$nombre){
     //     $sql="UPDATE pueblo SET nombre='$nombre' where id_pueblo='$id'";
