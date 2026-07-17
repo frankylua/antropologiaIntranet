@@ -1115,3 +1115,111 @@ Fecha:
 ### Observaciones
 
 La validación funcional no fue ejecutada por ausencia de datos controlados. La implementación mantiene reversibilidad restaurando `ejecutarConsulta($sql)`.
+
+## TASK-REG-A7-PROYECTO-EDITARCOINV-001
+
+### Identificación
+
+Nombre:
+TASK-REG-A7-PROYECTO-EDITARCOINV-001
+
+Tipo:
+Implementación backend incremental supervisada
+
+FEATURE asociada:
+FEATURE-001 — Evolución de los Contratos de Persistencia
+
+EPIC asociada:
+EPIC-008 — Gobierno del Modelo de Datos y Persistencia
+
+AT asociado:
+AT-REG-A7-PROYECTO-EDITARCOINV-001
+
+ADR asociado:
+ADR-001 — Contrato explícito para operaciones de escritura
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Migrar exclusivamente `Proyecto::editarCoinv()` desde el contrato heredado `ejecutarConsulta()` hacia el contrato explícito `ejecutarEscritura()`, manteniendo el comportamiento observable existente.
+
+### Implementación
+
+Archivo modificado:
+`src/Model/Proyecto.php`
+
+Método:
+`Proyecto::editarCoinv($coinv,$id_proy,$inst)`
+
+Cambio realizado:
+Sustitución exclusiva de `ejecutarConsulta($sql)` por `ejecutarEscritura($sql)` dentro de `Proyecto::editarCoinv()`.
+
+Contrato de persistencia:
+La operación `UPDATE` de `proyecto_investigacion` utiliza el contrato explícito de escritura definido por FEATURE-001.
+
+Se preservaron sin cambios:
+- Firma `editarCoinv($coinv,$id_proy,$inst)`.
+- Parámetros `$coinv`, `$id_proy` y `$inst`.
+- SQL `UPDATE` existente.
+- Tabla, columnas y condición utilizadas.
+- Endpoint `ajax/proyecto.php`.
+- Operación AJAX `update-coinv`.
+- Flujo frontend `form-doc/scripts/proyecto.js`.
+- Mensajes JSON y comportamiento observable.
+
+Quedaron fuera de alcance:
+- CRUD completo de Proyecto.
+- `Proyecto::editar()`.
+- `Proyecto::editarInv()`.
+- `Proyecto::insertar()`.
+- Cambios SQL.
+- Cambios frontend.
+- Cambios de esquema.
+- Nuevas transacciones.
+- Correcciones funcionales.
+- Refactor general.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Validaciones realizadas:
+- `php -l src/Model/Proyecto.php`: correcto.
+- `git diff --check`: correcto.
+- Consumidor confirmado: `ajax/proyecto.php`.
+- Operación confirmada: `update-coinv`.
+- Frontend confirmado: `form-doc/scripts/proyecto.js`.
+- El retorno se consume únicamente como condición booleana.
+- Firma, parámetros, SQL, endpoint, frontend y contrato JSON preservados.
+
+Validación funcional:
+No ejecutada
+
+Motivo:
+No existe fixture controlado ni proyecto autorizado para modificar.
+
+No se crearon datos artificiales ni se realizaron operaciones sobre la base de datos.
+
+La compatibilidad fue validada estáticamente mediante:
+- Revisión del flujo AJAX.
+- Revisión del endpoint.
+- Revisión del contrato de respuesta.
+- Confirmación de ausencia de dependencia de `PDOStatement`.
+
+### Evidencia Git
+
+Commit:
+`14b94e9bcf0b73b0bb0321ad80837173d660cc0e`
+
+Mensaje commit:
+`refactor(persistence): migrate proyecto editarCoinv to explicit write contract`
+
+Fecha:
+2026-07-16T22:45:56-04:00
+
+### Observaciones
+
+La validación funcional quedó pendiente por ausencia de datos controlados. La implementación mantiene reversibilidad mediante la restauración de `ejecutarConsulta()`.
