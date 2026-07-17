@@ -736,3 +736,97 @@ Fecha:
 ### Observaciones
 
 La implementación se limita al endpoint y al modelo de Pueblo. Los cambios correspondientes a Título y al volcado SQL pertenecen a otras unidades de trabajo.
+
+## TASK-TITULO-DELETE-SECURE-001
+
+### Identificación
+
+Nombre:
+TASK-TITULO-DELETE-SECURE-001
+
+Tipo:
+Implementación eliminación CRUD segura de Títulos académicos
+
+Clasificación:
+[FUNC] Operación CRUD segura
+[TEC] Persistencia backend
+[GOV] Protección datos maestros
+
+AT principal:
+AT-TITULO-DELETE-SECURE-001
+
+Diseño general:
+AT-DELETE-SECURE-DESIGN-001
+
+Migración previa:
+TASK-DB-MIGRATION-DELETE-RESTRICT-001
+
+Patrón aprobado:
+TASK-PUEBLO-DELETE-SECURE-001
+
+Estado:
+Cerrada
+
+### Objetivo
+
+Implementar la eliminación segura de `titulo_grado`, autorizada para Administrador y Comité Académico, impidiendo eliminar un título académico cuando existen registros asociados mediante la dependencia `grado_academico.tit_grado` → `titulo_grado.id_titulo`.
+
+### Implementación
+
+Archivos modificados:
+`src/Model/Titulo.php`
+`ajax/titulo.php`
+
+Cambio realizado:
+- Validación de autorización mediante el mecanismo existente para Administrador y Comité Académico, sin crear nuevos permisos.
+- Validación de existencia del título académico solicitado.
+- Validación de la dependencia `grado_academico.tit_grado` → `titulo_grado.id_titulo`.
+- Bloqueo con resultado `TIENE_DEPENDENCIAS` cuando existen grados académicos asociados.
+- Eliminación segura cuando el título no tiene dependencias.
+- Traducción de la restricción referencial a la respuesta JSON estándar.
+- Contrato JSON alineado con `TASK-PUEBLO-DELETE-SECURE-001` e integrado con la UX existente.
+
+Identidad del registro:
+La eliminación utiliza exclusivamente `titulo_grado.id_titulo`. La columna `tipo_grado` corresponde a clasificación y contexto visual, y no se utiliza como identidad persistente ni como criterio de eliminación.
+
+Regla de integridad:
+No se permite eliminar un título académico cuando existen grados académicos asociados. La operación elimina únicamente el registro de `titulo_grado`; los registros de `grado_academico` permanecen intactos.
+
+Contrato JSON:
+- Éxito: `{"ok":true,"codigo":"ELIMINADO","mensaje":"Registro eliminado correctamente"}`.
+- Dependencias: `{"ok":false,"codigo":"TIENE_DEPENDENCIAS","mensaje":"No se puede eliminar porque existen registros asociados"}`.
+- Sin permisos: `{"ok":false,"codigo":"NO_AUTORIZADO","mensaje":"Usuario sin permisos para eliminar"}`.
+
+### Validación
+
+Validación técnica:
+Aprobada
+
+Validación funcional:
+Aprobada
+
+Validaciones realizadas:
+- Firma `Titulo::eliminar($id)` restaurada sin dependencia de `tipo_grado`.
+- Consumidores revisados.
+- Administrador autorizado.
+- Comité Académico autorizado.
+- Usuarios sin permisos rechazados.
+- Títulos con dependencias bloqueados.
+- Grados académicos asociados permanecen intactos.
+- Contrato JSON validado.
+- Integración UX existente preservada.
+
+### Evidencia Git
+
+Commit:
+`939a59100f37094aa6a4d7af3732fa80b5b93dd3`
+
+Mensaje commit:
+`feat(crud): secure titulo deletion with dependency validation`
+
+Fecha:
+2026-07-16T21:08:48-04:00
+
+### Observaciones
+
+La implementación se limita al endpoint y al modelo de Título. No se modificaron la base de datos, la migración `TASK-DB-MIGRATION-DELETE-RESTRICT-001`, los componentes JavaScript ni la UX existente.
