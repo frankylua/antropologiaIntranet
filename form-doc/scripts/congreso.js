@@ -131,7 +131,7 @@ if(isEdit){
                         if(p['id_coaut'] == usuario){
                         $('#rol_cong').val(2) 
                         }
-                        if($('#rol_cong').val(2)){
+                        if($('#rol_cong').val() === '2'){
                             $('#aut').val(p['nom_aut']==null?"":$('#aut').val(cadenaMay(p['nom_aut'])))
                         }
                         if(p['id_aut'] == usuario || p['id_coaut'] == usuario){
@@ -155,7 +155,7 @@ if(isEdit){
                         if(p['id_coaut'] == usuario){
                         $('#rol_cong').val(2) 
                         }
-                        if($('#rol_cong').val(2)){
+                        if($('#rol_cong').val() === '2'){
                             $('#aut').val(p['nom_aut']==null?"":$('#aut').val(cadenaMay(p['nom_aut'])))
                         }
                         if(p['id_aut'] == usuario || p['id_coaut'] == usuario){
@@ -177,7 +177,7 @@ if(isEdit){
                         if(p['id_coaut'] == usuario){
                         $('#rol_cong').val(2) 
                         }
-                        if($('#rol_cong').val(2)){
+                        if($('#rol_cong').val() === '2'){
                             $('#aut').val(p['nom_aut']==null?"":$('#aut').val(cadenaMay(p['nom_aut'])))
                         }
                         if(p['id_aut'] == usuario || p['id_coaut'] == usuario){
@@ -228,7 +228,7 @@ if(isEdit){
                 if(part[0]['id_aut'] == usuario){
                     $('#rol_cong').val(2) 
                 }
-                if($('#rol_cong').val(2)){
+                if($('#rol_cong').val() === '2'){
                     $('#aut').val(cong[0]['nom_aut']==null?"":$('#aut').val(cadenaMay(cong[0]['nom_aut'])))
                 }
 
@@ -319,7 +319,10 @@ $("body").on("click", ".editarCong", function () {
             if(cong[0]['id_aut'] == usuario){
                 $('#rol_cong').val(1) 
             }
-            if($('#rol_cong').val(2)){
+            if(cong[0]['id_coaut'] == usuario){
+                $('#rol_cong').val(2)
+            }
+            if($('#rol_cong').val() === '2'){
                 $('#aut').val(cong[0]['nom_aut'])
             }
             $('#coautores').val( cong[0]['otro'])

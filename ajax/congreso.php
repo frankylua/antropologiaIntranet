@@ -13,8 +13,8 @@ $tipo_part=isset($_POST['tipo_part'])?(int)$_POST['tipo_part']:'';
 $rol=isset($_POST['rol'])?(int)$_POST['rol']:'';
 $tipo_cong=isset($_POST['tipo_cong'])?(int)$_POST['tipo_cong']:'';
 $autor=isset($_POST['nom_autor'])?$_POST['nom_autor']:'';
-$id_coautor=isset($_POST['coautor'])?(int)$_POST['coautor']:'';
-$id_autor=isset($_POST['autor'])?(int)$_POST['autor']:'';// prbar si esta bien el nombre de la variable // un caso de prueba
+$id_coautor=isset($_POST['coautor']) && (int)$_POST['coautor'] > 0?(int)$_POST['coautor']:null;
+$id_autor=isset($_POST['autor']) && (int)$_POST['autor'] > 0?(int)$_POST['autor']:null;
 $coautores=isset($_POST['coautores'])?$_POST['coautores']:'';
 $nom_mesa=isset($_POST['nom_mesa'])?$_POST['nom_mesa']:'';
 $comen_pon=isset($_POST['comen_pon'])?$_POST['comen_pon']:'';
@@ -60,7 +60,7 @@ switch($op){
             if($id_part == 0){
                $respuesta=$cong->insertarPart($tipo_part,$tipo_cong,$coautores,$nom_mesa,$comen_pon,$congreso,$autor,$id_autor,$id_coautor);
             }else{
-                $respuesta=$cong->editarPart($id_part,$id_congreso,$tipo_part,$tipo_cong,$coautores,$nom_mesa,$comen_pon,$autor,$id_autor,$id_coautor);
+                $respuesta=$cong->editarPart($id_part,$id_congreso,$tipo_part,$tipo_cong,$coautores,$nom_mesa,$comen_pon,$autor,$id_autor,$id_coautor,$rol);
 
             }
             $respuesta ? $mensaje="Congreso Editado" : $mensaje="Congreso no ha sido editado";
