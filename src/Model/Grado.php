@@ -7,7 +7,7 @@ class Grado {
     }
     public function insertar($usuario,$instituto,$titulo,$fecha){
         $sql="INSERT INTO grado_academico (id_grado,usuario,inst_grado,tit_grado,fech_graduacion) VALUES (NULL,'$usuario','$instituto','$titulo','$fecha')";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
     public function editar($id_grado,$inst,$titulo,$fecha){
         $sql="UPDATE grado_academico SET inst_grado='$inst', tit_grado='$titulo',fech_graduacion='$fecha' where id_grado='$id_grado'";
