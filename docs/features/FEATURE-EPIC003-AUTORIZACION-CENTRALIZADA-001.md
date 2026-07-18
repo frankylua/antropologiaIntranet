@@ -6,8 +6,8 @@
 
 - **Clasificación:** [ARQ] Evolución de arquitectura de autorización; [TEC] Feature técnica incremental; [GOV] Derivada de EPIC-003.
 - **EPIC asociado:** EPIC-003 — Separación segura entre estados académicos y roles de acceso.
-- **Estado:** Propuesta.
-- **Pendiente:** aprobación de Dirección Técnica y creación de la TASK piloto.
+- **Estado:** Piloto Reglamento completado.
+- **Siguiente etapa:** evaluación de nuevos módulos candidatos mediante análisis técnico previo.
 
 ## 2. Objetivo
 
@@ -102,6 +102,27 @@ Características del piloto:
 
 Extender el patrón gradualmente a los demás módulos protegidos, con validación funcional por cada alcance. Cada migración requiere una TASK independiente; no se autoriza una migración masiva mediante esta Feature.
 
+## Estado piloto Reglamento
+
+**TASK:** `TASK-EPIC003-AUTORIZACION-REGLAMENTO-PILOTO-001`
+
+**Estado:** ✅ Validado funcionalmente.
+
+El módulo Reglamento utiliza `Authorization` como punto central de evaluación de acceso, manteniendo la fuente actual de permisos y sin cambios de comportamiento observable.
+
+| Caso | Resultado |
+| --- | --- |
+| `admin = true` | Acceso permitido |
+| `comite = true` | Acceso permitido |
+| `aceptado = true` | Acceso permitido |
+| Sin claves autorizadas | Acceso bloqueado |
+
+La validación confirmó que el comportamiento actual se mantiene.
+
+No se requirieron cambios de código para completar el piloto. La integración existente con `Authorization` fue validada funcionalmente.
+
+Siguiente etapa: evaluación de nuevos módulos candidatos mediante análisis técnico previo.
+
 ## 6. Riesgos y mitigación
 
 | Riesgo | Mitigación |
@@ -152,4 +173,4 @@ Esta Feature no autoriza modificar código, SQL, ADR, Roadmap, Manual Maestro ni
 
 ## 11. Siguiente paso
 
-Revisión documental de `FEATURE-EPIC003-AUTORIZACION-CENTRALIZADA-001.md` antes de commit. Una vez aprobada, corresponderá evaluar la creación de una TASK piloto para Reglamento.
+Revisión documental de `FEATURE-EPIC003-AUTORIZACION-CENTRALIZADA-001.md` antes de commit. Una vez aprobada, corresponderá evaluar nuevos módulos candidatos mediante análisis técnico previo.
