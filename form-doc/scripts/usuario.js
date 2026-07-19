@@ -1,8 +1,8 @@
 
-ajaxSelect('#inst_unid','../ajax/institucion.php','Seleccione','read','inst');
-ajaxSelect('#inst_unid_trabajo','../ajax/institucion.php','Seleccione','read','inst');
-ajaxSelect('#pais_nac','../ajax/pais.php','Seleccione','read');
-ajaxSelect('#pais_res','../ajax/pais.php','Seleccione','read');
+ajaxSelect('#inst_unid','../ajax/institucion.php','Seleccione','read','inst', 'id_inst', 'inst');
+ajaxSelect('#inst_unid_trabajo','../ajax/institucion.php','Seleccione','read','inst', 'id_inst', 'inst');
+ajaxSelect('#pais_nac','../ajax/pais.php','Seleccione','read', undefined, 'id_pais', 'pais');
+ajaxSelect('#pais_res','../ajax/pais.php','Seleccione','read', undefined, 'id_pais', 'pais');
 
 
   

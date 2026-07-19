@@ -69,6 +69,14 @@ switch ($op) {
     //     break;
 
     case 'insert-update':
+        $tipoEstValido = isset($_POST['tipo_est'])
+            && is_scalar($_POST['tipo_est'])
+            && ctype_digit((string) $_POST['tipo_est'])
+            && in_array((int) $_POST['tipo_est'], [1, 2, 3, 4, 5, 6, 7], true);
+        if (!$tipoEstValido) {
+            echo json_encode(["<p>Tipo de estudiante invÃ¡lido</p>", 0], JSON_UNESCAPED_UNICODE);
+            break;
+        }
         $login = $est->insertarLogin($correo, $pass);
         foreach ($permiso as $per) {
             $per = (int) $per;

@@ -34,11 +34,11 @@ $('#prof_guia').keyup(function(){
             }else{
                 $('#prof_guia').attr('name','');
                 profes.forEach(list => {
-                    prof=list[1]+' '+list[2]+' '+list[3];
+                    prof=list.nombres+' '+list.ap_pat+' '+list.ap_mat;
                     prof=cadenaMay(prof);
                     template += `
                 
-                <li class='list-group-item listProf' id='${list[0]}' name='${prof}'> ${prof}</li>`});
+                <li class='list-group-item listProf' id='${list.id_usuario}' name='${prof}'> ${prof}</li>`});
 
             }  
           $('#list_prof').html(template);
@@ -120,7 +120,7 @@ $('#form_usuario').submit(function(e){
     let sit_ocup=guardar($('#sit_ocup').val());
     let fech_ing=$('#fech_ing').val();
     let fech_grad=$('#fech_grad').val();
-    let tipo_est=$('#tipo_est').val();
+    let tipo_est=$('#tipo_est').length ? $('#tipo_est').val() : 1;
     let permisos=[5]
     if(tipo_est==2||tipo_est==3){
         permisos.push(3)
@@ -248,7 +248,7 @@ $('#form_usuario').submit(function(e){
 })        
 function init(){
     $('#mnsj_row_acad_est').hide();
-    ajaxSelect('#tipo_est','../ajax/estudiante.php','Seleccione','read_tipo');
+    ajaxSelect('#tipo_est','../ajax/estudiante.php','Seleccione','read_tipo', undefined, 'id_tipo_est', 'tipo');
     //AntecAcad();
     $('.loadPage').fadeOut();
     infoPers();

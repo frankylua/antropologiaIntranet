@@ -1,8 +1,8 @@
 
 
 $(document).ready(function(){
-  ajaxSelect('#pais_nac','../ajax/pais.php','Seleccione','pais');
-  ajaxSelect('#pais_res','../ajax/pais.php','Seleccione','pais');
+  ajaxSelect('#pais_nac','../ajax/pais.php','Seleccione','pais', undefined, 'id_pais', 'pais');
+  ajaxSelect('#pais_res','../ajax/pais.php','Seleccione','pais', undefined, 'id_pais', 'pais');
 
   // mostrarPais('#pais_nac');
   // mostrarPais('#pais_res');
