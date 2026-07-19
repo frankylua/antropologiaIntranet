@@ -191,13 +191,13 @@ function cargarEst(tipo,busqueda){
               
                <!-- desde aca es el modal cambiat tipo estudiante -->
               <input type="hidden" class="login_modal" name=${est['id_login']} value=${est['id_usuario']}></input> 
-               <button typr="button"  class="btn btn-outline-primary btn-sm text-center cambiarTipoEst" data-bs-toggle="modal" data-bs-target="#btn_tipo_est${est['id_usuario']}"><i class="fa-solid fa-rotate-right"></i></button>
-               <div class="modal fade" id="btn_tipo_est${est['id_usuario']}" tabindex="-1" aria-labelledby="modal_tipo${est['id_usuario']}" aria-hidden="true">
+               <button typr="button"  class="btn btn-outline-primary btn-sm text-center cambiarTipoEst" data-bs-toggle="modal" data-bs-target="#estado-est-${est['id_usuario']}"><i class="fa-solid fa-rotate-right"></i></button>
+               <div class="modal fade" id="estado-est-${est['id_usuario']}" tabindex="-1" aria-labelledby="modal-estado-est-${est['id_usuario']}" aria-hidden="true">
 
                    <div class="modal-dialog">
                      <div class="modal-content">
                        <div class="modal-header">
-                         <h5 class="modal-title" id="modal_tipo${est['id_usuario']}">Seleccione tipo de
+                         <h5 class="modal-title" id="modal-estado-est-${est['id_usuario']}">Seleccione tipo de
                            Estudiante/Acceso</h5>
                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                        </div>
@@ -230,15 +230,15 @@ function cargarEst(tipo,busqueda){
       
                 </td>
                 <td class="text-center"><button type="button" class="btn btn-outline-success btn-sm verEst text-center" id="${est['id_usuario']}"><i class="fa-solid fa-eye"></i></button></td>
-                <td class="text-center"><button type="button" class="btn btn-outline-danger  btn-sm " data-bs-toggle="modal" data-bs-target="#btn_tipo_est${est['id_login']}" id="${est['id_login']}" ><i class="fa-solid fa-trash-can"></i></button>
+                <td class="text-center"><button type="button" class="btn btn-outline-danger  btn-sm " data-bs-toggle="modal" data-bs-target="#eliminar-est-${est['id_login']}" id="${est['id_login']}" ><i class="fa-solid fa-trash-can"></i></button>
                 
                 <!-- desde aca es el modal eliminar estudiante-->
-                 <div class="modal fade" id="btn_tipo_est${est['id_login']}" tabindex="-1" aria-labelledby="modal_tipo${est['id_login']}" aria-hidden="true">
+                 <div class="modal fade" id="eliminar-est-${est['id_login']}" tabindex="-1" aria-labelledby="modal-eliminar-est-${est['id_login']}" aria-hidden="true">
   
                      <div class="modal-dialog">
                        <div class="modal-content">
                          <div class="modal-header">
-                           <h5 class="modal-title" id="modal_tipo${est['id_login']}">Seleccione tipo de
+                           <h5 class="modal-title" id="modal-eliminar-est-${est['id_login']}">Seleccione tipo de
                              Estudiante/Acceso</h5>
                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                          </div>
@@ -271,7 +271,7 @@ function cargarEst(tipo,busqueda){
                       est.empty();
                       data.forEach(function(item){
                           est.append(
-                              `<option value="${item.id_tipo}">${item.tipo}</option>`
+                              `<option value="${item.id_tipo_est}">${item.tipo}</option>`
                           );
                       });
         })
@@ -302,7 +302,7 @@ $('body').on('click','.cambiarTipoEst',function(){
     tipo_est=$('#tipo-e'+id_usu).val()
     id_login = $(this).attr('name');
     console.log(tipo_est)
-    $('#btn_tipo_est'+id_usu).modal('hide');
+    $('#estado-est-'+id_usu).modal('hide');
     $.ajax({
       async: false,
       url: '../ajax/estudiante.php',
