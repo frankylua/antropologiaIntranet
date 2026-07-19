@@ -14,4 +14,11 @@ final class Authorization
 
         return false;
     }
+
+    public static function hasCapability(string $capability): bool
+    {
+        return isset($_SESSION['capacidades'])
+            && is_array($_SESSION['capacidades'])
+            && in_array($capability, $_SESSION['capacidades'], true);
+    }
 }

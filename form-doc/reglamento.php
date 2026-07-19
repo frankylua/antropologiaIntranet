@@ -6,7 +6,7 @@ if (strlen(session_id()) < 1) {
     session_start();//Validamos si existe o no la sesión
 }
 require_once __DIR__ . '/../src/bootstrap/app.php';
-if (!Authorization::hasAny(['admin', 'comite', 'aceptado'])) {
+if (!Authorization::hasCapability('reglamento.ver') && !Authorization::hasAny(['admin', 'comite', 'aceptado'])) {
     header('Location:../index.php');
 } else {
     require ('header.php');

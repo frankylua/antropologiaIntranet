@@ -10,6 +10,7 @@ $login= new Login();
 $correo=isset($_POST['correo'])?$_POST['correo']:"";
 $pass=isset($_POST['pass'])?$_POST['pass']:"";
 $mensaje='';
+$_SESSION['capacidades'] = [];
 if(isset($correo) && isset($pass)){
     $permisos=$login->validarPermiso($correo,$pass); //funcion para validar permisos desde la base de datos retorna areglos con permisos    
     foreach($permisos as $permiso){  
@@ -35,7 +36,15 @@ if(isset($correo) && isset($pass)){
             // $id_usuario=$login->retornarIdUsu($id_login);
             // $_SESSION['id_usuario']=$id_usuario;
         }
-    
+    }
+
+    if (!empty($permisos) && isset($_SESSION['login'])) {
+        $estadosAcademicos = $login->obtenerEstadosAcademicosPorLogin($_SESSION['login']);
+        if (is_array($estadosAcademicos) && count($estadosAcademicos) === 1 && in_array((int) $estadosAcademicos[0]['tipo_est'], [1, 2, 3, 4, 5, 7], true)) {
+            $_SESSION['capacidades'][] = 'reglamento.ver';
+        } elseif (is_array($estadosAcademicos) && count($estadosAcademicos) > 1) {
+            error_log('AUTHORIZATION_STATE_AMBIGUOUS');
+        }
     }
 }
     if(isset($_SESSION['docente'])||isset($_SESSION['estudiante'])){

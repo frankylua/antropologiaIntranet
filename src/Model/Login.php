@@ -36,5 +36,10 @@ class Login
         return ejecutarConsultaResultados($sql);
         
     }
+
+    public function obtenerEstadosAcademicosPorLogin($id_login){
+        $sql="SELECT e.tipo_est FROM usuario u JOIN estudiante e ON u.id_usuario=e.usuario WHERE u.login='$id_login'";
+        return ejecutarConsultaResultados($sql);
+    }
 }
 ?>
