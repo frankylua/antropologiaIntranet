@@ -162,14 +162,24 @@ switch ($op) {
         
     case 'update-permiso-tipo-est':
         $resp;
-        $resp=$est->eliminarAcceso($id_login);
-        if($tipo_est==1 || $tipo_est==4){
-            $resp= $est->agregarPermiso(5,$id_login);
-        } 
-        if($tipo_est==2 || $tipo_est==3){
-            $resp= $est->agregarPermiso(3,$id_login);
-            $resp= $est->agregarPermiso(5,$id_login);
+        $idUsuValido = isset($_POST['id_usu'])
+            && is_scalar($_POST['id_usu'])
+            && !is_bool($_POST['id_usu'])
+            && !is_float($_POST['id_usu'])
+            && ctype_digit((string) $_POST['id_usu'])
+            && (int) $_POST['id_usu'] > 0;
+        $tipoEstValido = isset($_POST['tipo_est'])
+            && is_scalar($_POST['tipo_est'])
+            && !is_bool($_POST['tipo_est'])
+            && !is_float($_POST['tipo_est'])
+            && ctype_digit((string) $_POST['tipo_est'])
+            && in_array((int) $_POST['tipo_est'], [1, 2, 3, 4, 5, 6, 7], true);
+        if (!$idUsuValido || !$tipoEstValido) {
+            echo json_encode('Los datos no han podido ser acualizados', JSON_UNESCAPED_UNICODE);
+            break;
         }
+        $id_usu = (int) $_POST['id_usu'];
+        $tipo_est = (int) $_POST['tipo_est'];
         $resp=$est->editarTipoEst($id_usu,$tipo_est);
         $resp? $mensaje = 'Los datos han sido  actualizados': $mensaje = 'Los datos no han podido ser acualizados';
         echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
