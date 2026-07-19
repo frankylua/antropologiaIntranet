@@ -1619,6 +1619,54 @@ Commit:
 Push:
 Completado.
 
+## TASK-EPIC003-RESOLVER-IDENTIDAD-LOGIN-001
+
+### Identificación
+
+Tipo:
+[TEC] [ARQ] [GOV] [MET] Resolver de identidad de solo lectura.
+
+Estado:
+Cerrada
+
+Fecha de cierre:
+2026-07-19
+
+### Objetivo
+
+Introducir un resolver de identidad de solo lectura para login, usuario, estudiante, profesor y cardinalidades.
+
+### Resultado
+
+- Distingue login inexistente y login sin usuario.
+- Distingue `NONE`, `SINGLE` y `MULTIPLE`.
+- Resuelve estudiante desde `estudiante.usuario`.
+- Resuelve profesor desde `profesor.usuario`.
+- Obtiene `tipo_est` exclusivamente desde `estudiante`.
+- Detecta multiplicidades e inconsistencias.
+- No consulta permisos como fuente de identidad.
+- No modifica sesión ni datos.
+- Todavía no está integrado en `ajax/login.php`.
+
+### Validación
+
+Validación técnica:
+Aprobada con observaciones no bloqueantes.
+
+Aprobación:
+Aprobada por el usuario.
+
+Validación funcional:
+No aplica todavía; el componente no tiene consumidor productivo.
+
+### Evidencia Git
+
+Commit:
+`814ecb2d703d8df1638a53e660a068c5f29e3b06`
+
+Push:
+Completado.
+
 ## Pendientes relacionados con el cierre EPIC-003
 
 - [TEC] [ARQ] El alta de estudiante no cuenta aún con una transacción global. La validación previa de `tipo_est` evita el fallo parcial observado, pero errores posteriores pueden persistir datos parciales.
