@@ -1578,6 +1578,47 @@ Commit:
 Push:
 Completado.
 
+## TASK-EPIC003-CAMBIO-ESTADO-SIN-RECONSTRUIR-PERMISOS-001
+
+### Identificación
+
+Tipo:
+[TEC] [ARQ] [GOV] [MET] Cambio de estado académico no destructivo.
+
+Estado:
+Cerrada
+
+Fecha de cierre:
+2026-07-19
+
+### Objetivo
+
+Actualizar `estudiante.tipo_est` sin eliminar ni reconstruir permisos.
+
+### Resultado
+
+- Valida `id_usu`.
+- Valida `tipo_est` entre 1 y 7.
+- Preserva `permiso_login`.
+- No asigna permisos 3 ni 5.
+- Las capacidades se recalculan en una nueva sesión.
+
+### Validación
+
+Validación técnica:
+Aprobada.
+
+Validación funcional:
+Aprobada por el usuario.
+
+### Evidencia Git
+
+Commit:
+`bc14bcd80170ef1c685c15a717c9323b36bc6b7d`
+
+Push:
+Completado.
+
 ## Pendientes relacionados con el cierre EPIC-003
 
 - [TEC] [ARQ] El alta de estudiante no cuenta aún con una transacción global. La validación previa de `tipo_est` evita el fallo parcial observado, pero errores posteriores pueden persistir datos parciales.
