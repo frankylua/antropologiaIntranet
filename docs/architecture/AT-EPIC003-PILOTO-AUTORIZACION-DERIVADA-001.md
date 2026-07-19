@@ -7,7 +7,7 @@
 - **Clasificación:** [ARQ] Piloto capa autorización derivada; [TEC] Migración incremental autorización; [DOC] Documento técnico EPIC-003.
 - **EPIC asociado:** EPIC-003 — Separación segura entre estados académicos y roles de acceso.
 - **Feature asociada:** [FEATURE-EPIC003-MODELO-AUTORIZACION-DERIVADA-001](../features/FEATURE-EPIC003-MODELO-AUTORIZACION-DERIVADA-001.md).
-- **Estado:** Análisis técnico documental. No autoriza implementación.
+- **Estado:** Piloto incremental ejecutado y validado. No constituye una solución global de autorización.
 
 El objetivo es analizar cómo un módulo existente puede consumir una resolución de permisos derivada sin modificar inmediatamente el modelo legado. Este documento no define código, cambios de sesión, permisos técnicos ni una TASK.
 
@@ -182,3 +182,45 @@ Sin commit.
 ## 14. Siguiente paso posterior
 
 Revisión técnica: `AT-EPIC003-PILOTO-AUTORIZACION-DERIVADA-001`.
+
+## 15. Ejecución y cierre del piloto
+
+### Resultado registrado
+
+El piloto se implementó de forma acotada para la capacidad `reglamento.ver`.
+
+- Fuente: estado académico persistido en `estudiante.tipo_est`.
+- Derivación: durante el inicio de sesión.
+- Representación temporal: `$_SESSION['capacidades']`.
+- Estados que conceden la capacidad: `1`, `2`, `3`, `4`, `5` y `7`.
+- Estado que no concede la capacidad: `6` — Eliminado.
+- Compatibilidad transitoria: `admin`, `comite` y `aceptado` continúan siendo reconocidos.
+- Permiso histórico `3`: preservado; no es la única fuente de la capacidad nueva.
+
+La implementación mantiene el alcance limitado a Reglamento. No autoriza extender la derivación a Cursos, Datos académicos, Mi perfil, Calendario u otros módulos.
+
+### Evidencia técnica y funcional
+
+| Tipo | Resultado | Responsable |
+| --- | --- | --- |
+| Validación técnica | Aprobada; revisión de cambios y comprobaciones estáticas registradas en las Tasks asociadas. | Codex |
+| Validación funcional integrada | Aprobada. | Usuario |
+
+La evidencia funcional confirma el alta de estudiante sin sesión de Administrador o Comité, la asignación de `tipo_est = 1` cuando el selector no está disponible, el cambio de estado por Administrador o Comité y el acceso a Reglamento tras una nueva sesión conforme al estado académico.
+
+### Decisión institucional aplicada
+
+Cuando un estudiante se crea desde un flujo en que el actor no puede seleccionar el estado académico, el sistema asigna `tipo_est = 1` — Postulante. La regla sólo aplica sin selector; Administrador y Comité conservan la selección explícita. No redefine el catálogo de estados, no convierte el permiso histórico `3` en estado académico y no autoriza nuevas cuentas con ese permiso.
+
+### Commits relacionados
+
+- `777323573c7aef6fabbfc15b28c3bcc6b68c9cfc` — `feat(auth): derive reglamento access from academic state`.
+- `0f38ade2cd8c7821e451af04c25e678d4a8a0b3a` — `fix(student): repair dropdowns and student creation flow`.
+- `cc3855dc7efd7b06cea8ce8cfee18e81b3a010c1` — `fix(student): correct academic state admin UI`.
+
+### Riesgos y trabajo pendiente
+
+- [TEC] [ARQ] El alta de estudiante aún no dispone de una transacción global; la validación previa de `tipo_est` evita el fallo observado, pero no garantiza atomicidad ante errores posteriores.
+- La congelación definitiva del permiso histórico `3` continúa pendiente hasta contar con capacidades sustitutas en los módulos correspondientes.
+- El cambio local de `ajax/estudiante.php`, rama `update-permiso-tipo-est`, no forma parte de este incremento y requiere revisión y Task independiente.
+- No se realizó limpieza del registro parcial detectado durante la investigación; cualquier intervención de datos requiere autorización y procedimiento separado.

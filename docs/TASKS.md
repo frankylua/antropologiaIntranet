@@ -1408,3 +1408,180 @@ Restaurar el consumo posicional anterior.
 
 Estado final:
 Cerrada
+
+## TASK-EPIC003-AUTORIZACION-REGLAMENTO-ESTADO-001
+
+### Identificación
+
+Tipo:
+[ARQ] [TEC] [DOC] [GOV] [MET] Piloto incremental de capacidades derivadas.
+
+Estado:
+Cerrada
+
+Fecha de cierre:
+2026-07-18
+
+### Resultado
+
+- La capacidad `reglamento.ver` se deriva durante el inicio de sesión desde `estudiante.tipo_est` y se mantiene temporalmente en `$_SESSION['capacidades']`.
+- Los estados `1`, `2`, `3`, `4`, `5` y `7` conceden la capacidad; el estado `6` — Eliminado no la concede.
+- Se mantiene el manejo explícito de cardinalidad ambigua y la coexistencia con `admin`, `comite` y `aceptado`.
+- El permiso histórico `3` se preserva y no se usa como única fuente de la nueva capacidad.
+
+### Validación
+
+Validación técnica:
+Aprobada.
+
+Validación funcional:
+Aprobada por el usuario. Codex realizó implementación, inspección y validación técnica estática; no ejecutó la validación funcional.
+
+### Evidencia Git
+
+Commit:
+`777323573c7aef6fabbfc15b28c3bcc6b68c9cfc`
+
+Push:
+Completado.
+
+Archivos:
+- `src/Model/Login.php`.
+- `ajax/login.php`.
+- `src/Security/Authorization.php`.
+- `form-doc/reglamento.php`.
+
+## TASK-EPIC003-FIX-DROPDOWNS-PERSONAS-001
+
+### Identificación
+
+Tipo:
+[TEC] [DOC] Corrección de contrato asociativo.
+
+Estado:
+Cerrada
+
+Fecha de cierre:
+2026-07-18
+
+### Resultado y validación
+
+Los dropdowns de instituciones, países y tipo de estudiante consumen propiedades asociativas explícitas.
+
+Validación técnica:
+Aprobada.
+
+Validación funcional:
+Aprobada por el usuario.
+
+### Evidencia Git
+
+Commit:
+`0f38ade2cd8c7821e451af04c25e678d4a8a0b3a`
+
+Push:
+Completado.
+
+## TASK-EPIC003-FIX-PROFESOR-GUIA-ALTA-001
+
+### Identificación
+
+Tipo:
+[TEC] [DOC] Adaptación asociativa de Profesor guía.
+
+Estado:
+Cerrada
+
+Fecha de cierre:
+2026-07-18
+
+### Resultado y validación
+
+La lista de Profesor guía consume `id_usuario`, `nombres`, `ap_pat` y `ap_mat`; el texto visible deja de resolver como `undefined`.
+
+Validación técnica:
+Aprobada.
+
+Validación funcional:
+Aprobada por el usuario.
+
+### Evidencia Git
+
+Commit:
+`0f38ade2cd8c7821e451af04c25e678d4a8a0b3a`
+
+Push:
+Completado.
+
+## TASK-EPIC003-FIX-TIPO-EST-POSTULANTE-DEFECTO-001
+
+### Identificación
+
+Tipo:
+[TEC] [DOC] Regla de alta de estudiante.
+
+Estado:
+Cerrada
+
+Fecha de cierre:
+2026-07-18
+
+### Resultado y validación
+
+Cuando el selector de estado no está disponible, el frontend envía `tipo_est = 1` — Postulante. Administrador y Comité mantienen la selección explícita. El backend valida `tipo_est` antes de `insertarLogin()` y antes de cualquier escritura. La regla no redefine el catálogo ni autoriza nuevas cuentas con permiso histórico `3`.
+
+Validación técnica:
+Aprobada.
+
+Validación funcional:
+Aprobada por el usuario.
+
+### Evidencia Git
+
+Commit:
+`0f38ade2cd8c7821e451af04c25e678d4a8a0b3a`
+
+Push:
+Completado.
+
+Nota de alcance:
+El commit incorporó exclusivamente la validación previa de `tipo_est` en `ajax/estudiante.php`; no incluyó el cambio local histórico de permisos.
+
+## TASK-EPIC003-FIX-UI-CAMBIO-ESTADO-ESTUDIANTE-001
+
+### Identificación
+
+Tipo:
+[TEC] [DOC] Corrección de interfaz de estado académico.
+
+Estado:
+Cerrada
+
+Fecha de cierre:
+2026-07-18
+
+### Resultado y validación
+
+El modal Cambiar estado utiliza identificadores independientes del modal Eliminar y el filtro superior consume `id_tipo_est`.
+
+Validación técnica:
+Aprobada.
+
+Validación funcional:
+Aprobada por el usuario.
+
+### Evidencia Git
+
+Commit:
+`cc3855dc7efd7b06cea8ce8cfee18e81b3a010c1`
+
+Push:
+Completado.
+
+## Pendientes relacionados con el cierre EPIC-003
+
+- [TEC] [ARQ] El alta de estudiante no cuenta aún con una transacción global. La validación previa de `tipo_est` evita el fallo parcial observado, pero errores posteriores pueden persistir datos parciales.
+- El permiso histórico `3` permanece preservado; su congelación definitiva requiere capacidades sustitutas en los módulos correspondientes.
+- El working tree conserva un cambio no incluido en `ajax/estudiante.php`, rama `update-permiso-tipo-est`; requiere revisión y Task independiente antes de versionarse.
+- `reglamento.ver` es un piloto. La extensión a otros módulos requiere Tasks independientes derivadas de la matriz institucional y ADR-002.
+- No se realizó limpieza del registro parcial detectado durante la investigación; cualquier limpieza de datos requiere autorización y procedimiento separado.
