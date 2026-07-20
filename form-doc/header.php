@@ -1,4 +1,6 @@
 <?php
+use App\Security\Authorization;
+
 require_once __DIR__ . '/../src/Config/global.php';
 // RUTA de la app (leída desde .env como APP_URL)
 if (!defined('RUTA')) {
@@ -10,7 +12,7 @@ if (strlen(session_id()) < 1) {
 }
 // $id = $_SESSION['admin'];
 // $user = mostrar_perfil_admin($conexion,$id); 
-$miperfil = isset($_SESSION['docente']) ? RUTA . 'form-doc/info.docente.php' : (isset($_SESSION['estudiante']) ? RUTA . 'form-doc/info.estudiante.php' : RUTA . 'admin/perfil.php');
+$miperfil = isset($_SESSION['docente']) ? RUTA . 'form-doc/info.docente.php' : (Authorization::hasCapability('perfil.ver') ? RUTA . 'form-doc/info.estudiante.php' : RUTA . 'admin/perfil.php');
 // if(isset($_SESSION['profesor'])){
 //     $miperfil = RUTA . 'form-doc/info.docente.php';
 // }else if(isset($_SESSION['estudiante'])){
