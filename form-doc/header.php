@@ -76,7 +76,7 @@ $miperfil = isset($_SESSION['docente']) ? RUTA . 'form-doc/info.docente.php' : (
                                 </ul>
                             </li>
                             <?php endif; ?>
-                            <?php if (isset($_SESSION['admin']) || isset($_SESSION['comite'])|| isset($_SESSION['aceptado'])|| isset($_SESSION['estudiante'])|| isset($_SESSION['docente'])): ?>
+                            <?php if (isset($_SESSION['admin']) || isset($_SESSION['comite'])|| isset($_SESSION['aceptado'])|| Authorization::hasCapability('perfil.ver')|| isset($_SESSION['docente'])): ?>
                                 <li class="nav-item dropdown mx-2">
                                     <a class="nav-link  dropdown-toggle" id="listaIngreso" data-bs-toggle="dropdown"
                                     role="button" aria-expanded="false">Programa</a>
@@ -91,7 +91,7 @@ $miperfil = isset($_SESSION['docente']) ? RUTA . 'form-doc/info.docente.php' : (
                                     <li><a href="<?php echo RUTA; ?>admin/act.list.php" class="dropdown-item">Actualizar
                                         Listas</a></li>
                                         <?php endif; ?>
-                                        <?php if ((isset($_SESSION['docente']) && isset($_SESSION['aceptado'])) || isset($_SESSION['admin']) || isset($_SESSION['comite']) ): ?>
+                                        <?php if (isset($_SESSION['aceptado']) || isset($_SESSION['admin']) || isset($_SESSION['comite']) ): ?>
                                         <li><a href="<?php echo RUTA; ?>form-doc/ver.curso.php" class="dropdown-item">Cursos</a>
                                         </li>
                                         <?php endif; ?>
