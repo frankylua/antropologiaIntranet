@@ -1715,6 +1715,55 @@ Mensaje commit:
 Push:
 Completado.
 
+## TASK-EPIC003-CAPACIDAD-PERFIL-VER-001
+
+### Identificación
+
+Tipo:
+[ARQ] [TEC] [SEC] [GOV] [MET] Capacidad transitoria para lectura del perfil propio.
+
+Estado:
+Cerrada
+
+Fecha de cierre:
+2026-07-19
+
+### Objetivo
+
+Introducir `perfil.ver` como capacidad transitoria basada en el permiso histórico 5 y proteger `read_est_perfil` mediante autorización backend centralizada.
+
+### Resultado
+
+- El permiso 5 produce `perfil.ver` con deduplicación estricta.
+- La capacidad no se deriva desde estado académico ni identidad derivada.
+- `read_est_perfil` exige `perfil.ver`, `admin` o `comite`.
+- La denegación ocurre antes de consultar el modelo y devuelve HTTP 403 con JSON seguro.
+- El titular se obtiene desde la sesión; no se aceptan identificadores desde el cliente.
+- La respuesta exitosa permanece intacta.
+- Las sesiones históricas se preservan.
+- Los permisos y la base de datos permanecen sin cambios.
+- La navegación y la redirección permanecen sin cambios.
+- El permiso 5 continúa vigente como productor transitorio y el estado 6 conserva acceso temporal cuando mantiene ese permiso.
+
+### Validación
+
+Revisión técnica:
+Aprobada con observaciones no bloqueantes.
+
+Validación funcional:
+Aprobada por el usuario. Codex no ejecutó la validación funcional.
+
+### Evidencia Git
+
+Commit:
+`58d7745684aa1156e1feec0e1c80900cb1dce998`
+
+Mensaje commit:
+`feat(auth): introduce perfil.ver capability`
+
+Push:
+Completado.
+
 ## Pendientes relacionados con el cierre EPIC-003
 
 - [TEC] [ARQ] El alta de estudiante no cuenta aún con una transacción global. La validación previa de `tipo_est` evita el fallo parcial observado, pero errores posteriores pueden persistir datos parciales.

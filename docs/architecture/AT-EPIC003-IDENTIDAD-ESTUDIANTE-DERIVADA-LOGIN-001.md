@@ -139,17 +139,60 @@ Estado remoto:
 Publicado en origin/refactor/fase-0-seguridad.
 ```
 
+## Introducción transitoria de `perfil.ver` completada
+
+### TASK-EPIC003-CAPACIDAD-PERFIL-VER-001
+
+Estado:
+
+```text
+Completada.
+```
+
+Commit:
+
+```text
+58d7745684aa1156e1feec0e1c80900cb1dce998
+feat(auth): introduce perfil.ver capability
+```
+
+Resultado:
+
+* `perfil.ver` introducida como capacidad transitoria;
+* productor basado en el permiso histórico `5`;
+* consumidor piloto `read_est_perfil` protegido antes de consultar el modelo;
+* autorización backend mediante `Authorization`;
+* compatibilidad de Administrador y Comité preservada;
+* contrato exitoso intacto;
+* el estado `6` conserva acceso temporal cuando mantiene permiso `5`;
+* la identidad derivada todavía no concede la capacidad;
+* validación funcional aprobada por el usuario; Codex no la ejecutó.
+
+Se completaron únicamente la introducción transitoria de `perfil.ver` y la
+protección del consumidor piloto `read_est_perfil`. La migración del productor
+hacia estado y la exclusión institucional del estado `6` permanecen pendientes.
+
+Estado remoto:
+
+```text
+Publicado en origin/refactor/fase-0-seguridad.
+```
+
 ## Estado arquitectónico consolidado
 
 ```text
 Fuente de identidad objetivo: login → usuario → especializaciones
 Estrategia actual: derivación paralela
 Fuente del comportamiento observable: permisos y sesiones históricas
+Productor transitorio de perfil.ver: permiso 5
+Consumidor migrado: read_est_perfil
+Mecanismo de autorización: Authorization::hasCapability()
+Estado 6: acceso temporal preservado cuando mantiene permiso 5
 Permiso 5: compatibilidad transitoria
 Permiso 4: no confiable como fuente de identidad docente
 Permiso 3: pendiente de sustitución
 Sincronización durante login: prohibida
-IdentityResolution: local a la solicitud
+IdentityResolution: local a la solicitud y no autorizativa
 ```
 
 ## Secuencia de progreso
@@ -157,24 +200,26 @@ IdentityResolution: local a la solicitud
 ```text
 [✓] TASK-EPIC003-RESOLVER-IDENTIDAD-LOGIN-001
 [✓] TASK-EPIC003-INTEGRAR-IDENTIDAD-DERIVADA-LOGIN-001
+[✓] TASK-EPIC003-CAPACIDAD-PERFIL-VER-001
 ```
 
 La resolución y su integración paralela están completadas. Permanecen
 pendientes la sustitución funcional de permisos y sesiones históricas, la
-migración de consumidores y la redirección por capacidades.
+migración del productor de `perfil.ver` hacia la regla institucional de
+estados, la exclusión institucional del estado `6`, la migración de la página
+completa y de consumidores adicionales, la navegación y redirección por
+capacidades, la edición del perfil, los datos académicos, el perfil ajeno y el
+retiro del permiso `5`.
 
 ## Próximo incremento
 
-### TASK-EPIC003-CAPACIDAD-PERFIL-VER-001
-
-Objetivo provisional:
-
 ```text
-Introducir perfil.ver y preparar la sustitución del consumo backend y de
-navegación basado en $_SESSION['estudiante'].
+Inspeccionar el siguiente consumidor de perfil o navegación para migración
+incremental.
 ```
 
-Este incremento requiere inspección técnica previa. La sustitución funcional
-del permiso `5`, la migración de navegación, la redirección por capacidades,
-la congelación de productores y el retiro de sesiones históricas permanecen
-pendientes para Tasks posteriores.
+No se asigna automáticamente un identificador de Task: la secuencia vigente no
+define todavía el identificador del siguiente incremento. La sustitución
+funcional del permiso `5`, la migración de navegación, la redirección por
+capacidades, la congelación de productores y el retiro de sesiones históricas
+permanecen pendientes para Tasks posteriores.
