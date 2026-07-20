@@ -81,6 +81,9 @@ if(isset($correo) && isset($pass)){
         
         if($permiso['id_permiso']== 5){
             $_SESSION['estudiante']=$permiso['id_login'];
+            if (!in_array('perfil.ver', $_SESSION['capacidades'], true)) {
+                $_SESSION['capacidades'][] = 'perfil.ver';
+            }
             // $id_usuario=$login->retornarIdUsu($id_login);
             // $_SESSION['id_usuario']=$id_usuario;
         }

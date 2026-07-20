@@ -2,6 +2,7 @@
 session_start();
 require_once __DIR__ . '/../src/bootstrap/app.php';
 use App\Model\Estudiante;
+use App\Security\Authorization;
 require 'usuario.php';
 $est = new Estudiante();
 $promedio = isset($_POST['promedio']) ? floatval($_POST['promedio']) : '';
@@ -42,7 +43,16 @@ switch ($op) {
         echo json_encode($resp, JSON_UNESCAPED_UNICODE);
         break;
     case 'read_est_perfil':
-         $resp = $est->mostrarEstId($id_est);
+        if (!Authorization::hasCapability('perfil.ver') && !Authorization::hasAny(['admin', 'comite'])) {
+            http_response_code(403);
+            echo json_encode(['error' => 'FORBIDDEN'], JSON_UNESCAPED_UNICODE);
+            break;
+        }
+        if ($id_est <= 0) {
+            echo json_encode([], JSON_UNESCAPED_UNICODE);
+            break;
+        }
+        $resp = $est->mostrarEstId($id_est);
         echo json_encode($resp, JSON_UNESCAPED_UNICODE);
         break;
 
