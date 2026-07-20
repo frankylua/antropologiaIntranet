@@ -1,7 +1,10 @@
 <?php
+use App\Security\Authorization;
+
 if (strlen(session_id()) < 1) {
     session_start();//Validamos si existe o no la sesión
 }
+require_once __DIR__ . '/src/bootstrap/app.php';
 // direccionamiento segun permisos de inicio de sesion
 if(isset($_SESSION['admin']) or isset($_SESSION['comite'])){
     header('Location:admin/inicio.php');
@@ -10,7 +13,7 @@ if(isset($_SESSION['admin']) or isset($_SESSION['comite'])){
 }else if(isset($_SESSION['docente'])){
     header('Location:form-doc/info.docente.php');
 }
-else if(isset($_SESSION['estudiante'])){
+else if(Authorization::hasCapability('perfil.ver')){
     header('Location:form-doc/info.estudiante.php');
 }
 
