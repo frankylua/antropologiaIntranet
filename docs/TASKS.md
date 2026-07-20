@@ -1814,6 +1814,58 @@ Mensaje commit:
 Push:
 Completado.
 
+## TASK-EPIC003-MIGRAR-REDIRECCION-PERFIL-ESTUDIANTE-001
+
+### Identificación
+
+Tipo:
+[ARQ] [TEC] [SEC] [MET] Migración del destino estudiantil en la redirección central.
+
+Estado:
+Cerrada
+
+Fecha de cierre:
+2026-07-20
+
+### Objetivo
+
+Migrar en `index.php` la selección del destino estudiantil desde la señal
+histórica `estudiante` hacia `perfil.ver`, preservando la prioridad y los
+destinos existentes.
+
+### Resultado
+
+- Se importó `Authorization`.
+- El bootstrap se carga antes de evaluar la redirección.
+- La condición estudiantil utiliza `perfil.ver`.
+- No existe fallback directo por `estudiante`.
+- Se preservó la prioridad `admin/comite > aceptado > docente > perfil.ver > login`.
+- Todos los destinos permanecen intactos.
+- La navegación permanece sin cambios.
+- Se eliminó para esta ruta el ciclo específico de una sesión con `estudiante`
+  presente y `perfil.ver` ausente.
+- La limpieza general de señales residuales de sesión permanece pendiente.
+
+### Validación
+
+Revisión técnica:
+Aprobada con observaciones no bloqueantes.
+
+Validación funcional:
+Aprobada por el usuario con observaciones no bloqueantes. Codex no ejecutó la
+validación funcional.
+
+### Evidencia Git
+
+Commit:
+`2c2f4d906e6154e804154bd12a47eab7bd608c74`
+
+Mensaje commit:
+`refactor(auth): migrate student profile redirect`
+
+Push:
+Completado.
+
 ## Pendientes relacionados con el cierre EPIC-003
 
 - [TEC] [ARQ] El alta de estudiante no cuenta aún con una transacción global. La validación previa de `tipo_est` evita el fallo parcial observado, pero errores posteriores pueden persistir datos parciales.
