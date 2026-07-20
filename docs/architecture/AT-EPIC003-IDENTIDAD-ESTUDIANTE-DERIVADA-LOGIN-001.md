@@ -55,7 +55,7 @@ Resultado:
 * cardinalidades explícitas `NONE`, `SINGLE` y `MULTIPLE`;
 * identidad estudiante derivada desde la relación;
 * identidad profesor derivada desde la relación;
-* sin integración todavía en `ajax/login.php`;
+* esa Task no incorporó todavía la integración en `ajax/login.php`, completada posteriormente;
 * sin modificación de sesión;
 * sin consulta o sincronización de permisos;
 * comportamiento observable preservado.
@@ -73,8 +73,9 @@ bloqueantes. La sintaxis de los tres archivos, el autoload PSR-4 y la
 compatibilidad con PHP 8.2.12 fueron confirmados. No se detectaron efectos
 colaterales, escrituras, consultas de permisos ni ocultación de multiplicidad.
 
-No hubo validación funcional productiva porque el componente todavía no tiene
-un consumidor dentro del flujo de login.
+En esa Task no hubo validación funcional productiva porque el componente aún
+no tenía un consumidor dentro del flujo de login. La integración y su
+validación funcional se completaron posteriormente.
 
 ## Observaciones no bloqueantes
 
@@ -96,28 +97,84 @@ pendientes para la integración futura.
 * El permiso `3` continúa pendiente de sustitución.
 * La sincronización de permisos durante login está prohibida.
 
-El resolver no sustituye todavía estos mecanismos en el flujo productivo.
+La integración paralela del resolver no sustituye estos mecanismos en el flujo
+productivo.
+
+## Integración paralela completada
+
+### TASK-EPIC003-INTEGRAR-IDENTIDAD-DERIVADA-LOGIN-001
+
+Estado:
+
+```text
+Completada.
+```
+
+Commit:
+
+```text
+2c94d414c72cf3196d46ed766576881742c66e7c
+feat(identity): integrate derived identity into login
+```
+
+Resultado:
+
+* resolver integrado después de autenticar;
+* resolución paralela con `IdentityResolution` local a la solicitud;
+* comparación de estudiante con permiso histórico `5`;
+* comparación de profesor con permiso histórico `4`;
+* observabilidad mediante códigos técnicos seguros;
+* capturas específicas de `PDOException` e `InvalidArgumentException`;
+* discrepancias `WITHOUT_RELATION` limitadas a usuario `SINGLE`;
+* sesiones, permisos y capacidades históricas intactas;
+* respuesta, navegación y redirección intactas;
+* validación funcional aprobada por el usuario; Codex no la ejecutó.
+
+La relación profesor sin permiso `4` permanece como discrepancia observada y
+no fue corregida ni sincronizada durante el login.
+
+Estado remoto:
+
+```text
+Publicado en origin/refactor/fase-0-seguridad.
+```
+
+## Estado arquitectónico consolidado
+
+```text
+Fuente de identidad objetivo: login → usuario → especializaciones
+Estrategia actual: derivación paralela
+Fuente del comportamiento observable: permisos y sesiones históricas
+Permiso 5: compatibilidad transitoria
+Permiso 4: no confiable como fuente de identidad docente
+Permiso 3: pendiente de sustitución
+Sincronización durante login: prohibida
+IdentityResolution: local a la solicitud
+```
 
 ## Secuencia de progreso
 
 ```text
 [✓] TASK-EPIC003-RESOLVER-IDENTIDAD-LOGIN-001
-[ ] TASK-EPIC003-INTEGRAR-IDENTIDAD-DERIVADA-LOGIN-001
+[✓] TASK-EPIC003-INTEGRAR-IDENTIDAD-DERIVADA-LOGIN-001
 ```
 
-Solo el paso correspondiente al resolver está completado.
+La resolución y su integración paralela están completadas. Permanecen
+pendientes la sustitución funcional de permisos y sesiones históricas, la
+migración de consumidores y la redirección por capacidades.
 
 ## Próximo incremento
 
-### TASK-EPIC003-INTEGRAR-IDENTIDAD-DERIVADA-LOGIN-001
+### TASK-EPIC003-CAPACIDAD-PERFIL-VER-001
 
 Objetivo provisional:
 
 ```text
-Integrar el resolver en paralelo dentro de ajax/login.php, sin retirar
-sesiones históricas, sin cambiar redirección, sin modificar permisos y sin
-alterar capacidades efectivas.
+Introducir perfil.ver y preparar la sustitución del consumo backend y de
+navegación basado en $_SESSION['estudiante'].
 ```
 
-La integración, la observabilidad de discrepancias, `perfil.ver` y la migración
-de redirección y navegación pertenecen a Tasks posteriores.
+Este incremento requiere inspección técnica previa. La sustitución funcional
+del permiso `5`, la migración de navegación, la redirección por capacidades,
+la congelación de productores y el retiro de sesiones históricas permanecen
+pendientes para Tasks posteriores.

@@ -1667,6 +1667,54 @@ Commit:
 Push:
 Completado.
 
+## TASK-EPIC003-INTEGRAR-IDENTIDAD-DERIVADA-LOGIN-001
+
+### Identificación
+
+Tipo:
+[TEC] [ARQ] [SEC] [GOV] [MET] Integración paralela de identidad derivada.
+
+Estado:
+Cerrada
+
+Fecha de cierre:
+2026-07-19
+
+### Objetivo
+
+Integrar `IdentityResolver` en paralelo durante el login sin sustituir permisos, sesiones históricas, capacidades, respuesta, navegación ni redirección.
+
+### Resultado
+
+- Se ejecuta después de autenticar.
+- Utiliza el `id_login` real y validado como entero positivo.
+- Reutiliza la instancia PDO entregada por `conexion()`.
+- Mantiene `IdentityResolution` local a la solicitud.
+- Compara estudiante derivado con permiso histórico 5.
+- Compara profesor derivado con permiso histórico 4.
+- Registra códigos técnicos seguros sin datos personales.
+- No sincroniza permisos ni modifica sesiones históricas.
+- No altera capacidades ni comportamiento observable.
+
+### Validación
+
+Revisión técnica:
+Aprobada después del addendum correctivo.
+
+Validación funcional:
+Aprobada por el usuario. Codex no ejecutó la validación funcional.
+
+### Evidencia Git
+
+Commit:
+`2c94d414c72cf3196d46ed766576881742c66e7c`
+
+Mensaje commit:
+`feat(identity): integrate derived identity into login`
+
+Push:
+Completado.
+
 ## Pendientes relacionados con el cierre EPIC-003
 
 - [TEC] [ARQ] El alta de estudiante no cuenta aún con una transacción global. La validación previa de `tipo_est` evita el fallo parcial observado, pero errores posteriores pueden persistir datos parciales.
