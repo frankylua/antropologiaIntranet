@@ -178,6 +178,45 @@ Estado remoto:
 Publicado en origin/refactor/fase-0-seguridad.
 ```
 
+## Migración de la guardia del perfil estudiantil completada
+
+### TASK-EPIC003-MIGRAR-GUARDIA-PERFIL-ESTUDIANTE-001
+
+Estado:
+
+```text
+Completada.
+```
+
+Commit:
+
+```text
+018a3679b191afbfbe6fe277b3ad60e5184a5964
+refactor(auth): migrate student profile guard
+```
+
+Resultado:
+
+* la guardia de `form-doc/info.estudiante.php` usa `perfil.ver`, `admin` o `comite`;
+* el bootstrap se carga antes de `Authorization`;
+* el fallback directo por `estudiante` fue retirado del consumidor;
+* la redirección histórica a `../index.php` permanece intacta;
+* el contenido, formularios y scripts permanecen intactos;
+* el estado `6` conserva acceso temporal cuando mantiene permiso `5`;
+* la identidad derivada no concede acceso estudiantil;
+* la validación funcional fue aprobada por el usuario; Codex no la ejecutó.
+
+Se completó únicamente la migración de la guardia backend de la página y su
+alineación con `read_est_perfil`. Permanecen pendientes la navegación, la
+redirección por capacidades, las capacidades de escritura, el perfil ajeno,
+el retiro del permiso `5` y el tratamiento de sesiones históricas.
+
+Estado remoto:
+
+```text
+Publicado en origin/refactor/fase-0-seguridad.
+```
+
 ## Estado arquitectónico consolidado
 
 ```text
@@ -185,7 +224,7 @@ Fuente de identidad objetivo: login → usuario → especializaciones
 Estrategia actual: derivación paralela
 Fuente del comportamiento observable: permisos y sesiones históricas
 Productor transitorio de perfil.ver: permiso 5
-Consumidor migrado: read_est_perfil
+Consumidores migrados: read_est_perfil, form-doc/info.estudiante.php
 Mecanismo de autorización: Authorization::hasCapability()
 Estado 6: acceso temporal preservado cuando mantiene permiso 5
 Permiso 5: compatibilidad transitoria
@@ -201,15 +240,16 @@ IdentityResolution: local a la solicitud y no autorizativa
 [✓] TASK-EPIC003-RESOLVER-IDENTIDAD-LOGIN-001
 [✓] TASK-EPIC003-INTEGRAR-IDENTIDAD-DERIVADA-LOGIN-001
 [✓] TASK-EPIC003-CAPACIDAD-PERFIL-VER-001
+[✓] TASK-EPIC003-MIGRAR-GUARDIA-PERFIL-ESTUDIANTE-001
 ```
 
 La resolución y su integración paralela están completadas. Permanecen
 pendientes la sustitución funcional de permisos y sesiones históricas, la
 migración del productor de `perfil.ver` hacia la regla institucional de
 estados, la exclusión institucional del estado `6`, la migración de la página
-completa y de consumidores adicionales, la navegación y redirección por
-capacidades, la edición del perfil, los datos académicos, el perfil ajeno y el
-retiro del permiso `5`.
+completa y de consumidores adicionales fuera de esta guardia, la navegación y
+redirección por capacidades, la edición del perfil, los datos académicos, el
+perfil ajeno y el retiro del permiso `5`.
 
 ## Próximo incremento
 

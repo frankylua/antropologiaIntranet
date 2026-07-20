@@ -1764,6 +1764,56 @@ Mensaje commit:
 Push:
 Completado.
 
+## TASK-EPIC003-MIGRAR-GUARDIA-PERFIL-ESTUDIANTE-001
+
+### Identificación
+
+Tipo:
+[ARQ] [TEC] [SEC] [GOV] [MET] Migración de la guardia backend del perfil estudiantil.
+
+Estado:
+Cerrada
+
+Fecha de cierre:
+2026-07-19
+
+### Objetivo
+
+Migrar la guardia backend de `form-doc/info.estudiante.php` desde señales
+históricas directas hacia `perfil.ver`, conservando `admin` y `comite` como
+fallback histórico.
+
+### Resultado
+
+- `Authorization` se carga antes de la guardia.
+- La regla es `perfil.ver OR admin OR comite`.
+- No existe fallback directo por `estudiante`.
+- La redirección continúa siendo `../index.php`.
+- La guardia ocurre antes de emitir HTML.
+- El contenido histórico permanece intacto.
+- No se modificaron formularios, scripts, endpoints, navegación, permisos ni capacidades ejecutables.
+- El estado 6 conserva acceso temporal cuando mantiene permiso 5.
+- La identidad derivada no concede acceso estudiantil.
+
+### Validación
+
+Revisión técnica:
+Aprobada con observaciones no bloqueantes.
+
+Validación funcional:
+Aprobada por el usuario. Codex no ejecutó la validación funcional.
+
+### Evidencia Git
+
+Commit:
+`018a3679b191afbfbe6fe277b3ad60e5184a5964`
+
+Mensaje commit:
+`refactor(auth): migrate student profile guard`
+
+Push:
+Completado.
+
 ## Pendientes relacionados con el cierre EPIC-003
 
 - [TEC] [ARQ] El alta de estudiante no cuenta aún con una transacción global. La validación previa de `tipo_est` evita el fallo parcial observado, pero errores posteriores pueden persistir datos parciales.
