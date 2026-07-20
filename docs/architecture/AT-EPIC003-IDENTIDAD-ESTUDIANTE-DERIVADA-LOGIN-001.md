@@ -270,6 +270,59 @@ Estado remoto:
 Publicado en origin/refactor/fase-0-seguridad.
 ```
 
+## Migración de la navegación estudiantil de “Mi Perfil” completada
+
+### TASK-EPIC003-MIGRAR-NAVEGACION-MI-PERFIL-ESTUDIANTE-001
+
+Estado:
+
+```text
+Completada.
+```
+
+Commit:
+
+```text
+4d3d4c805ef7b00c42ecb0d629c29940266b70f3
+refactor(auth): migrate student profile navigation
+```
+
+Resultado:
+
+* `$miperfil` utiliza `perfil.ver` como selector del destino estudiantil;
+* la prioridad `docente > perfil.ver > fallback administrativo` fue preservada;
+* las URL y el fallback administrativo permanecen intactos;
+* `Authorization` utiliza el autoload existente y no se añadió otro bootstrap;
+* Programa, Cursos y Calendario Académico permanecieron fuera del alcance;
+* el cambio local de Cursos y el EOF fueron excluidos mediante staging selectivo;
+* el estado `6` con permiso `5` conserva Mi Perfil estudiantil;
+* el estado `6` con permiso `3`, sin permiso `5`, no accede a Mi Perfil estudiantil;
+* `IdentityResolution` permanece no autorizativa;
+* la validación funcional fue aprobada por el usuario con observaciones no bloqueantes; Codex no la ejecutó.
+
+Usos migrados de `perfil.ver`:
+
+```text
+ajax/estudiante.php → read_est_perfil
+form-doc/info.estudiante.php → guardia
+index.php → selección del destino estudiantil
+form-doc/header.php → selección de Mi Perfil
+```
+
+Se completaron únicamente la lectura piloto, la guardia de página, la
+redirección inicial y el selector estudiantil de Mi Perfil. Permanecen
+pendientes la visibilidad completa de Programa, las capacidades para docente,
+administración, comité y calendario, la limpieza de sesiones residuales, la
+alineación de prioridades, el productor institucional de `perfil.ver`, la
+resolución definitiva del estado `6`, las capacidades de edición, la protección
+de escrituras, el perfil ajeno y el retiro futuro del permiso `5`.
+
+Estado remoto:
+
+```text
+Publicado en origin/refactor/fase-0-seguridad.
+```
+
 ## Estado arquitectónico consolidado
 
 ```text
@@ -277,16 +330,17 @@ Fuente de identidad objetivo: login → usuario → especializaciones
 Estrategia actual: derivación paralela
 Fuente del comportamiento observable: permisos y sesiones históricas
 Productor transitorio de perfil.ver: permiso 5
-Usos migrados: read_est_perfil, guardia de info.estudiante.php, selección estudiantil en index.php
+Usos migrados: read_est_perfil, guardia de info.estudiante.php, selección estudiantil en index.php, selector de Mi Perfil en header.php
 Mecanismo de autorización: Authorization::hasCapability()
-Estado 6: acceso temporal preservado cuando mantiene permiso 5
+Estado 6: acceso a Mi Perfil sólo cuando existe permiso 5
 Permiso 5: compatibilidad transitoria
 Permiso 4: no confiable como fuente de identidad docente
 Permiso 3: pendiente de sustitución
 Sincronización durante login: prohibida
 IdentityResolution: local a la solicitud y no autorizativa
 Prioridad de index.php: admin/comite > aceptado > docente > perfil.ver > login
-Navegación: todavía histórica
+Prioridad de header.php: docente > perfil.ver > fallback administrativo
+Programa: todavía histórico
 Otros destinos: todavía históricos
 Limpieza de sesión: pendiente
 ```
@@ -299,26 +353,27 @@ Limpieza de sesión: pendiente
 [✓] TASK-EPIC003-CAPACIDAD-PERFIL-VER-001
 [✓] TASK-EPIC003-MIGRAR-GUARDIA-PERFIL-ESTUDIANTE-001
 [✓] TASK-EPIC003-MIGRAR-REDIRECCION-PERFIL-ESTUDIANTE-001
+[✓] TASK-EPIC003-MIGRAR-NAVEGACION-MI-PERFIL-ESTUDIANTE-001
 ```
 
 La resolución y su integración paralela están completadas. Permanecen
 pendientes la sustitución funcional de permisos y sesiones históricas, la
 migración del productor de `perfil.ver` hacia la regla institucional de
-estados, la resolución institucional del estado `6`, la navegación de Mi
-Perfil, la redirección integral de los demás actores, las capacidades para
-docente, administración, comité y calendario, la limpieza de sesión al
-reautenticar, la edición del perfil, las escrituras, los datos académicos, el
-perfil ajeno y el retiro del permiso `5`.
+estados, la resolución institucional del estado `6`, la visibilidad completa de
+Programa, la redirección integral de los demás actores, la alineación de
+prioridades, las capacidades para docente, administración, comité y calendario,
+la limpieza de sesión al reautenticar, la edición del perfil, las escrituras,
+los datos académicos, el perfil ajeno y el retiro del permiso `5`.
 
 ## Próximo incremento
 
 ```text
-Inspección técnica del enlace “Mi Perfil” y de la navegación en
-form-doc/header.php.
+Inspección técnica de la visibilidad general del menú Programa y del uso
+residual de $_SESSION['estudiante'] en form-doc/header.php.
 ```
 
-`form-doc/header.php` contiene cambios locales ajenos que deben aislarse antes
-de cualquier implementación. No se crea automáticamente una nueva Task. La
-sustitución funcional del permiso `5`, la migración de navegación, la
-redirección integral de otros actores, la congelación de productores y el
-retiro de sesiones históricas permanecen pendientes para Tasks posteriores.
+`form-doc/header.php` conserva cambios locales ajenos relacionados con Cursos y
+EOF. No se crea automáticamente una nueva Task. La sustitución funcional del
+permiso `5`, la migración de la visibilidad general de Programa, la redirección
+integral de otros actores, la congelación de productores y el retiro de
+sesiones históricas permanecen pendientes para Tasks posteriores.

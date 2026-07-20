@@ -1866,6 +1866,57 @@ Mensaje commit:
 Push:
 Completado.
 
+## TASK-EPIC003-MIGRAR-NAVEGACION-MI-PERFIL-ESTUDIANTE-001
+
+### Identificación
+
+Tipo:
+[ARQ] [TEC] [SEC] [MET] Migración de la selección estudiantil del enlace Mi Perfil.
+
+Estado:
+Cerrada
+
+Fecha de cierre:
+2026-07-20
+
+### Objetivo
+
+Migrar en `form-doc/header.php` la selección estudiantil del enlace Mi Perfil
+desde la señal histórica `estudiante` hacia `perfil.ver`, preservando la
+prioridad docente y el fallback administrativo.
+
+### Resultado
+
+- Se importó `Authorization`.
+- La condición estudiantil de `$miperfil` utiliza `perfil.ver`.
+- Se preservó la prioridad `docente > perfil.ver > fallback administrativo`.
+- No existe fallback directo por `estudiante` dentro de `$miperfil`.
+- Las URL permanecen intactas.
+- Se reutilizó el autoload existente, sin añadir otro bootstrap.
+- Programa, Cursos y Calendario Académico permanecieron fuera del alcance.
+- El cambio local de Cursos y el EOF fueron excluidos del commit mediante
+  staging selectivo.
+
+### Validación
+
+Revisión técnica:
+Aprobada con observaciones no bloqueantes y aislable.
+
+Validación funcional:
+Aprobada por el usuario con observaciones no bloqueantes. Codex no ejecutó la
+validación funcional.
+
+### Evidencia Git
+
+Commit:
+`4d3d4c805ef7b00c42ecb0d629c29940266b70f3`
+
+Mensaje commit:
+`refactor(auth): migrate student profile navigation`
+
+Push:
+Completado.
+
 ## Pendientes relacionados con el cierre EPIC-003
 
 - [TEC] [ARQ] El alta de estudiante no cuenta aún con una transacción global. La validación previa de `tipo_est` evita el fallo parcial observado, pero errores posteriores pueden persistir datos parciales.
