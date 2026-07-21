@@ -1917,6 +1917,110 @@ Mensaje commit:
 Push:
 Completado.
 
+## TASK-EPIC003-MIGRAR-VISIBILIDAD-PROGRAMA-ESTUDIANTE-001
+
+### Identificación
+
+Tipo:
+[ARQ] [TEC] [SEC] [MET] Migración de la visibilidad estudiantil del menú Programa.
+
+Estado:
+Cerrada con corrección aditiva posterior
+
+Fecha de cierre:
+2026-07-20
+
+### Objetivo
+
+Migrar en `form-doc/header.php` la señal estudiantil del wrapper Programa desde
+`estudiante` hacia `perfil.ver`.
+
+### Resultado acumulado
+
+```text
+admin OR comite OR aceptado OR perfil.ver OR docente
+```
+
+- Se realizó una sustitución funcional exclusivamente dentro del wrapper Programa.
+- `$miperfil`, los enlaces hijos y las guardias backend permanecieron intactos.
+- No se crearon capacidades ni se modificó el login.
+
+### Incidencia y resolución
+
+El commit funcional original incluyó accidentalmente una modificación local de
+Cursos y el EOF del archivo. Ambos cambios ajenos fueron restaurados mediante
+el commit correctivo aditivo, sin reescribir la historia.
+
+### Validación
+
+Revisión técnica:
+Aprobada con observaciones no bloqueantes.
+
+Validación funcional:
+Aprobada por el usuario. Codex no ejecutó la validación funcional.
+
+### Evidencia Git
+
+Commit funcional original:
+`eda073e2f61793a197bd8f0812883c2862144c4f`
+
+Mensaje:
+`refactor(auth): migrate program menu visibility`
+
+Commit correctivo:
+`3874da2b1e2d20c012f5dd5375c1e15678463afa`
+
+Mensaje:
+`fix(auth): remove unrelated changes from program menu migration`
+
+Estado remoto:
+Ambos commits publicados.
+
+## TASK-EPIC003-CORREGIR-PUBLICACION-VISIBILIDAD-PROGRAMA-001
+
+### Identificación
+
+Tipo:
+[TEC] [GOV] [MET] [DOC] Corrección aditiva de publicación.
+
+Estado:
+Cerrada
+
+Fecha de cierre:
+2026-07-20
+
+### Objetivo
+
+Restaurar exclusivamente Cursos y EOF incluidos accidentalmente en `eda073e2`,
+preservando la migración autorizada del wrapper Programa.
+
+### Resultado
+
+- Cursos fue restaurado literalmente desde el padre de `eda073e2`.
+- EOF fue restaurado literalmente desde el padre de `eda073e2`.
+- El wrapper con `perfil.ver` fue preservado.
+- El diff acumulado quedó reducido a la sustitución autorizada.
+- La historia publicada no fue reescrita y no se utilizó force push.
+
+### Validación
+
+Revisión técnica:
+Aprobada con observaciones no bloqueantes.
+
+Validación funcional:
+Aprobada por el usuario. Codex no ejecutó la validación funcional.
+
+### Evidencia Git
+
+Commit correctivo:
+`3874da2b1e2d20c012f5dd5375c1e15678463afa`
+
+Mensaje:
+`fix(auth): remove unrelated changes from program menu migration`
+
+Push:
+Completado.
+
 ## Pendientes relacionados con el cierre EPIC-003
 
 - [TEC] [ARQ] El alta de estudiante no cuenta aún con una transacción global. La validación previa de `tipo_est` evita el fallo parcial observado, pero errores posteriores pueden persistir datos parciales.

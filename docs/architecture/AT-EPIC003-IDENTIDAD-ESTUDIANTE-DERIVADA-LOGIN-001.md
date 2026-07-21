@@ -310,8 +310,9 @@ form-doc/header.php → selección de Mi Perfil
 ```
 
 Se completaron únicamente la lectura piloto, la guardia de página, la
-redirección inicial y el selector estudiantil de Mi Perfil. Permanecen
-pendientes la visibilidad completa de Programa, las capacidades para docente,
+redirección inicial y el selector estudiantil de Mi Perfil. En ese punto
+permanecían pendientes la visibilidad completa de Programa, las capacidades
+para docente,
 administración, comité y calendario, la limpieza de sesiones residuales, la
 alineación de prioridades, el productor institucional de `perfil.ver`, la
 resolución definitiva del estado `6`, las capacidades de edición, la protección
@@ -323,6 +324,69 @@ Estado remoto:
 Publicado en origin/refactor/fase-0-seguridad.
 ```
 
+## Migración de la visibilidad estudiantil de Programa completada
+
+### TASK-EPIC003-MIGRAR-VISIBILIDAD-PROGRAMA-ESTUDIANTE-001
+
+Estado:
+
+```text
+Completada con corrección aditiva posterior.
+```
+
+Commit funcional original:
+
+```text
+eda073e2f61793a197bd8f0812883c2862144c4f
+refactor(auth): migrate program menu visibility
+```
+
+Resultado acumulado:
+
+* el wrapper Programa usa `perfil.ver` en lugar de `estudiante`;
+* `admin`, `comite`, `aceptado` y `docente` permanecen en el mismo orden;
+* `$miperfil` no cambió;
+* los enlaces hijos y las guardias backend no cambiaron;
+* una sesión residual sólo con `estudiante` deja de mostrar Programa;
+* el estado `6` con permiso `5` conserva Programa mediante `perfil.ver`;
+* el estado `6` con permiso `3`, sin permiso `5`, conserva Programa por
+  `aceptado`, pero no obtiene acceso a Mi Perfil estudiantil;
+* `perfil.ver` no autoriza globalmente los enlaces hijos;
+* la validación funcional fue aprobada por el usuario; Codex no la ejecutó.
+
+El commit original incluyó accidentalmente una modificación local de Cursos y
+el EOF de `form-doc/header.php`. Estos cambios no pertenecían a la Task.
+
+### TASK-EPIC003-CORREGIR-PUBLICACION-VISIBILIDAD-PROGRAMA-001
+
+Estado:
+
+```text
+Completada y publicada.
+```
+
+Commit correctivo:
+
+```text
+3874da2b1e2d20c012f5dd5375c1e15678463afa
+fix(auth): remove unrelated changes from program menu migration
+```
+
+Resultado:
+
+* Cursos fue restaurado literalmente desde `eda073e2^:form-doc/header.php`;
+* el EOF fue restaurado literalmente desde el mismo padre;
+* el wrapper con `perfil.ver` fue preservado;
+* la historia publicada no fue reescrita;
+* no se utilizó force push;
+* el diff acumulado contiene únicamente la migración autorizada.
+
+Estado remoto:
+
+```text
+Ambos commits publicados en origin/refactor/fase-0-seguridad.
+```
+
 ## Estado arquitectónico consolidado
 
 ```text
@@ -330,7 +394,7 @@ Fuente de identidad objetivo: login → usuario → especializaciones
 Estrategia actual: derivación paralela
 Fuente del comportamiento observable: permisos y sesiones históricas
 Productor transitorio de perfil.ver: permiso 5
-Usos migrados: read_est_perfil, guardia de info.estudiante.php, selección estudiantil en index.php, selector de Mi Perfil en header.php
+Usos migrados: read_est_perfil, guardia de info.estudiante.php, selección estudiantil en index.php, selector de Mi Perfil y visibilidad estudiantil del wrapper Programa en header.php
 Mecanismo de autorización: Authorization::hasCapability()
 Estado 6: acceso a Mi Perfil sólo cuando existe permiso 5
 Permiso 5: compatibilidad transitoria
@@ -340,9 +404,11 @@ Sincronización durante login: prohibida
 IdentityResolution: local a la solicitud y no autorizativa
 Prioridad de index.php: admin/comite > aceptado > docente > perfil.ver > login
 Prioridad de header.php: docente > perfil.ver > fallback administrativo
-Programa: todavía histórico
+Programa: wrapper estudiantil migrado; contenedor todavía heterogéneo
+Guardias backend de Programa: sin cambios por esta Task
 Otros destinos: todavía históricos
 Limpieza de sesión: pendiente
+Historia Git: preservada mediante corrección aditiva
 ```
 
 ## Secuencia de progreso
@@ -354,26 +420,30 @@ Limpieza de sesión: pendiente
 [✓] TASK-EPIC003-MIGRAR-GUARDIA-PERFIL-ESTUDIANTE-001
 [✓] TASK-EPIC003-MIGRAR-REDIRECCION-PERFIL-ESTUDIANTE-001
 [✓] TASK-EPIC003-MIGRAR-NAVEGACION-MI-PERFIL-ESTUDIANTE-001
+[✓] TASK-EPIC003-MIGRAR-VISIBILIDAD-PROGRAMA-ESTUDIANTE-001
+[✓] TASK-EPIC003-CORREGIR-PUBLICACION-VISIBILIDAD-PROGRAMA-001
 ```
 
 La resolución y su integración paralela están completadas. Permanecen
 pendientes la sustitución funcional de permisos y sesiones históricas, la
 migración del productor de `perfil.ver` hacia la regla institucional de
 estados, la resolución institucional del estado `6`, la visibilidad completa de
-Programa, la redirección integral de los demás actores, la alineación de
-prioridades, las capacidades para docente, administración, comité y calendario,
-la limpieza de sesión al reautenticar, la edición del perfil, las escrituras,
-los datos académicos, el perfil ajeno y el retiro del permiso `5`.
+los enlaces individuales de Programa, la redirección integral de los demás
+actores, la alineación de prioridades, las capacidades para docente,
+administración, comité, Cursos y Calendario, la condición frontend de
+Reglamento, la limpieza de sesión al reautenticar, la edición del perfil, las
+escrituras, los datos académicos, el perfil ajeno y el retiro del permiso `5`.
 
 ## Próximo incremento
 
 ```text
-Inspección técnica de la visibilidad general del menú Programa y del uso
-residual de $_SESSION['estudiante'] en form-doc/header.php.
+Inspección técnica de las inconsistencias restantes entre visibilidad frontend
+y guardias backend de Reglamento, Cursos y Calendario Académico.
 ```
 
-`form-doc/header.php` conserva cambios locales ajenos relacionados con Cursos y
-EOF. No se crea automáticamente una nueva Task. La sustitución funcional del
-permiso `5`, la migración de la visibilidad general de Programa, la redirección
-integral de otros actores, la congelación de productores y el retiro de
-sesiones históricas permanecen pendientes para Tasks posteriores.
+No se crea automáticamente una nueva Task ni se decide cuál de esos módulos
+debe migrarse primero. La sustitución funcional del permiso `5`, las
+condiciones individuales por capacidades, la redirección integral de otros
+actores, la limpieza general de sesiones, el identificador estudiantil, el
+productor institucional de `perfil.ver`, la congelación de productores y el
+retiro futuro del permiso `5` permanecen pendientes para Tasks posteriores.
