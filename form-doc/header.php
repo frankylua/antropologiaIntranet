@@ -104,8 +104,15 @@ $miperfil = isset($_SESSION['docente']) ? RUTA . 'form-doc/info.docente.php' : (
                                     <li><a href="<?php echo RUTA; ?>form-doc/calend.acad.php"
                                             class="dropdown-item">Calendario Académico</a></li>
                                             <?php endif; ?>
+                                    <?php if (
+                                        Authorization::hasCapability('reglamento.ver')
+                                        || isset($_SESSION['admin'])
+                                        || isset($_SESSION['comite'])
+                                        || isset($_SESSION['aceptado'])
+                                    ): ?>
                                     <li><a href="<?php echo RUTA; ?>form-doc/reglamento.php"
                                             class="dropdown-item">Reglamento</a></li>
+                                    <?php endif; ?>
                                     <li><a href="<?php echo $miperfil ?>" class="dropdown-item">Mi Perfil</a></li>
                                 </ul>
                             </li>
