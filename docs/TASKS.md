@@ -2021,6 +2021,74 @@ Mensaje:
 Push:
 Completado.
 
+## TASK-EPIC003-ALINEAR-VISIBILIDAD-REGLAMENTO-001
+
+### Identificación
+
+Tipo:
+[TEC] [SEC] [MET] Alineación de la visibilidad frontend de Reglamento.
+
+Estado:
+Cerrada
+
+Fecha de cierre:
+2026-07-20
+
+### Objetivo
+
+Alinear la visibilidad frontend del enlace Reglamento con su guardia backend
+vigente.
+
+Archivo:
+`form-doc/header.php`
+
+Regla implementada:
+
+```text
+reglamento.ver OR admin OR comite OR aceptado
+```
+
+### Resultado
+
+- El enlace se muestra sólo para sesiones autorizadas por la guardia vigente.
+- El acceso directo continúa gobernado por `form-doc/reglamento.php`.
+- El wrapper Programa permanece intacto.
+- `$miperfil`, Cursos y Calendario Académico permanecen intactos.
+- No se crearon capacidades.
+- No se modificaron login, sesiones, permisos ni estados productores.
+- La URL, el texto, la clase y la posición del enlace permanecen intactos.
+
+### Validación
+
+Revisión técnica:
+Aprobada con observaciones no bloqueantes y aislable.
+
+Validación funcional:
+Aprobada por el usuario. Codex no ejecutó la validación funcional.
+
+### Evidencia Git
+
+Commit:
+`3d551a0e9aba88f3fb50644f612edd62c88a80cd`
+
+Mensaje commit:
+`refactor(auth): align regulation menu visibility`
+
+Push:
+Completado.
+
+### Limitación
+
+Una sesión con `reglamento.ver` aislada puede continuar autorizada por backend
+sin mostrar Programa. La Task no modifica el wrapper ni declara paridad
+bidireccional completa.
+
+### Siguiente recomendación
+
+Resolver el trabajo local pendiente de Cursos antes de intervenir nuevamente su
+navegación o sus contratos de autorización. Esta recomendación no crea una Task
+ni prioriza automáticamente una capacidad nueva.
+
 ## Pendientes relacionados con el cierre EPIC-003
 
 - [TEC] [ARQ] El alta de estudiante no cuenta aún con una transacción global. La validación previa de `tipo_est` evita el fallo parcial observado, pero errores posteriores pueden persistir datos parciales.

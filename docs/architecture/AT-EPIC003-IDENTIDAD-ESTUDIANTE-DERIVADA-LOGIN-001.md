@@ -387,6 +387,67 @@ Estado remoto:
 Ambos commits publicados en origin/refactor/fase-0-seguridad.
 ```
 
+## Alineación frontend de Reglamento completada
+
+### TASK-EPIC003-ALINEAR-VISIBILIDAD-REGLAMENTO-001
+
+Estado:
+
+```text
+Completada y publicada.
+```
+
+Commit funcional:
+
+```text
+3d551a0e9aba88f3fb50644f612edd62c88a80cd
+refactor(auth): align regulation menu visibility
+```
+
+Resultado:
+
+* el enlace Reglamento quedó alineado unidireccionalmente con su guardia
+  backend mediante `reglamento.ver OR admin OR comite OR aceptado`;
+* la condición frontend controla visibilidad y no sustituye la autorización
+  backend;
+* el wrapper Programa no fue modificado y `reglamento.ver` no fue añadido a su
+  condición;
+* `perfil.ver` no concede visibilidad de Reglamento por sí sola;
+* `docente` no concede visibilidad de Reglamento por sí sola;
+* el estado `6` con permiso `5` no ve Reglamento;
+* el permiso histórico `3` conserva acceso mediante `aceptado` sin ser
+  reinterpretado como estado institucional inequívoco;
+* el acceso directo continúa bajo control de `form-doc/reglamento.php`;
+* `$miperfil`, Cursos, Calendario Académico, login, permisos, sesiones, estados
+  productores y capacidades permanecen intactos;
+* la URL, el texto, la clase y la posición del enlace permanecen intactos;
+* la revisión técnica fue aprobada con observaciones no bloqueantes y aislable;
+* la validación funcional fue aprobada por el usuario; Codex no la ejecutó.
+
+Limitación consciente:
+
+```text
+reglamento.ver aislada
+→ backend autorizado
+→ Programa oculto
+→ enlace no visible
+```
+
+La Task no resuelve esta asimetría y no declara paridad bidireccional completa.
+
+Productor preservado:
+
+```text
+Estados que producen reglamento.ver: 1, 2, 3, 4, 5 y 7
+Estado 6: no produce reglamento.ver
+```
+
+Estado remoto:
+
+```text
+Publicado en origin/refactor/fase-0-seguridad.
+```
+
 ## Estado arquitectónico consolidado
 
 ```text
@@ -394,19 +455,23 @@ Fuente de identidad objetivo: login → usuario → especializaciones
 Estrategia actual: derivación paralela
 Fuente del comportamiento observable: permisos y sesiones históricas
 Productor transitorio de perfil.ver: permiso 5
-Usos migrados: read_est_perfil, guardia de info.estudiante.php, selección estudiantil en index.php, selector de Mi Perfil y visibilidad estudiantil del wrapper Programa en header.php
+Usos migrados o controles alineados: read_est_perfil, guardia de info.estudiante.php, selección estudiantil en index.php, selector de Mi Perfil, visibilidad estudiantil del wrapper Programa y visibilidad frontend del enlace Reglamento
 Mecanismo de autorización: Authorization::hasCapability()
+Authorization: la guardia backend sigue siendo la autoridad efectiva
 Estado 6: acceso a Mi Perfil sólo cuando existe permiso 5
 Permiso 5: compatibilidad transitoria
 Permiso 4: no confiable como fuente de identidad docente
-Permiso 3: pendiente de sustitución
+Permiso 3: compatibilidad histórica preservada; pendiente de sustitución
 Sincronización durante login: prohibida
-IdentityResolution: local a la solicitud y no autorizativa
+IdentityResolution: observacional, local a la solicitud y no autorizativa
 Prioridad de index.php: admin/comite > aceptado > docente > perfil.ver > login
 Prioridad de header.php: docente > perfil.ver > fallback administrativo
 Programa: wrapper estudiantil migrado; contenedor todavía heterogéneo
-Guardias backend de Programa: sin cambios por esta Task
-Otros destinos: todavía históricos
+Reglamento: frontend alineado unidireccionalmente con backend
+Reglamento backend: autoridad efectiva; guardia sin cambios
+perfil.ver: no equivale a reglamento.ver
+Caso reglamento.ver aislada: autorizado sin wrapper visible; pendiente
+Otros destinos: Cursos y Calendario todavía pendientes
 Limpieza de sesión: pendiente
 Historia Git: preservada mediante corrección aditiva
 ```
@@ -422,28 +487,30 @@ Historia Git: preservada mediante corrección aditiva
 [✓] TASK-EPIC003-MIGRAR-NAVEGACION-MI-PERFIL-ESTUDIANTE-001
 [✓] TASK-EPIC003-MIGRAR-VISIBILIDAD-PROGRAMA-ESTUDIANTE-001
 [✓] TASK-EPIC003-CORREGIR-PUBLICACION-VISIBILIDAD-PROGRAMA-001
+[✓] TASK-EPIC003-ALINEAR-VISIBILIDAD-REGLAMENTO-001
 ```
 
 La resolución y su integración paralela están completadas. Permanecen
 pendientes la sustitución funcional de permisos y sesiones históricas, la
 migración del productor de `perfil.ver` hacia la regla institucional de
 estados, la resolución institucional del estado `6`, la visibilidad completa de
-los enlaces individuales de Programa, la redirección integral de los demás
-actores, la alineación de prioridades, las capacidades para docente,
-administración, comité, Cursos y Calendario, la condición frontend de
-Reglamento, la limpieza de sesión al reautenticar, la edición del perfil, las
+los enlaces individuales restantes de Programa, el caso `reglamento.ver`
+aislada sin wrapper, la redirección integral de los demás actores, la alineación
+de prioridades, las capacidades para docente, administración, comité, Cursos y
+Calendario, la limpieza de sesión al reautenticar, la edición del perfil, las
 escrituras, los datos académicos, el perfil ajeno y el retiro del permiso `5`.
 
 ## Próximo incremento
 
 ```text
-Inspección técnica de las inconsistencias restantes entre visibilidad frontend
-y guardias backend de Reglamento, Cursos y Calendario Académico.
+Resolver el trabajo local pendiente de Cursos antes de intervenir nuevamente su
+navegación o sus contratos de autorización.
 ```
 
-No se crea automáticamente una nueva Task ni se decide cuál de esos módulos
-debe migrarse primero. La sustitución funcional del permiso `5`, las
-condiciones individuales por capacidades, la redirección integral de otros
-actores, la limpieza general de sesiones, el identificador estudiantil, el
-productor institucional de `perfil.ver`, la congelación de productores y el
-retiro futuro del permiso `5` permanecen pendientes para Tasks posteriores.
+Esta recomendación no crea automáticamente una nueva Task ni prioriza una
+capacidad nueva. El caso `reglamento.ver` aislada, la sustitución funcional del
+permiso `5`, las condiciones individuales por capacidades, la redirección
+integral de otros actores, la limpieza general de sesiones, el identificador
+estudiantil, el productor institucional de `perfil.ver`, la congelación de
+productores y el retiro futuro del permiso `5` permanecen pendientes para Tasks
+posteriores.
