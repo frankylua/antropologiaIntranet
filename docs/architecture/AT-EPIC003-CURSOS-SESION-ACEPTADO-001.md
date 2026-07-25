@@ -34,7 +34,7 @@ estado académico: estudiante.tipo_est = aceptado
   ──► Programa → Cursos no se muestra
 ```
 
-La resolución institucional sí establece el acceso de visualización para estudiante aceptado, pero declara expresamente que estado académico y permiso funcional son conceptos distintos y que su implementación técnica debe evaluarse en una TASK específica. El problema es, por tanto, un comportamiento legado/falta de mapeo estado → permiso efectivo, no una nueva regla de menú.
+El antecedente institucional disponible indica «solo vista» para estudiante aceptado, pero no define su alcance de lectura ni el mapeo técnico entre estado y permiso efectivo. El problema técnico observado no autoriza completar esas definiciones ni crear una nueva regla de menú.
 
 ## 3. Flujo de login y sesión
 
@@ -150,9 +150,9 @@ La corrección de menú fue técnicamente pertinente y suficiente para eliminar 
 
 1. Realizar una validación no mutante de la cuenta reportada: comparar `estudiante.tipo_est`, filas de `permiso_login` y claves generadas tras un nuevo inicio de sesión.
 2. Mantener la corrección actual del menú; no agregar condiciones ni permisos como solución local.
-3. Requerir una definición técnica aprobada para sincronizar o derivar permisos efectivos desde transiciones de estado, preservando roles acumulativos y separando visualización de administración.
-4. Esa definición excede la corrección de navegación y la TASK de separación de capacidades. Si se aprueba, requerirá una TASK posterior específica; este AT no crea ninguna.
-5. No requiere actualizar ADR, Roadmap, Manual Maestro ni la resolución institucional. Puede requerir validación institucional solo si la política de convivencia del permiso histórico 3 con estudiantes y docentes no está clara.
+3. Requerir primero una definición institucional aprobada para el alcance de lectura, los roles acumulativos y las facultades por operación.
+4. La materialización de esa definición excede este diagnóstico y sólo podrá evaluarse si un Documento Fuente Aprobado autoriza elaborar AT y crear una Task posterior.
+5. No corresponde modificar ADR, Roadmap ni Manual Maestro mediante este diagnóstico.
 
 ## 10. Fuentes utilizadas
 
@@ -176,8 +176,18 @@ Sin cambios Manual Maestro.
 Sin commit.
 ```
 
-El único cambio de esta entrega es la creación de este AT. Siguiente paso:
+## 12. Actualización institucional posterior
 
-```text
-Revisión técnica AT-EPIC003-CURSOS-SESION-ACEPTADO-001
-```
+Fuente: `Derivación institucional formal — Matriz operativa de Cursos`.
+
+Este diagnóstico permanece cerrado como levantamiento técnico, pero no puede
+utilizarse para materializar acceso. No se identificó autoridad competente, la
+matriz operativa no está aprobada y no existe Documento Fuente Aprobado.
+
+La frase «solo vista» excluye crear, actualizar, eliminar y administrar
+profesores para estudiantes aceptados y matriculados. Listado, detalle,
+descargas e históricos permanecen pendientes. No está autorizado crear un AT
+de materialización ni una Task técnica.
+
+El diagnóstico técnico permanece preservado. Su aplicación operativa queda
+sujeta a la condición de desbloqueo indicada en esta actualización.

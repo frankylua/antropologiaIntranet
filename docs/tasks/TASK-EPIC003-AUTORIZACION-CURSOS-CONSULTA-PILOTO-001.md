@@ -7,16 +7,16 @@
 - **Clasificación:** [TEC] implementación incremental de autorización; [ARQ] evolución de arquitectura de autorización; [GOV] derivada de FEATURE EPIC-003.
 - **EPIC asociado:** EPIC-003 — Separación segura entre estados académicos y roles de acceso.
 - **Feature asociada:** FEATURE-EPIC003-AUTORIZACION-CENTRALIZADA-001.
-- **Estado:** 🟡 Pendiente revisión técnica.
+- **Estado:** 🔴 Bloqueada por falta de decisión institucional.
 
 ## 2. Antecedentes y dependencias
 
 - ✅ FEATURE-EPIC003-AUTORIZACION-CENTRALIZADA-001.
 - ✅ AT-EPIC003-AUTORIZACION-CENTRALIZACION-001.
 - ✅ AT-EPIC003-AUTORIZACION-CURSOS-001.
-- ✅ ACTA-VALIDACION-EPIC003-REGLAS-PERMISOS-RESOLUCION-001.
+- ⚠️ ACTA-VALIDACION-EPIC003-REGLAS-PERMISOS-RESOLUCION-001, antecedente documental sin autoridad acreditada suficiente para autorizar Cursos.
 
-Pendiente: revisión técnica de esta TASK.
+Bloqueo: no existe autoridad acreditada, matriz operativa aprobada ni Documento Fuente Aprobado.
 
 ## 3. Objetivo
 
@@ -53,7 +53,7 @@ La implementación debe reutilizar las condiciones actuales de autorización uti
 - Modificar `permiso_login`.
 - Redefinir roles.
 - Cambiar reglas académicas.
-- Modificar reglas institucionales aprobadas.
+- Modificar o inferir reglas institucionales.
 
 ## 5. Separación de capacidades
 
@@ -152,4 +152,34 @@ Esta TASK no autoriza modificaciones fuera de su futura implementación aprobada
 Revisión técnica TASK-EPIC003-AUTORIZACION-CURSOS-CONSULTA-PILOTO-001
 ```
 
-Solo tras dicha revisión corresponde la implementación supervisada.
+No corresponde realizar revisión para implementación. La condición de
+desbloqueo es un Documento Fuente Aprobado emitido por autoridad competente,
+con matriz por operación y autorización expresa para crear una Task de
+implementación.
+
+## 16. Actualización institucional
+
+Fuente: `Derivación institucional formal — Matriz operativa de Cursos`.
+
+```text
+Estado:
+Bloqueada por falta de decisión institucional
+
+Motivo:
+No existe autoridad acreditada ni matriz operativa aprobada
+
+Implementación:
+No autorizada
+
+Trabajo local:
+Preservado, no publicado
+
+Protección provisional P-B:
+Propuesta, no aprobada
+
+Condición de desbloqueo:
+Documento Fuente Aprobado emitido por autoridad competente
+```
+
+Esta Task no está cerrada y no autoriza modificar código, navegación,
+capacidades, sesiones ni permisos de Cursos.

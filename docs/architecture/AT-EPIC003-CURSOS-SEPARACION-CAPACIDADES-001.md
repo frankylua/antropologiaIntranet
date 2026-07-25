@@ -8,7 +8,7 @@
 - **EPIC asociado:** EPIC-003 — Separación segura entre estados académicos y roles de acceso.
 - **Feature asociada:** FEATURE-EPIC003-AUTORIZACION-CENTRALIZADA-001.
 - **Antecedente:** TASK-EPIC003-AUTORIZACION-CURSOS-CONSULTA-PILOTO-001.
-- **Alcance:** análisis documental y técnico; no autoriza ni contiene implementación.
+- **Alcance:** análisis documental y técnico preservado; la materialización está bloqueada por falta de decisión institucional.
 
 ## 2. Objetivo y conclusión
 
@@ -65,7 +65,7 @@ El endpoint `ajax/curso.php` no declara una validación de sesión o permiso por
 
 ## 5. Comparación con EPIC-003
 
-El modelo aprobado separa conceptos:
+El modelo conceptual documentado separa conceptos:
 
 ```text
 Estado / rol / participación
@@ -85,7 +85,7 @@ Acceso general a una pantalla
 Consulta y múltiples acciones administrativas
 ```
 
-Esta diferencia impide afirmar que la regla institucional de «Cursos: solo vista» esté implementada por el acceso actual con `aceptado`, `docente`, `admin` o `comite`. La matriz aprobada concede Cursos solo vista a determinados estados de estudiantes y profesores, conserva la acumulación de roles autorizados y no permite inferir facultades administrativas desde la visualización.
+Esta diferencia impide afirmar que «Cursos: solo vista» esté implementado por el acceso actual con `aceptado`, `docente`, `admin` o `comite`. El único antecedente institucional disponible aplica «solo vista» a estudiantes aceptados y matriculados y permite excluir mutaciones para ellos; el alcance de lectura y las facultades de los demás actores continúan pendientes. No existe una matriz operativa aprobada ni una regla aprobada de acumulación de roles para Cursos.
 
 ## 6. Alternativas de separación
 
@@ -148,7 +148,7 @@ La siguiente lista es identificatoria y no autoriza cambios:
 
 ## 9. Riesgos
 
-- Pérdida de acceso si se reemplaza una condición histórica en vez de preservar acumulativamente los permisos efectivos aprobados.
+- Pérdida de acceso si se reemplaza una condición histórica antes de aprobar la política aplicable y el tratamiento de roles acumulativos.
 - Aumento accidental de privilegios si una capacidad de lectura hereda creación, edición o eliminación por compartir pantalla o endpoint.
 - Duplicación o ambigüedad de permisos durante una convivencia entre claves históricas y permisos funcionales nuevos.
 - Complejidad de migración por la divergencia entre navegación y URL directa, y por el mapeo no confirmado de claves históricas a estados institucionales.
@@ -157,11 +157,9 @@ La siguiente lista es identificatoria y no autoriza cambios:
 
 ## 10. Recomendación técnica
 
-No es suficiente extender la TASK de consulta actual para separar capacidades: su alcance explícitamente excluye CRUD, permisos nuevos, `permiso_login`, sesiones y administración. Antes de cualquier implementación se requiere una **TASK técnica previa e independiente** para establecer la política de separación entre consulta y administración, incluidas las fronteras de endpoint y la equivalencia con las condiciones históricas.
+No es suficiente extender la Task de consulta actual para separar capacidades. Tampoco está autorizada una Task técnica previa o independiente: faltan autoridad acreditada, matriz operativa y Documento Fuente Aprobado.
 
-La Feature vigente puede cubrir el análisis y una separación mínima que conserve permisos existentes, porque prevé centralización incremental por módulo. Si se pretende introducir permisos funcionales nuevos, modificar `permiso_login` o aplicar directamente la matriz institucional a las operaciones administrativas, se requiere ampliar la Feature o crear una nueva Feature según el alcance que se apruebe.
-
-El siguiente paso incremental recomendado es documentar y validar: (1) la política histórica que debe prevalecer entre navegación y acceso directo, (2) qué actor puede administrar cada operación, y (3) la estrategia de protección por endpoint. No corresponde crear esa TASK ni implementar cambios en este análisis.
+La propuesta de protección provisional P-B no fue aprobada. El siguiente paso autorizado es exclusivamente obtener la resolución institucional que defina actores, operaciones, roles acumulativos, históricos, desactivación y, si corresponde, una protección provisional con responsable y duración.
 
 ## 11. Estado de EPIC-003
 
@@ -171,8 +169,8 @@ EPIC-003:
 Arquitectura:
 ✅ Consolidada
 
-Resolución permisos:
-✅ Aprobada
+Matriz operativa de Cursos:
+No aprobada
 
 Feature autorización:
 🟢 Activa
@@ -181,10 +179,16 @@ Reglamento:
 ✅ Validado
 
 Cursos:
-🟡 Bloqueado por separación de capacidades
+🔴 Bloqueado por falta de decisión institucional
 
-TASK consulta Cursos:
-⏸ Detenida
+Task consulta Cursos:
+🔴 Bloqueada
+
+AT de materialización:
+No autorizado
+
+Task técnica:
+No autorizada
 ```
 
 ## 12. Hallazgos y límites de certeza
@@ -196,7 +200,7 @@ TASK consulta Cursos:
 - `ajax/curso.php` expone `read`, `query_id`, `insert-update`, `read_cursos` y `delete` sin una comprobación declarada de sesión o permiso.
 - La pantalla y la navegación aplican condiciones diferentes para Cursos.
 - La eliminación del programa asociado se realiza físicamente mediante `unlink(...)` cuando la eliminación del curso informa éxito.
-- La regla EPIC-003 distingue solo vista de capacidades administrativas y conserva roles acumulativos autorizados.
+- «Solo vista» excluye mutaciones para estudiantes aceptados y matriculados; su alcance de lectura y los roles acumulativos permanecen pendientes.
 
 ### Hipótesis o validaciones pendientes
 
@@ -224,3 +228,25 @@ TASK consulta Cursos:
 - Sin cambios ADR, Roadmap, Manual Maestro, Feature ni TASK existentes.
 - Sin implementación.
 - Sin commit.
+
+## 14. Bloqueo institucional posterior
+
+Fuente: `Derivación institucional formal — Matriz operativa de Cursos`.
+
+Resultado:
+
+```text
+F. No se identificó autoridad competente.
+```
+
+La evidencia técnica de este análisis permanece válida como contexto: el
+endpoint publicado no tenía autorización AJAX suficiente; el working tree
+añade guardias y separa create/update; las cuatro operaciones locales mantienen
+la política histórica `admin OR comite OR aceptado OR docente`; y los atributos
+`data-capacidad` no tienen consumidor ni constituyen capacidades centralizadas.
+Nada de ello legitima el parche local ni permite enviarlo a revisión para
+publicación.
+
+Condición de desbloqueo: Documento Fuente Aprobado emitido por autoridad
+competente y con autorización expresa para elaborar AT y crear Task de
+implementación.

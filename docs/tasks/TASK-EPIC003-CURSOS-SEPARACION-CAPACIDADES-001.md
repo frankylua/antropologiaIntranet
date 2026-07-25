@@ -9,7 +9,7 @@
 - **Feature relacionada:** FEATURE-EPIC003-AUTORIZACION-CENTRALIZADA-001.
 - **Antecedentes:** AT-EPIC003-AUTORIZACION-CURSOS-001 y AT-EPIC003-CURSOS-SEPARACION-CAPACIDADES-001.
 - **TASK relacionada bloqueada:** TASK-EPIC003-AUTORIZACION-CURSOS-CONSULTA-PILOTO-001.
-- **Estado:** 🟡 Pendiente revisión técnica.
+- **Estado:** 🔴 Bloqueada por falta de decisión institucional.
 
 ## 2. Antecedentes y dependencias
 
@@ -22,7 +22,7 @@ Dependencias:
 - ✅ AT-EPIC003-AUTORIZACION-CURSOS-001.
 - ✅ AT-EPIC003-CURSOS-SEPARACION-CAPACIDADES-001.
 
-Pendiente: revisión técnica de esta TASK.
+Bloqueo: no existe autoridad acreditada, matriz operativa aprobada ni Documento Fuente Aprobado.
 
 ## 3. Objetivo
 
@@ -199,4 +199,35 @@ Esta TASK no autoriza cambios de código fuente, SQL, datos, ADR, Roadmap, Manua
 Revisión técnica TASK-EPIC003-CURSOS-SEPARACION-CAPACIDADES-001
 ```
 
-Solo tras esa revisión corresponde autorizar una implementación acotada.
+No corresponde autorizar una implementación acotada. La condición de
+desbloqueo es un Documento Fuente Aprobado emitido por autoridad competente,
+con matriz por operación y autorización expresa para elaborar AT técnico y
+crear una Task de implementación.
+
+## 16. Actualización institucional
+
+Fuente: `Derivación institucional formal — Matriz operativa de Cursos`.
+
+```text
+Estado:
+Bloqueada por falta de decisión institucional
+
+Motivo:
+No existe autoridad acreditada ni matriz operativa aprobada
+
+Implementación:
+No autorizada
+
+Trabajo local:
+Preservado, no publicado
+
+Eliminación física:
+No autorizada
+
+Condición de desbloqueo:
+Documento Fuente Aprobado emitido por autoridad competente
+```
+
+La separación técnica observada en el working tree no constituye aprobación de
+la política histórica `admin OR comite OR aceptado OR docente` y no puede pasar
+a revisión para publicación.

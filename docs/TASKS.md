@@ -2096,3 +2096,110 @@ ni prioriza automáticamente una capacidad nueva.
 - El working tree conserva un cambio no incluido en `ajax/estudiante.php`, rama `update-permiso-tipo-est`; requiere revisión y Task independiente antes de versionarse.
 - `reglamento.ver` es un piloto. La extensión a otros módulos requiere Tasks independientes derivadas de la matriz institucional y ADR-002.
 - No se realizó limpieza del registro parcial detectado durante la investigación; cualquier limpieza de datos requiere autorización y procedimiento separado.
+
+## Bloqueo institucional del módulo Cursos
+
+### Identificación
+
+Fuente:
+`Derivación institucional formal — Matriz operativa de Cursos`
+
+Resultado:
+
+```text
+F. No se identificó autoridad competente.
+```
+
+### Estado
+
+```text
+Módulo:
+Cursos
+
+Matriz operativa:
+No aprobada
+
+Autoridad institucional:
+No identificada
+
+Documento Fuente Aprobado:
+No existe
+
+Protección provisional:
+No aprobada
+
+AT de materialización:
+No autorizado
+
+Task técnica:
+No autorizada
+
+Implementación local:
+Parcial, no publicable y preservada
+
+Eliminación física:
+No autorizada
+```
+
+Las Tasks de consulta piloto y separación de capacidades de Cursos están
+bloqueadas, no cerradas. El único antecedente institucional disponible indica
+«solo vista» para estudiantes aceptados y matriculados. De él sólo puede
+concluirse que no deben crear, actualizar, eliminar ni administrar profesores;
+el alcance de lectura continúa pendiente.
+
+La protección provisional P-B fue propuesta, pero no aprobada.
+
+### Hipótesis institucional
+
+La coincidencia pública plausible con el Doctorado en Antropología de la Pontificia Universidad
+Católica de Chile no vincula formalmente esta intranet con esa institución y no
+se utiliza para identificar autoridades ni adoptar decisiones.
+
+### Decisiones institucionales pendientes
+
+- Alcance de «solo vista».
+- Lectura, detalle y descargas.
+- Facultades de profesores.
+- Responsable institucional de cada curso.
+- Facultades del Comité como órgano.
+- Facultades de integrantes individuales del Comité.
+- Facultades administrativas.
+- Separación entre administrador técnico y autoridad académica.
+- Creación, aprobación y publicación.
+- Actualización y reemplazo de archivos.
+- Administración de profesores.
+- Desactivación, restauración e históricos.
+- Roles acumulativos.
+- Navegación.
+- Protección provisional.
+
+### Condición de desbloqueo
+
+Cursos sólo puede continuar cuando una autoridad competente emita un Documento
+Fuente Aprobado que contenga institución y unidad propietaria, autoridad
+emisora, fundamento de competencia, fecha y vigencia, actores, matriz por
+operación, alcance de «solo vista», facultades de profesores, Comité y
+administración, roles acumulativos, históricos, desactivación, protección
+provisional cuando corresponda y aprobación verificable.
+
+El documento debe declarar expresamente si autoriza elaborar AT técnico, diseñar
+una protección provisional y crear una Task de implementación.
+
+```text
+AUTORIZA ELABORAR AT TÉCNICO:
+Sí / No
+
+AUTORIZA DISEÑAR PROTECCIÓN PROVISIONAL:
+Sí / No
+
+AUTORIZA CREAR TASK DE IMPLEMENTACIÓN:
+Sí / No
+```
+
+### Continuidad
+
+El bloqueo afecta únicamente la autorización operativa de Cursos. El proyecto
+puede continuar con incrementos independientes que no modifiquen
+`ajax/curso.php`, `form-doc/scripts/curso.js`, `form-doc/ver.curso.php`, la
+navegación, las capacidades ni las reglas institucionales de Cursos. Esta
+anotación no selecciona el siguiente incremento.

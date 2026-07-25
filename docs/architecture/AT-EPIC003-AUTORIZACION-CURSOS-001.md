@@ -7,13 +7,13 @@
 - **EPIC asociado:** EPIC-003 — Separación segura entre estados académicos y roles de acceso.
 - **Feature asociada:** FEATURE-EPIC003-AUTORIZACION-CENTRALIZADA-001.
 - **Clasificación:** [ARQ] evolución de autorización; [TEC] impacto en Cursos; [DOC] documento técnico oficial.
-- **Estado:** análisis técnico documental. No autoriza implementación.
+- **Estado:** bloqueado por falta de decisión institucional. No autoriza implementación.
 
 Este documento evalúa si el módulo Cursos puede ser el segundo piloto de centralización del consumo de autorizaciones. Identifica evidencia, riesgos y alternativas para una futura decisión. No modifica código, SQL, modelo de datos, ADR, Roadmap, Manual Maestro, Feature, actas ni TASK.
 
 ## 2. Marco aplicable
 
-ADR-002 y la resolución de EPIC-003 mantienen separadas identidad, estado académico, rol institucional, participación académica y permiso funcional. La regla institucional aprobada es:
+ADR-002 y la documentación previa de EPIC-003 mantienen separadas identidad, estado académico, rol institucional, participación académica y permiso funcional. La derivación institucional posterior determinó que no existe una autoridad acreditada ni una matriz operativa aprobada para Cursos. El siguiente esquema se conserva únicamente como antecedente conceptual:
 
 ```text
 Estado académico/institucional
@@ -73,7 +73,7 @@ La divergencia confirmada es relevante: la pantalla permite una disyunción de c
 
 ## 5. Relación con la resolución EPIC-003
 
-La matriz aprobada concede Cursos en solo vista a estudiantes aceptados y matriculados; no lo concede a postulantes, graduados o reprobados, y niega todo acceso a retirados y eliminados. Para profesores, Cursos corresponde al estado institucional Aceptado, pero no al Registrado ni al Inhabilitado. Administrador y Comité son roles acumulativos, y una persona puede coexistir como profesor + Comité, profesor + administrador u otras participaciones autorizadas.
+El único antecedente institucional disponible indica «Cursos: solo vista» para estudiantes aceptados y matriculados. De él sólo puede concluirse que esos estudiantes no deben crear, actualizar, eliminar ni administrar profesores. Listado, detalle, descargas, históricos y el resto de los actores permanecen pendientes. Las facultades de profesores, Comité, administración y roles acumulativos no están aprobadas.
 
 La implementación actual no expresa esas capacidades de forma funcional: consume claves históricas de sesión y ofrece una pantalla que combina lectura y administración. Por ello, la equivalencia técnica entre la regla institucional «Cursos: solo vista» y el acceso actual con `aceptado` no está confirmada. Tampoco está validado el mapeo completo entre los estados técnicos de estudiante o profesor y las claves de sesión usadas por Cursos.
 
@@ -82,7 +82,7 @@ Una futura centralización de consumo puede conservar inicialmente la política 
 ## 6. Riesgos específicos de Cursos
 
 - **Navegación versus acceso directo:** las condiciones actuales no son equivalentes, con riesgo de experiencias contradictorias o de ampliar/restringir acceso al intentar unificarlas.
-- **Consulta versus administración:** la misma pantalla y el mismo endpoint reúnen lectura, altas, edición y eliminación. La matriz aprobada habla de «solo vista» para estudiantes y no autoriza inferir facultades administrativas desde esa capacidad.
+- **Consulta versus administración:** la misma pantalla y el mismo endpoint reúnen lectura, altas, edición y eliminación. El antecedente «solo vista» para estudiantes aceptados y matriculados excluye mutaciones, pero no define el alcance de lectura ni autoriza inferir facultades administrativas.
 - **Estados académicos:** `aceptado` es una clave histórica; no confirma por sí sola si representa estudiante aceptado, matriculado, profesor aceptado o una capacidad funcional.
 - **Permisos históricos y acumulación:** una persona puede mantener `admin`, `comite`, `docente` y otras claves. Una migración que reemplace en vez de consultar acumulativamente puede alterar capacidades legítimas.
 - **Controles de endpoint:** la ausencia de una validación declarada en `ajax/curso.php` eleva el riesgo de que una migración limitada a la vista deje operaciones críticas sin una política equivalente verificable.
@@ -90,7 +90,7 @@ Una futura centralización de consumo puede conservar inicialmente la política 
 
 ## 7. Factibilidad como segundo piloto
 
-**Cursos es candidato condicionado, no candidato inmediato para una migración integral.** Es adecuado como segundo piloto únicamente si el alcance se limita explícitamente a la evaluación centralizada y equivalente del acceso de consulta, sin cambiar permisos, estados, sesión ni operaciones de administración.
+**Cursos no es un candidato autorizado para implementación.** La evaluación técnica previa se conserva como antecedente, pero no puede reanudarse ni convertirse en piloto hasta que exista un Documento Fuente Aprobado emitido por autoridad competente.
 
 | Aspecto | Reglamento validado | Cursos |
 | --- | --- | --- |
@@ -130,9 +130,9 @@ La siguiente lista es únicamente identificatoria:
 
 ## 10. Recomendación técnica
 
-Se recomienda aprobar Cursos como **segundo piloto condicionado a una futura TASK independiente y acotada a Alternativa A**, después de aclarar documentalmente la política de equivalencia entre acceso directo y navegación. Esa TASK deberá excluir de manera expresa altas, edición, eliminación, cambios de estado y cambios a `Authorization.php` salvo que su alcance aprobado los contemple.
+La recomendación técnica histórica de evaluar un segundo piloto queda suspendida. No existe autorización para elaborar un AT de materialización, diseñar una protección provisional ni crear una Task de implementación. La propuesta P-B no fue aprobada.
 
-No se requiere una Feature adicional para analizar o para un piloto equivalente: la Feature vigente prevé migraciones progresivas por módulo. Sí requiere TASK antes de cualquier modificación. Si la revisión pretende separar lectura de administración o aplicar la matriz institucional de Cursos, será necesaria una aclaración funcional previa y posiblemente una ampliación o nueva Feature según el alcance aprobado. No corresponde crear ninguna de ellas en este documento.
+La continuación requiere primero un Documento Fuente Aprobado que identifique institución, unidad propietaria, autoridad emisora, fundamento de competencia, fecha, vigencia, matriz por operación y aprobación verificable.
 
 ## 11. Estado EPIC-003
 
@@ -140,17 +140,20 @@ No se requiere una Feature adicional para analizar o para un piloto equivalente:
 Arquitectura:
 ✅ Consolidada
 
-Resolución permisos:
-✅ Aprobada
+Matriz operativa de Cursos:
+No aprobada
 
 Piloto Reglamento:
 ✅ Validado
 
 Piloto Cursos:
-🟡 En análisis
+🔴 Bloqueado por falta de decisión institucional
 
-TASK:
-No creada
+AT de materialización:
+No autorizado
+
+Task técnica:
+No autorizada
 ```
 
 ## 12. Hallazgos y límites de certeza
@@ -161,7 +164,7 @@ No creada
 - Cursos utiliza controles directos de `$_SESSION`; no utiliza el componente `Authorization`.
 - La protección directa de Cursos y su enlace de navegación no aplican la misma combinación de claves.
 - La pantalla activa concentra lectura y acciones de administración de Cursos.
-- La resolución vigente autoriza Cursos solo vista para determinados estados de estudiantes y profesores, y mantiene la acumulación de roles autorizados.
+- El único antecedente disponible indica «solo vista» para estudiantes aceptados y matriculados; su alcance de lectura no está definido y no autoriza mutaciones.
 
 ### Hipótesis o validaciones pendientes
 
@@ -174,7 +177,7 @@ No creada
 
 - Ampliar o restringir acceso por elegir una de las dos condiciones actuales sin resolución funcional.
 - Interpretar una clave histórica de sesión como estado o permiso funcional.
-- Conceder administración cuando la regla institucional aprobada solamente concede vista.
+- Conceder administración sin una matriz institucional aprobada.
 - Preservar una validación de pantalla sin controlar las operaciones de escritura asociadas.
 
 ## 13. Fuentes utilizadas
@@ -189,6 +192,37 @@ No creada
 
 La identificación del inventario se contrastó con los archivos vigentes del módulo, sin modificar ninguno.
 
+- Fuente institucional posterior: `Derivación institucional formal — Matriz operativa de Cursos`.
+
 ## 14. Cierre
 
-No se creó TASK ni se implementaron cambios. El siguiente paso aplicable es la revisión técnica de `AT-EPIC003-AUTORIZACION-CURSOS-001.md`.
+No se creó Task ni se implementaron cambios. El módulo queda bloqueado hasta que una autoridad competente emita el Documento Fuente Aprobado. Este AT no autoriza revisión para materialización ni publicación.
+
+## 15. Actualización institucional posterior
+
+Resultado aplicable:
+
+```text
+F. No se identificó autoridad competente.
+```
+
+Estado:
+
+```text
+Módulo: Cursos
+Matriz operativa: No aprobada
+Autoridad institucional: No identificada
+Documento Fuente Aprobado: No existe
+Protección provisional: No aprobada
+AT de materialización: No autorizado
+Task técnica: No autorizada
+Implementación local: Parcial, no publicable y preservada
+Eliminación física: No autorizada
+```
+
+### Hipótesis institucional
+
+La coincidencia pública plausible con el Doctorado en Antropología de la
+Pontificia Universidad Católica de Chile no vincula formalmente esta intranet
+con esa institución y no se utiliza para identificar autoridades ni adoptar
+decisiones.

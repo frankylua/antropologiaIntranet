@@ -10,17 +10,17 @@
 - **TASK en ejecución:** TASK-EPIC003-CURSOS-SEPARACION-CAPACIDADES-001.
 - **Estado:** análisis técnico documental. No autoriza implementación ni cambios de reglas.
 
-Este documento registra el hallazgo informado durante la validación: un estudiante que se identifica institucionalmente como **aceptado** no visualiza `Programa → Cursos`, aunque la matriz institucional aprobada concede Cursos en modalidad **solo vista**. Se revisan las condiciones actuales de sesión, navegación, acceso directo y endpoint; no se modifica código, SQL, datos ni documentación de gobierno.
+Este documento registra el hallazgo informado durante la validación: un estudiante que se identifica institucionalmente como **aceptado** no visualiza `Programa → Cursos`, aunque el antecedente institucional disponible indica Cursos en modalidad **solo vista**. Se revisan las condiciones actuales de sesión, navegación, acceso directo y endpoint; no se modifica código, SQL, datos ni documentación de gobierno.
 
-## 2. Regla institucional y comportamiento técnico
+## 2. Antecedente institucional y comportamiento técnico
 
-La resolución aprobada establece para estudiante:
+El único antecedente institucional disponible establece:
 
 | Estado institucional | Perfil y datos académicos | Reglamento | Calendario | Cursos |
 | --- | --- | --- | --- | --- |
 | Aceptado | Sí | Sí | Sí | Solo vista |
 
-La regla conceptual aprobada es:
+El siguiente esquema conceptual se conserva como antecedente, no como matriz operativa aprobada:
 
 ```text
 Estado académico
@@ -85,12 +85,12 @@ Esto protege el endpoint respecto de una sesión sin esas claves, pero todavía 
 | Actor o condición | Regla institucional relevante | Clave/sesión técnica observada | Menú Cursos | URL y endpoint actual |
 | --- | --- | --- | --- | --- |
 | Estudiante aceptado | Cursos solo vista | No hay mapeo unívoco confirmado; puede involucrar `aceptado` | Solo aparece si además existe `docente` | `aceptado` basta técnicamente para acceso y todas las capacidades actuales |
-| Profesor aceptado | Cursos y Calendario | No hay mapeo institucional completo confirmado; se consumen `docente` y/o `aceptado` | Requiere ambas claves, salvo roles acumulativos | Cada una de `docente` o `aceptado` basta técnicamente |
-| Comité académico | Rol acumulativo | `comite` | Permitido | Permitido |
-| Administrador | Rol acumulativo | `admin` | Permitido | Permitido |
+| Profesor aceptado | Pendiente | No hay mapeo institucional completo confirmado; se consumen `docente` y/o `aceptado` | Requiere ambas claves según la condición histórica | Cada una de `docente` o `aceptado` basta técnicamente |
+| Comité académico | Pendiente | `comite` | Permitido técnicamente | Permitido técnicamente |
+| Administrador | Pendiente | `admin` | Permitido técnicamente | Permitido técnicamente |
 | `estudiante` sin otra clave | No equivale por sí solo a estado institucional en el código revisado | `estudiante` | No permitido | No permitido |
 
-La tabla registra condiciones técnicas, no concede ni redefine permisos. La resolución exige acumulación de roles autorizados para Comité y administración; las condiciones actuales respetan su acceso por presencia de una de esas claves, aunque no expresan permisos funcionales por capacidad.
+La tabla registra condiciones técnicas, no concede ni redefine permisos. Las facultades del Comité, de sus integrantes, de administración y de los roles acumulativos permanecen pendientes.
 
 ## 5. Relación con las TASK de Cursos
 
@@ -104,8 +104,8 @@ También afecta a `TASK-EPIC003-AUTORIZACION-CURSOS-CONSULTA-PILOTO-001`, pero n
 
 - **Confirmado:** existe una inconsistencia técnica entre el menú y el acceso directo para las mismas claves históricas. Para `aceptado` aislado, el menú bloquea y la URL permite.
 - **No confirmado:** que la clave `aceptado` de la sesión del caso reportado equivalga inequívocamente al estado institucional «estudiante aceptado»; el login declara que esa clave también representa al docente o estudiante aceptado.
-- **No clasificado aún como defecto de implementación de la regla institucional:** la matriz aprobada no está implementada como mapeo estado → permiso efectivo, y las fuentes autorizadas mantienen esa implementación para una TASK posterior específica.
-- **Regla faltante:** falta la política técnica aprobada que determine cuál condición histórica prevalece y cómo se traduce la regla institucional de solo vista sin ampliar capacidades administrativas.
+- **No clasificado como defecto respecto de una matriz definitiva:** no existe una matriz operativa aprobada ni un mapeo institucional estado → permiso efectivo para Cursos.
+- **Regla faltante:** falta la decisión institucional que determine actores, operaciones, roles acumulativos y el alcance de «solo vista».
 
 No se detecta evidencia de una regresión causada por la separación de capacidades en sí: la condición del menú sigue siendo distinta de la entrada directa y la nueva separación de endpoint mantiene las mismas claves para todas las capacidades. La validación debe tratar el hallazgo como preexistente hasta contrastarlo con una versión y un caso de sesión controlado.
 
@@ -121,7 +121,7 @@ No se detecta evidencia de una regresión causada por la separación de capacida
 
 ### Confirmados
 
-- La resolución institucional concede Cursos solo vista a estudiante aceptado.
+- El antecedente institucional disponible indica Cursos «solo vista» para estudiante aceptado.
 - El enlace `Programa → Cursos` exige `docente` y `aceptado` simultáneamente, excepto para `admin` o `comite`.
 - La URL directa de Cursos permite cualquiera de `admin`, `comite`, `aceptado` o `docente`.
 - Para una sesión con solo `aceptado`, el menú bloquea y el acceso directo permite.
@@ -199,8 +199,28 @@ Sin cambios Manual Maestro.
 Sin commit.
 ```
 
-El único cambio documental de esta entrega es la creación de este AT. El siguiente paso posterior es:
+El diagnóstico técnico permanece preservado. Su aplicación operativa queda
+sujeta a la actualización institucional posterior.
+
+## 12. Actualización institucional posterior
+
+Fuente: `Derivación institucional formal — Matriz operativa de Cursos`.
+
+El resultado técnico y las pruebas no mutantes se preservan como diagnóstico.
+No legitiman el parche local ni acreditan una política institucional.
 
 ```text
-Revisión técnica AT-EPIC003-CURSOS-VALIDACION-ACCESO-ACEPTADO-001
+Autoridad institucional: No identificada
+Matriz operativa: No aprobada
+Documento Fuente Aprobado: No existe
+Protección provisional P-B: Propuesta, no aprobada
+AT de materialización: No autorizado
+Task técnica: No autorizada
+Implementación local: Parcial, no publicable y preservada
+Eliminación física: No autorizada
 ```
+
+Las cuatro operaciones locales continúan usando la misma política histórica
+`admin OR comite OR aceptado OR docente`. Los atributos `data-capacidad` no
+tienen consumidor y no son capacidades centralizadas. El bloqueo se retira
+únicamente con un Documento Fuente Aprobado emitido por autoridad competente.
