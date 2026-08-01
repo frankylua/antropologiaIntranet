@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../src/bootstrap/session.php';
 session_start();
 $conexion = conexion($bd_config);
 $id_login = rol_id();

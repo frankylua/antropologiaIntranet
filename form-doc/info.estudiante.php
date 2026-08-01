@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../src/bootstrap/session.php';
 use App\Security\Authorization;
 
 ob_start();

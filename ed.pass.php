@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/src/bootstrap/session.php';
 require 'functions.php';
 require 'config.php';
 session_start();

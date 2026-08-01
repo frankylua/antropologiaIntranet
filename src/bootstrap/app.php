@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/session.php';
+
 use App\Config\Configuration;
 
 if (!isset($GLOBALS['app_config']) || !$GLOBALS['app_config'] instanceof Configuration) {

@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/../src/bootstrap/session.php';
+
 use App\Identity\Cardinality;
 use App\Identity\IdentityResolver;
 use App\Model\Login;
