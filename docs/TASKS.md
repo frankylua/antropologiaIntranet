@@ -2089,6 +2089,50 @@ Resolver el trabajo local pendiente de Cursos antes de intervenir nuevamente su
 navegación o sus contratos de autorización. Esta recomendación no crea una Task
 ni prioriza automáticamente una capacidad nueva.
 
+## TASK-EPIC003-CENTRALIZAR-CONFIGURACION-SESION-APP-001
+
+### Identificación
+
+Tipo:
+[ARQ] [SEC] [APP] [DEPLOY] [DOC] [GOV] Centralización de política de sesión.
+
+Estado:
+Cerrada
+
+### Resultado
+
+Política de sesión centralizada mediante un bootstrap dedicado. El alcance APP
+aplica y verifica seis directivas antes de todos los `session_start()`
+publicados y preserva las directivas dependientes del despliegue.
+
+Cobertura publicada:
+`33/33` callers.
+
+### Validación
+
+Revisión técnica:
+Aprobada con observaciones no bloqueantes.
+
+Validación funcional:
+Aprobada por el usuario.
+
+### Evidencia Git
+
+Commit:
+`7bd947661d443228ab0dccdb133cd117c9806104`
+
+Mensaje:
+`refactor(session): centralize application session policy`
+
+Push:
+Completado.
+
+### Pendiente
+
+`session.cookie_secure` y el despliegue HTTPS productivo requieren una
+inspección posterior con evidencia externa de infraestructura. No se creó una
+Task de despliegue.
+
 ## Pendientes relacionados con el cierre EPIC-003
 
 - [TEC] [ARQ] El alta de estudiante no cuenta aún con una transacción global. La validación previa de `tipo_est` evita el fallo parcial observado, pero errores posteriores pueden persistir datos parciales.

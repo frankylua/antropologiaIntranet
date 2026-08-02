@@ -32,6 +32,7 @@ No hay implementación de modernización documentada en las fuentes oficiales co
 - **Arquitectura general:** aplicación web PHP heredada con modelos bajo `src/Model` y puntos de entrada distribuidos en directorios como `admin`, `ajax`, `fetchapi` y `form-doc`. La arquitectura completa continúa en revisión.
 - **Renderizado:** no está documentado de forma concluyente.
 - **Autenticación:** existe inicio de sesión y construcción de sesión sobre cuentas de acceso.
+- **Política de sesión:** la aplicación utiliza un bootstrap dedicado que aplica strict mode, cookies-only, HttpOnly y SameSite=Lax antes de todos los `session_start()` publicados. La configuración `Secure` depende del entorno de despliegue y permanece pendiente de evidencia HTTPS productiva.
 - **Autorización:** se asignan múltiples permisos a las cuentas; la autorización está distribuida y el alcance efectivo de cada permiso sigue en revisión.
 - **Acceso a datos:** MySQL mediante PDO.
 - **Frontend:** existe una interfaz web, pero su organización y tecnologías no están documentadas de forma concluyente.
