@@ -99,7 +99,7 @@ function cargarListas(n_input) {
     ajaxListas("#listas", "../ajax/beca.php", 'read_lista', n_input);
   }
   if (n_input == "financ") {
-    ajaxListas("#listas", "../ajax/financiamiento.php", "read");
+    ajaxListas("#listas", "../ajax/financiamiento.php", "read", undefined, "id_financ", "financiamiento");
   }
 }
 function eliminarLista(id, n_input, descripcion) {
