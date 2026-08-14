@@ -12,9 +12,9 @@
 - **Commit fuente del AT:** `0d75b7cba5f6ade15614fa8fe98d7829dead689e`.
 - **Clasificación:** [PERSIST] [IMPL] [GOV] [DOC].
 - **Nivel de operación:** L2 — creación documental de Task implementativa bajo supervisión de Dirección Técnica.
-- **Estado:** Aprobada para revisión técnica previa a implementación.
+- **Estado:** Cerrada.
 
-La creación de este documento no autoriza automáticamente a Codex a modificar código. La Task no será ejecutable hasta obtener aprobación de revisión técnica.
+Durante su creación, este documento no autorizaba automáticamente a Codex a modificar código. La Task no era ejecutable hasta obtener aprobación de revisión técnica.
 
 ### 2. Estado Git de creación
 
@@ -97,7 +97,7 @@ desde `ejecutarConsulta($sql)` hacia `ejecutarEscritura($sql)`, preservando ínt
 - helpers globales;
 - comportamiento observable.
 
-Esta Task no implementa el cambio.
+Esta Task no implementaba el cambio durante su creación documental.
 
 ### 5. Inspección previa
 
@@ -299,7 +299,7 @@ Además deberá verificar:
 - SQL, firma y parámetros intactos;
 - ausencia de uso de `PDOStatement` por el caller.
 
-### 15. Validación funcional
+### 15. Validación funcional prevista
 
 La validación funcional será realizada exclusivamente por el usuario:
 
@@ -440,7 +440,7 @@ La Task deja definidos:
 
 **Clasificación de auditoría:** [ARQ] [PERSIST] [IMPL] [GOV] [DOC] [BLOCK].
 
-### 23. Estado de autorización
+### 23. Estado de autorización original
 
 ```text
 CREAR DOCUMENTO TASK: AUTORIZADO
@@ -487,6 +487,37 @@ Commit creado: No
 Push realizado: No
 ```
 
-### 26. Dictamen
+### 26. Dictamen de creación
 
 **A. Task completa y lista para revisión técnica.**
+
+### 27. Cierre oficial
+
+La Task queda cerrada después de completar la implementación, aprobar la
+validación funcional y verificar la publicación remota.
+
+`Financiamiento::insertar($nombre)` utiliza ahora
+`ejecutarEscritura($sql)`. La implementación preservó el SQL, los parámetros,
+la firma y el caller, que continúa consumiendo el retorno mediante truthiness.
+`Financiamiento::insertarObtenerId()` permaneció intacto.
+
+La incidencia de carga de la lista detectada durante la validación funcional
+fue independiente de esta migración de persistencia. Después de cerrar la
+corrección frontend, la validación funcional de persistencia fue reanudada y
+aprobada por el usuario.
+
+### 28. Evidencia de cierre
+
+```text
+Estado: Cerrada
+Implementación: Completada
+Validación funcional: Aprobada
+Publicación: Completada
+Commit: 2032cc33b9d7b90ea508ed0622968a488eb5c5f1
+Mensaje: refactor(persistence): migrate financing insert write contract
+Estado remoto: Publicado y verificado
+```
+
+### 29. Dictamen de cierre
+
+**A. Task cerrada con implementación, validación funcional y publicación completadas.**

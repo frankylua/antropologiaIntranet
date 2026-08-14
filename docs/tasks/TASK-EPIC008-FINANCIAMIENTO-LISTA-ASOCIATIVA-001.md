@@ -11,9 +11,9 @@
 - **Dictamen fuente:** A. Defecto frontend preexistente y corrección mínima identificada.
 - **Clasificación:** [IMPL] [FRONT] [CONTRACT] [VF-BLOCKER] [GOV].
 - **Nivel de operación:** L2 — creación documental de Task correctiva bloqueante de validación funcional.
-- **Estado:** Aprobada para revisión técnica previa a implementación.
+- **Estado:** Cerrada.
 
-Esta Task bloquea temporalmente la Validación Funcional de `TASK-EPIC008-FINANCIAMIENTO-INSERTAR-ESCRITURA-001`, pero no forma parte de su transformación de persistencia. La creación de este documento no autoriza automáticamente su implementación.
+Durante su creación, esta Task bloqueaba temporalmente la Validación Funcional de `TASK-EPIC008-FINANCIAMIENTO-INSERTAR-ESCRITURA-001`, pero no formaba parte de su transformación de persistencia. La creación del documento no autorizaba automáticamente su implementación.
 
 ### 2. Estado Git de creación
 
@@ -85,7 +85,7 @@ La corrección deberá agregar únicamente:
 - propiedad ID: `id_financ`;
 - propiedad etiqueta: `financiamiento`.
 
-Esta Task no implementa el cambio durante su creación documental.
+Esta Task no implementaba el cambio durante su creación documental.
 
 ### 5. Inspección previa
 
@@ -239,7 +239,7 @@ Además se deberá verificar:
 - modelo idéntico respecto de su cambio de persistencia pendiente;
 - ningún archivo adicional atribuible a esta Task.
 
-### 12. Validación funcional
+### 12. Validación funcional prevista
 
 La validación funcional corresponde exclusivamente al usuario:
 
@@ -337,7 +337,7 @@ No se modifican registros generales, Roadmap, Project Context, Workflow, ADR, AT
 - **[VF-BLOCKER]** Su corrección es requisito para completar la VF pendiente.
 - **[BLOCK]** No mezclar con `cadenaMay()`, backend o persistencia.
 
-### 20. Estado de autorización
+### 20. Estado de autorización original
 
 ```text
 CREAR DOCUMENTO TASK: AUTORIZADO
@@ -352,7 +352,7 @@ COMMIT: PROHIBIDO
 PUSH: PROHIBIDO
 ```
 
-### 21. Resumen
+### 21. Resumen de creación
 
 ```text
 Task creada: Sí
@@ -373,6 +373,43 @@ Commit creado: No
 Push realizado: No
 ```
 
-### 22. Dictamen
+### 22. Dictamen de creación
 
 **A. Task completa y lista para revisión técnica.**
+
+### 23. Cierre oficial
+
+La Task queda cerrada después de completar la implementación, aprobar la
+validación funcional y verificar la publicación remota.
+
+El defecto correspondía a un consumidor frontend preexistente. La corrección
+quedó limitada a la llamada de Financiamiento a `ajaxListas()`, declarando
+explícitamente `undefined`, `id_financ` y `financiamiento`.
+
+Se preservaron sin cambios:
+
+- `cadenaMay()`;
+- la función genérica `ajaxListas()`;
+- el backend de Financiamiento;
+- los demás consumidores de listas.
+
+La validación funcional aprobada por el usuario confirmó la carga correcta de
+la lista, la visualización e identificación de sus registros y la ausencia del
+error `Cannot read properties of undefined (reading 'split')`. Con ello dejó de
+estar bloqueada y pudo reanudarse la validación funcional de persistencia.
+
+### 24. Evidencia de cierre
+
+```text
+Estado: Cerrada
+Implementación: Completada
+Validación funcional: Aprobada
+Publicación: Completada
+Commit: dd458e41222e434010876723e9338c1fb6731764
+Mensaje: fix(frontend): adapt financing list to associative response
+Estado remoto: Publicado y verificado
+```
+
+### 25. Dictamen de cierre
+
+**A. Task cerrada con implementación, validación funcional y publicación completadas.**

@@ -2133,6 +2133,108 @@ Completado.
 inspección posterior con evidencia externa de infraestructura. No se creó una
 Task de despliegue.
 
+## TASK-EPIC008-FINANCIAMIENTO-LISTA-ASOCIATIVA-001
+
+### Identificación
+
+Tipo:
+[FRONT] [IMPL] [GOV] Corrección del contrato asociativo de la lista de
+Financiamiento.
+
+EPIC asociada:
+EPIC-008 — Gobierno del Modelo de Datos y Persistencia
+
+Estado:
+Cerrada
+
+Fecha de cierre:
+2026-08-14
+
+### Resultado
+
+La llamada del consumidor de Financiamiento a `ajaxListas()` declara
+explícitamente `undefined`, `id_financ` y `financiamiento`. El defecto era
+frontend preexistente y la corrección no modificó `cadenaMay()`, la función
+genérica `ajaxListas()` ni el backend.
+
+### Validación
+
+Implementación:
+Completada
+
+Validación funcional:
+Aprobada por el usuario. La lista carga correctamente y el error
+`Cannot read properties of undefined (reading 'split')` dejó de bloquear la
+validación de persistencia.
+
+### Evidencia Git
+
+Commit:
+`dd458e41222e434010876723e9338c1fb6731764`
+
+Mensaje commit:
+`fix(frontend): adapt financing list to associative response`
+
+Publicación:
+Completada y verificada remotamente.
+
+## TASK-EPIC008-FINANCIAMIENTO-INSERTAR-ESCRITURA-001
+
+### Identificación
+
+Tipo:
+[PERSIST] [IMPL] [GOV] Migración incremental del contrato de escritura de
+Financiamiento.
+
+FEATURE asociada:
+FEATURE-001 — Migración incremental por consumidor
+
+EPIC asociada:
+EPIC-008 — Gobierno del Modelo de Datos y Persistencia
+
+ADR asociado:
+ADR-001 — Contrato explícito para operaciones de escritura
+
+Estado:
+Cerrada
+
+Fecha de cierre:
+2026-08-14
+
+### Resultado
+
+`Financiamiento::insertar($nombre)` utiliza `ejecutarEscritura($sql)`. El SQL,
+los parámetros, la firma y el caller fueron preservados; el caller continúa
+utilizando truthiness y `insertarObtenerId()` permanece intacto.
+
+La incidencia frontend encontrada durante la validación funcional fue una
+unidad independiente. Tras su corrección, la validación de persistencia fue
+reanudada y aprobada.
+
+### Validación
+
+Implementación:
+Completada
+
+Validación funcional:
+Aprobada por el usuario.
+
+### Evidencia Git
+
+Commit:
+`2032cc33b9d7b90ea508ed0622968a488eb5c5f1`
+
+Mensaje commit:
+`refactor(persistence): migrate financing insert write contract`
+
+Publicación:
+Completada y verificada remotamente.
+
+### Observaciones
+
+El cierre corresponde exclusivamente a estas dos Tasks. FEATURE-001 y EPIC-008
+permanecen abiertas para futuros consumidores.
+
 ## Pendientes relacionados con el cierre EPIC-003
 
 - [TEC] [ARQ] El alta de estudiante no cuenta aún con una transacción global. La validación previa de `tipo_est` evita el fallo parcial observado, pero errores posteriores pueden persistir datos parciales.
