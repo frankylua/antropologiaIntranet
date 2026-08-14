@@ -7,7 +7,7 @@ class Financiamiento {
     }
     public function insertar($nombre){
         $sql="INSERT INTO financiamiento (id_financ,financiamiento) VALUES (NULL,'$nombre')";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
     public function insertarObtenerId($nombre){
         $sql="INSERT INTO financiamiento (id_financ,financiamiento) VALUES (NULL,'$nombre')";
