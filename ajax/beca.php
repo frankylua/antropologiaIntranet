@@ -46,7 +46,7 @@ switch($op){
                 echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
              }
             else{
-                $respuesta=$beca->editar($id_inst,$nombre);
+                $respuesta=$beca->editar($id_beca,$nombre);
                 $respuesta ? $mensaje="Beca ha sido editada" : $mensaje="Beca no ha sido editada";
                  echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
             }
