@@ -96,7 +96,7 @@ function cargarListas(n_input) {
     );
   }
   if (n_input == "bec_ext" ||n_input == "bec_int" ) {
-    ajaxListas("#listas", "../ajax/beca.php", 'read_lista', n_input);
+    ajaxListas("#listas", "../ajax/beca.php", 'read_lista', n_input, "id_nom_beca", "beca");
   }
   if (n_input == "financ") {
     ajaxListas("#listas", "../ajax/financiamiento.php", "read", undefined, "id_financ", "financiamiento");
