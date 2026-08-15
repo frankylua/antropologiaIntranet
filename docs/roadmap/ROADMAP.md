@@ -449,6 +449,413 @@ La EPIC podrá considerarse finalizada cuando:
 - los cambios no introduzcan reglas de negocio no confirmadas;
 - la evolución de la persistencia pueda validarse independientemente de la interfaz y del backend que la consumen.
 
+## EPIC-009 — Consolidación Funcional de Objetos y CRUD Integral
+
+### Identificación y estado
+
+- **EPIC:** EPIC-009.
+- **Nombre:** Consolidación Funcional de Objetos y CRUD Integral.
+- **Clasificación:** [EPIC] [ARQ] [GOV] [CRUD] [VF] [REV] [PERSIST].
+- **Estado:** APROBADA.
+- **Implementación:** No iniciada.
+- **Primer objeto:** Pendiente de selección.
+- **Próximo paso:** Inspección dirigida para seleccionar el primer objeto funcional integral.
+
+Esta creación no selecciona un objeto, no crea Feature, AT o Task y no modifica el orden de prioridad de las épicas existentes. EPIC-009 actúa como marco metodológico transversal para los incrementos que comiencen después de su checkpoint de origen.
+
+### Baseline de origen
+
+El punto de separación metodológica previo a EPIC-009 es:
+
+```text
+Commit: 955f515ae48da2cfbb3774074ef2edcbfc4beb9b
+Mensaje: chore(project): checkpoint state before next epic
+```
+
+El checkpoint consolida el estado Git existente antes de adoptar la nueva metodología. No constituye cierre funcional automático de Cursos, Tesis, EPIC-003, EPIC-008 ni de los documentos históricos incluidos en él.
+
+### Hechos confirmados
+
+- La modernización incremental anterior utilizó unidades delimitadas por métodos, llamadas u operaciones aisladas.
+- Cada micro-unidad puede requerir inspección, análisis técnico, Task, revisión, implementación, VF, commit y publicación independientes.
+- La fragmentación de un mismo objeto incrementa la sobrecarga documental y de integración.
+- Validar una sola operación no demuestra que el objeto completo sea funcionalmente coherente.
+- Un objeto puede conservar simultáneamente operaciones correctas, defectuosas, ausentes o desconectadas.
+- El repositorio contiene objetos que atraviesan interfaz, JavaScript, transporte, endpoints, modelos, persistencia, permisos y consumidores.
+- EPIC-008 continúa gobernando contratos de datos y persistencia.
+- EPIC-003 continúa gobernando identidad, roles, estados, permisos, capacidades y decisiones institucionales relacionadas.
+- ADR-001 continúa gobernando los contratos explícitos de escritura.
+
+### Problema
+
+La división artificial de una entidad funcional en múltiples micro-unidades puede producir una secuencia repetida:
+
+```text
+inspección
+→ AT
+→ Task
+→ revisión técnica
+→ implementación
+→ VF
+→ commit
+→ publicación
+```
+
+por cada método o llamada aislada. Esta granularidad aumenta la carga de coordinación y puede dejar el mismo objeto en un estado parcial, por ejemplo:
+
+```text
+CREATE correcto
+READ correcto
+UPDATE defectuoso
+DELETE inexistente
+```
+
+Sin una visión integral, una operación validada puede ocultar incompatibilidades en las demás operaciones, en sus contratos o en sus interacciones.
+
+### Objetivo estratégico
+
+Establecer un proceso incremental en el que cada objeto seleccionado sea inspeccionado y modernizado integralmente a través de sus operaciones aplicables e interacciones relevantes, manteniendo alcance controlado, trazabilidad, reversibilidad y compatibilidad funcional.
+
+Antes de declarar finalizado un objeto deberán revisarse, según su existencia:
+
+```text
+interfaz
+→ JavaScript
+→ transporte AJAX/HTTP
+→ endpoint
+→ modelo
+→ persistencia
+→ base de datos
+→ callers/consumers
+→ permisos
+→ mensajes
+→ comportamiento observable
+```
+
+### Unidad funcional preferente
+
+EPIC-009 define el **objeto funcional completo** como unidad preferente de trabajo.
+
+Un objeto representa un concepto funcional coherente cuyas operaciones e interacciones pueden analizarse y evolucionar conjuntamente. Beca, Financiamiento, Institución, Título, Grado y Postdoctorado son ejemplos ilustrativos; esta lista no selecciona ni prioriza el primer objeto.
+
+La unidad preferente reemplaza la selección automática de un método individual o una operación CRUD aislada cuando todas las operaciones pertenecen al mismo objeto y pueden evolucionar de manera segura y reversible.
+
+### Inspección integral del objeto
+
+Toda inspección previa deberá revisar, según existencia y evidencia:
+
+#### Frontend
+
+- vistas, formularios, listas, botones y modales;
+- selectores, JavaScript y mensajes visibles;
+- identificación y transporte de IDs.
+
+#### Transporte
+
+- AJAX o HTTP;
+- parámetros, payload y JSON;
+- métodos GET/POST y contratos de identificación.
+
+#### Endpoint
+
+- operaciones y branches;
+- validaciones, mensajes y forma de retorno.
+
+#### Modelo
+
+- métodos, firmas, SQL, retornos y helpers.
+
+#### Persistencia
+
+- lecturas, inserciones, actualizaciones y eliminaciones;
+- IDs generados, filas afectadas y transacciones.
+
+#### Integraciones
+
+- callers, consumers y módulos dependientes;
+- permisos y capacidades relacionadas.
+
+#### Estado funcional
+
+- operaciones correctas o defectuosas;
+- operaciones ausentes o desconectadas;
+- inconsistencias y comportamiento histórico observable.
+
+### Matriz CRUD obligatoria
+
+Todo objeto seleccionado deberá contar con una matriz sustentada por evidencia del repositorio:
+
+| Operación | Estados permitidos |
+| --- | --- |
+| CREATE | Existe / Defectuoso / Falta / No aplica / Bloqueado |
+| READ | Existe / Defectuoso / Falta / No aplica / Bloqueado |
+| UPDATE | Existe / Defectuoso / Falta / No aplica / Bloqueado |
+| DELETE | Existe / Defectuoso / Falta / No aplica / Bloqueado |
+
+La pertenencia conceptual de una operación a CRUD no demuestra por sí sola que deba existir. Cada clasificación deberá indicar evidencia y comportamiento observable.
+
+### Regla de CRUD incompleto
+
+Cuando una operación necesaria falte, sea parcial, esté defectuosa o desconectada, utilice contratos incompatibles o no complete su flujo observable, la Task integral del objeto deberá incluir su resolución.
+
+No se podrá declarar terminado un objeto dejando silenciosamente una operación necesaria incompleta.
+
+### Operaciones no aplicables
+
+Una operación podrá clasificarse como **No aplica** únicamente cuando exista evidencia de una regla funcional, política institucional, requisito de seguridad, conservación histórica, decisión arquitectónica o naturaleza del objeto que justifique su ausencia.
+
+EPIC-009 no obliga a implementar artificialmente las cuatro operaciones CRUD. Cuando no exista evidencia suficiente para declarar que una operación no aplica, deberá registrarse como pendiente de definición o bloqueada.
+
+### Operaciones bloqueadas
+
+Una operación necesaria que no pueda resolverse dentro de la Task integral deberá registrarse con esta información mínima:
+
+```text
+Objeto:
+Operación:
+Estado: Bloqueada
+Causa:
+Evidencia:
+Dependencia:
+Decisión requerida:
+Siguiente artefacto:
+```
+
+El objeto permanecerá **No finalizado** hasta resolver el bloqueo o determinar formalmente que la operación no aplica.
+
+### Task integral por objeto
+
+El estándar preferente es:
+
+```text
+1 objeto
+→ 1 Task integral
+```
+
+La Task podrá incluir múltiples métodos, archivos, endpoints, cambios frontend, cambios de modelo y ajustes de persistencia cuando formen una sola unidad funcional coherente.
+
+CREATE, READ, UPDATE y DELETE no se dividirán automáticamente en cuatro Tasks. La Task integral seguirá teniendo un objetivo único: completar coherentemente el objeto dentro del alcance aprobado.
+
+### Límites de agrupación
+
+La agrupación no autoriza mezclar decisiones incompatibles. La ejecución deberá separarse cuando exista:
+
+- una decisión arquitectónica independiente;
+- una decisión institucional pendiente;
+- un riesgo de seguridad autónomo;
+- una migración de esquema de alto riesgo;
+- una dependencia externa;
+- un bloqueo funcional;
+- un objeto distinto;
+- necesidad de un ADR propio.
+
+En esos casos se conservará la visión integral del objeto, con división de ejecución y trazabilidad explícitas.
+
+### Excepciones a la Task integral
+
+Una Task puntual será admisible únicamente con justificación registrada, por ejemplo:
+
+- seguridad o producción;
+- bug urgente;
+- bloqueo externo;
+- decisión arquitectónica independiente;
+- operación aislada surgida después del cierre integral;
+- riesgo excesivo de agrupación.
+
+### Relación con EPIC-008
+
+EPIC-009 no sustituye ni cierra EPIC-008.
+
+- EPIC-009 gobierna la granularidad funcional de la modernización por objeto.
+- EPIC-008 gobierna los contratos de datos y la evolución de la persistencia.
+
+Cuando un objeto requiera cambios de persistencia, deberá cumplir las decisiones vigentes de EPIC-008.
+
+### Relación con ADR-001
+
+ADR-001 permanece vigente y sin modificaciones. Cada objeto deberá distinguir entre:
+
+- escritura que solo requiere éxito o fallo;
+- escritura que requiere el ID insertado;
+- escritura que requiere filas afectadas;
+- operación que pueda requerir una transacción.
+
+No se sustituirán mecánicamente todas las escrituras por un mismo contrato.
+
+### Relación con EPIC-003
+
+EPIC-009 no redefine identidad, roles, estados, permisos, capacidades ni reglas institucionales.
+
+Cuando un objeto dependa de estas materias deberá registrar el bloqueo o la dependencia hacia EPIC-003. Una Task CRUD no resolverá silenciosamente esas decisiones.
+
+### Validación funcional integral
+
+La VF se diseñará por objeto y cubrirá todas sus operaciones aplicables:
+
+- CREATE: crear y confirmar persistencia;
+- READ: listar o cargar y confirmar datos;
+- UPDATE: editar y confirmar persistencia;
+- DELETE: eliminar y confirmar el resultado, cuando corresponda;
+- recarga, mensajes, errores, integración visual y permisos aplicables.
+
+La VF corresponde exclusivamente al usuario. Codex no ejecutará operaciones funcionales reales sin una autorización posterior explícita.
+
+### Criterio de cierre del objeto
+
+Un objeto podrá declararse **Finalizado** únicamente cuando:
+
+1. su matriz CRUD esté completa;
+2. todas las operaciones aplicables funcionen;
+3. los defectos conocidos incluidos en el alcance estén resueltos;
+4. las operaciones requeridas ausentes estén implementadas;
+5. las operaciones No aplica estén justificadas;
+6. los bloqueos estén resueltos;
+7. frontend y backend sean coherentes;
+8. los contratos técnicos estén conformes;
+9. callers y consumers relevantes estén revisados;
+10. la VF integral esté aprobada;
+11. la integración Git esté publicada;
+12. la documentación de cierre esté actualizada.
+
+### Prohibición de deuda oculta
+
+No podrá registrarse un objeto como terminado cuando una operación necesaria continúe defectuosa o ausente, o cuando frontend y backend permanezcan incompatibles.
+
+Toda deuda dentro del objeto deberá quedar resuelta o formalmente registrada como bloqueada o no aplicable.
+
+### Priorización de objetos
+
+La selección posterior deberá ponderar:
+
+1. beneficio funcional;
+2. riesgo;
+3. tamaño del CRUD;
+4. claridad institucional;
+5. dependencias;
+6. posibilidad de VF;
+7. acoplamiento;
+8. contratos de persistencia;
+9. defectos existentes;
+10. cantidad de interacciones.
+
+La cantidad de llamadas a `ejecutarConsulta()` o de métodos heredados no será por sí sola un criterio de prioridad.
+
+Esta creación no altera el orden por prioridad de las épicas existentes. La priorización inicial de objetos se realizará mediante una inspección posterior específica.
+
+### Reversibilidad y alcance
+
+Aunque una Task integral abarque varias capas, deberá seguir siendo acotada, trazable, reversible y revisable.
+
+EPIC-009 no autoriza refactorizaciones generales, reescrituras masivas, reformateo, reorganización oportunista, cambio de framework ni cambios no relacionados.
+
+Para EOL y EOF se preservará la representación material del worktree antes y después. El blob Git no introducirá normalización adicional respecto de su padre cuando intervengan `text=auto` o `core.autocrlf=true`.
+
+### Seguridad y datos locales
+
+Los dumps de base de datos que contengan datos personales, credenciales o información sensible no se incorporarán automáticamente al repositorio.
+
+No se documentarán valores sensibles. El dump local excluido antes de EPIC-009 no forma parte de esta épica ni de sus artefactos.
+
+### Flujo metodológico
+
+EPIC-009 formaliza el flujo:
+
+```text
+EPIC
+→ selección del objeto
+→ inspección integral
+→ matriz CRUD
+→ análisis técnico integral
+→ Task integral
+→ revisión técnica
+→ implementación supervisada
+→ VF integral del objeto
+→ commit
+→ publicación
+→ cierre documental del objeto
+```
+
+Las micro-Tasks se reducirán cuando la agrupación no aumente indebidamente el riesgo.
+
+### Métrica de avance
+
+La métrica principal será **Objetos funcionales finalizados**.
+
+Cada objeto deberá registrar:
+
+| Dimensión | Estados |
+| --- | --- |
+| CRUD | Completo / Parcial / Bloqueado |
+| VF | Pendiente / Aprobada |
+| Estado | No iniciado / En análisis / En implementación / En VF / Finalizado / Bloqueado |
+
+La cantidad de métodos migrados no será el indicador principal de progreso.
+
+### Fuera de alcance
+
+EPIC-009 no autoriza por sí sola:
+
+- reemplazar PHP o cambiar de framework;
+- adoptar una nueva base de datos;
+- realizar una reescritura global;
+- crear una API general nueva;
+- reemplazar totalmente jQuery;
+- ejecutar un rediseño visual general;
+- definir nuevas reglas institucionales;
+- eliminar masivamente código heredado;
+- ejecutar cambios generales de esquema;
+- modificar ADR-001, EPIC-003 o EPIC-008;
+- incorporar dumps sensibles.
+
+### Bloqueos iniciales
+
+No existe un bloqueo para la creación documental de EPIC-009. La selección del primer objeto permanece pendiente y no se resolverá sin una inspección dirigida.
+
+Una dependencia o decisión institucional detectada durante la inspección de un objeto deberá registrarse como bloqueo de ese objeto, no resolverse como supuesto.
+
+### Decisiones adoptadas
+
+- La unidad funcional preferente será el objeto completo.
+- Cada objeto contará con una matriz CRUD basada en evidencia.
+- Una operación necesaria incompleta deberá resolverse en la Task integral.
+- Una operación No aplica requerirá evidencia.
+- Una operación bloqueada mantendrá abierto el objeto.
+- La Task integral por objeto será el estándar preferente.
+- La VF será integral y ejecutada por el usuario.
+- El cierre exigirá integración Git publicada y documentación actualizada.
+
+### Reglas de EPIC-009
+
+- La matriz CRUD deberá basarse en evidencia del repositorio.
+- Toda operación necesaria incompleta deberá resolverse dentro de la Task integral o registrarse como bloqueada.
+- La clasificación No aplica exigirá justificación verificable.
+- Un bloqueo mantendrá el objeto abierto.
+- La agrupación por objeto será preferente, pero no absorberá decisiones autónomas ni objetos diferentes.
+- Toda excepción que requiera una Task puntual deberá quedar justificada y trazada.
+- La VF integral será ejecutada por el usuario.
+- Ningún objeto se cerrará antes de publicar su integración Git y actualizar su documentación.
+
+### Dependencias
+
+- EPIC-008 para contratos de datos y persistencia.
+- ADR-001 para distinguir contratos de escritura.
+- EPIC-003 cuando intervengan identidad, roles, estados, permisos, capacidades o decisiones institucionales.
+- Otras épicas vigentes según las capas e interacciones concretas del objeto seleccionado.
+
+### Próximo paso
+
+Realizar una inspección dirigida para seleccionar el primer objeto funcional integral. Esa inspección deberá comparar candidatos con los criterios definidos, sin anticipar la selección en este documento.
+
+### Auditoría metodológica
+
+- EPIC-009 no sustituye EPIC-008.
+- EPIC-009 no sustituye EPIC-003.
+- EPIC-009 no modifica ADR-001.
+- EPIC-009 introduce la unidad funcional por objeto y el cierre CRUD integral.
+- No se seleccionó el primer objeto.
+- No se creó Feature, AT o Task.
+- No se modificó código, base de datos ni configuración.
+
 ### EPIC-005 — Modernización incremental del backend PHP
 
 #### Objetivo
