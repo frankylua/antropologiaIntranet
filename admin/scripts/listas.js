@@ -16,6 +16,17 @@ function insertUpdate(url, dato_lista) {// funcion para llamar ajax;
       $('#agregar_lista').val('Agregar');
     }
     click();
+  }).fail(function (xhr) {
+    if (dato_lista.tipo == 'pueb' && xhr.status == 403) {
+      const mensaje = xhr.responseJSON && xhr.responseJSON.mensaje
+        ? xhr.responseJSON.mensaje
+        : 'Usuario sin permisos para crear o editar';
+      mostrarMensajeCRUD({
+        contenedor: '#mnsj_row_listas',
+        mensaje: mensaje,
+        tipo: 'danger'
+      });
+    }
   })
 }
 function clickListas(nom) {

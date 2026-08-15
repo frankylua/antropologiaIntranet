@@ -81,7 +81,7 @@ function llenarFormPersEst(id_usu) {
                 $("input[type='radio'][name='pueblo'][value='si']").attr('checked', true);
                 $('#p').remove()
                 $('#row_pueb').append('<div class="col-md-6 mb-3" id="p"><label for="pueb_ind" class="form-label" >Pueblo Indígena</label><select id="select_pueb" name="select_pueb" class="form-select"></select></div>')
-                ajaxSelect('#select_pueb', ruta + 'ajax/pueblo.php', 'Seleccione', 'read');
+                ajaxSelect('#select_pueb', ruta + 'ajax/pueblo.php', 'Seleccione', 'read', undefined, 'id_pueblo', 'pueblo');
                 $('#select_pueb').val(usu[0]['id_pueblo']);
             }
             $('#pais_res').val(usu[0]['pais_res']);
