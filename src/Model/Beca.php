@@ -15,7 +15,7 @@ class Beca {
     }
     public function insertarList($nombre,$tipo_int){
         $sql="INSERT INTO nombre_beca (id_nom_beca,beca,tipo_beca) VALUES (NULL,'$nombre','$tipo_int')";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
 
     }
     public function editar($id,$nombre){
