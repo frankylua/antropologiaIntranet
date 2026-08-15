@@ -57,7 +57,7 @@ class Tesis {
     }
     public function editarCoguia($coguia,$id_tesis){
         $sql="UPDATE tesis SET nom_prof_coguia=NULL, id_prof_coguia='$coguia' WHERE id_tesis='$id_tesis'";
-        return ejecutarConsulta($sql);
+        return ejecutarEscritura($sql);
     }
     // public function editar($id,$nombre){
     //     $sql="UPDATE pueblo SET nombre='$nombre' where id_pueblo='$id'";

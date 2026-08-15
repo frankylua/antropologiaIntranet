@@ -18,7 +18,7 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSIO
       <div class="col" id="list_curso">
 
         <h3 class=" text-center titulo_curso">CURSOS
-          <button class="btn btn-dark text-light px-3 m-3" id="btn-agr-curso">Agregar Registro</button>
+          <button class="btn btn-dark text-light px-3 m-3" id="btn-agr-curso" data-capacidad="creacion">Agregar Registro</button>
 
         </h3>
         <div class="row justify-content-center p-0" id="mnsj_elim">
@@ -74,7 +74,7 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSIO
     <div class="row">
       <div class="col" id="form_curso">
         <h3 class="card-title text-center mb-5">INGRESAR CURSO</h3>
-        <form class=" g-3 m-5" method='post' id='form_curso' enctype="multipart/form-data">
+        <form class=" g-3 m-5" method='post' id='form_curso' data-capacidad="creacion-actualizacion" enctype="multipart/form-data">
           <div class="row ">
             <div class="col-md-6 mb-3">
               <input type='hidden' id='id_curso' value="0"></input>
@@ -142,7 +142,7 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSIO
               <button type="button" class="col-12 btn btn-dark col-6" id="btn-ver-curso">Cancelar</button>
             </div>
             <div class="col-6 col-md-4 mb-3 ">
-              <button type="submit" class="col-12 btn btn-dark col-6">Guardar</button>
+            <button type="submit" class="col-12 btn btn-dark col-6" data-capacidad="creacion-actualizacion">Guardar</button>
             </div>
           </div>
         </form>
@@ -201,7 +201,7 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSIO
             <button type="button" class="col-12 btn btn-dark col-6 detalleCurso">Volver</button>
           </div>
           <div class="col-6 col-md-4 mb-3 ">
-            <button type="submit" class="col-12 btn btn-dark col-6" id="editar_curso">Editar</button>
+            <button type="submit" class="col-12 btn btn-dark col-6" id="editar_curso" data-capacidad="actualizacion">Editar</button>
           </div>
         </div>
 

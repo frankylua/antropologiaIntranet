@@ -13,8 +13,8 @@ function mostrarCurso(){
         <td >${cadenaMay(list['nom_curso'])}</td>
         <td>${list['periodo']==1?'I Semestre':list['periodo']==2?'II Semestre':'III Semestre'}</td>
         <td >${list['anio_curso']}</td>
-        <td class="text-center"><button type="button" class="btn btn-link link-success btn-sm verCurso text-center" id="${list[0]}">Ver</button></td>
-        <td class="text-center"><button type="button" class="btn btn-link link-danger btn-sm eliminarCurso" id="${list[0]}" >Eliminar</button></td>
+        <td class="text-center"><button type="button" class="btn btn-link link-success btn-sm verCurso text-center" data-capacidad="visualizacion" id="${list[0]}">Ver</button></td>
+        <td class="text-center"><button type="button" class="btn btn-link link-danger btn-sm eliminarCurso" data-capacidad="eliminacion" id="${list[0]}" >Eliminar</button></td>
         </tr>
         
         `});
@@ -167,7 +167,7 @@ $('#form_curso').submit(function(e){
 
     //valido los campos vacios
     if((campos_llenos || editado)){
-        op='insert-update';
+        op=editado ? 'update' : 'create';
         curso=new FormData();
         curso.append('nombre',nombre);
         curso.append('creditos',creditos);

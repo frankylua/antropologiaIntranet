@@ -2,6 +2,42 @@
 require_once __DIR__ . '/../src/bootstrap/app.php';
 use App\Model\Curso;
 require 'validaciones.php';
+
+if (strlen(session_id()) < 1) {
+        session_start();
+}
+
+function capacidadCursoPermitida($capacidad) {
+        // Las capacidades se distinguen aquí, pero conservan las mismas claves
+        // históricas hasta que exista una política funcional aprobada.
+        $permisosActuales = array(
+                'visualizacion' => array('admin', 'comite', 'aceptado', 'docente'),
+                'creacion' => array('admin', 'comite', 'aceptado', 'docente'),
+                'actualizacion' => array('admin', 'comite', 'aceptado', 'docente'),
+                'eliminacion' => array('admin', 'comite', 'aceptado', 'docente')
+        );
+
+        if (!isset($permisosActuales[$capacidad])) {
+                return false;
+        }
+
+        foreach ($permisosActuales[$capacidad] as $permiso) {
+                if (isset($_SESSION[$permiso])) {
+                        return true;
+                }
+        }
+
+        return false;
+}
+
+function requerirCapacidadCurso($capacidad) {
+        if (!capacidadCursoPermitida($capacidad)) {
+                http_response_code(403);
+                echo json_encode('<p>Acceso no autorizado</p>', JSON_UNESCAPED_UNICODE);
+                exit;
+        }
+}
+
 $curso=new Curso();
 
 $nom_curso=isset($_POST['nombre'])?(int)$_POST['nombre']:'';
@@ -32,26 +68,33 @@ $op=isset($_POST['op'])?$_POST['op']:'';
 
 // $lista=array('creditos'=>$creditos,'caracter'=>$caracter,'periodo'=>$periodo,'año'=>$anio_curso,'carga'=>$carga_hor,'nombre'=>$nombre,'programa'=>$programa);
 switch($op){
-        case 'insert-update':
+        case 'create':
+                requerirCapacidadCurso('creacion');
                 $dir= '../files/prog_curso';//ruta para guardar archivo programa curso
                 $nom_prog=basename($_FILES['prog_curso']['name']);
                 $archivos=$curso->buscarArchivo($nom_prog);                
                 $nom_prog=count($archivos)==0?$nom_prog:rand(00,99).'-'.$nom_prog; //modifico nombre en caso de existir el nombre de archivo en la base de datos 
                 $ruta_carga=$dir.'/'.$nom_prog;
                 $arch_tmp=$_FILES['prog_curso']['tmp_name'];
-                if($id_curso == 0 ){
-                        if (!file_exists($dir)) {
-                                mkdir($dir, 0777);
-                            }
-                        if(move_uploaded_file($arch_tmp,$ruta_carga)){                                
-                                $respuesta=$curso->insertar($creditos,$caracter,$periodo,$anio_curso,$car_hor,$nom_curso,$nom_prog,$docente);
-                        }else{
-                                $respuesta=false;
-                        }
-                        $respuesta ? $mensaje="<p>Curso guardado correctamente</p>" : $mensaje="<p>Curso no ha sido guardado</p>";
-                        echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
+                if (!file_exists($dir)) {
+                        mkdir($dir, 0777);
                 }
-                else{
+                if(move_uploaded_file($arch_tmp,$ruta_carga)){
+                        $respuesta=$curso->insertar($creditos,$caracter,$periodo,$anio_curso,$car_hor,$nom_curso,$nom_prog,$docente);
+                }else{
+                        $respuesta=false;
+                }
+                $respuesta ? $mensaje="<p>Curso guardado correctamente</p>" : $mensaje="<p>Curso no ha sido guardado</p>";
+                echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
+        break;
+        case 'update':
+                requerirCapacidadCurso('actualizacion');
+                $dir= '../files/prog_curso';//ruta para guardar archivo programa curso
+                $nom_prog=basename($_FILES['prog_curso']['name']);
+                $archivos=$curso->buscarArchivo($nom_prog);
+                $nom_prog=count($archivos)==0?$nom_prog:rand(00,99).'-'.$nom_prog;
+                $ruta_carga=$dir.'/'.$nom_prog;
+                $arch_tmp=$_FILES['prog_curso']['tmp_name'];
                         if (file_exists($_FILES['prog_curso']['tmp_name']) || is_uploaded_file($_FILES['prog_curso']['tmp_name'])){
                                 if(move_uploaded_file($arch_tmp,$ruta_carga)){
                                         unlink($dir.'/'.$_POST['arch_actual']);
@@ -66,21 +109,24 @@ switch($op){
                         }                       
                         $respuesta ? $mensaje="<p>Curso editado correctamente</p>" : $mensaje="<p>Curso no ha sido editado</p>";
                         echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
-                }
         break;
         case 'read':
+                requerirCapacidadCurso('visualizacion');
                 $respuesta=$curso->mostrar();
                 echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
         break;
         case 'read_cursos':
+             requerirCapacidadCurso('visualizacion');
              $respuesta=$curso->mostrarCursos();
             echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
     break;
         case 'query_id':
+                requerirCapacidadCurso('visualizacion');
                 $respuesta=$curso->mostrarPorId($id_curso);
                 echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
         break;
         case'delete':
+                requerirCapacidadCurso('eliminacion');
                 $nom_prog=$curso->buscarArchivoId($id_curso);
                 $respuesta=$curso->eliminar($id_curso);
                 if($respuesta){
