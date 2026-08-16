@@ -7,8 +7,6 @@ function cargarFichaDoc(id_usu) {
     data: { op: "read_prof_id", id_usu },
     success: function (response) {
       let usu = JSON.parse(response);
-      console.log(usu);
-      console.log(id_usu)
       let template;
       nombre =
         cadenaMay(usu[0]["nombres"]) +
@@ -179,10 +177,8 @@ function cargarDocentes(tipo, busqueda) {
     type: "POST",
     data: { op, tipo, busqueda },
     success: function (response) {
-      console.log(response)
       let docentes = JSON.parse(response);
       let template;
-      console.log(docentes.length);
       if (docentes.length > 0) {
         docentes.forEach((doc) => {
           nombre =
@@ -254,21 +250,44 @@ $("body").on("click", ".verFicha", function () {
   $('#campos_tesis').html('')
 });
 $("body").on("click", ".eliminarDoc", function () {
-  id_login = $(this).attr("id");
+  const id_login = $(this).attr("id");
+  if (!window.confirm("Esta operación eliminará completamente la cuenta del Profesor. ¿Desea continuar?")) {
+    return;
+  }
   $.ajax({
     url: "../ajax/docente.php",
     type: "POST",
+    dataType: "json",
     data: { id_login, op: "delete" },
     success: function (response) {
-      let mensaje = JSON.parse(response);
-      console.log(mensaje);
+      if (!response.ok) {
+        $("#mnsj_elim").show();
+        $("#eliminado").removeClass("alert-success").addClass("alert-danger");
+        $("#eliminado").text(response.mensaje || "No fue posible eliminar al Profesor.");
+        return;
+      }
       $("#mnsj_elim").show();
-      $("#eliminado").addClass("alert-success");
-      $("#eliminado").html(mensaje);
+      $("#eliminado").removeClass("alert-danger").addClass("alert-success");
+      $("#eliminado").text(response.mensaje);
       cargarDocentes();
       setTimeout(function () {
         $("#mnsj_elim").fadeOut(1500);
       }, 3000);
+    },
+    error: function (xhr) {
+      let mensaje = "No fue posible eliminar al Profesor.";
+      if (xhr.responseJSON && xhr.responseJSON.mensaje) {
+        mensaje = xhr.responseJSON.mensaje;
+      } else {
+        try {
+          const respuesta = JSON.parse(xhr.responseText);
+          mensaje = respuesta.mensaje || mensaje;
+        } catch (error) {
+        }
+      }
+      $("#mnsj_elim").show();
+      $("#eliminado").removeClass("alert-success").addClass("alert-danger");
+      $("#eliminado").text(mensaje);
     },
   });
 });
@@ -276,6 +295,11 @@ function init() {
   listaDoc();
   $('#lista_doc').attr('name','true')
   cargarDocentes($("#tipo_doc").val());
+  const idUsuario=new URLSearchParams(window.location.search).get('id_usuario');
+  if(idUsuario && /^[1-9]\d*$/.test(idUsuario)){
+    fichaDoc();
+    cargarFichaDoc(Number(idUsuario));
+  }
   $("#box-pass").hide();
   $("#mnsj_row_per").hide();
   $("#mnsj_row_per_doc").hide();

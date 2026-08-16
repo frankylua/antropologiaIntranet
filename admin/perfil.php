@@ -1,18 +1,46 @@
 <?php
 require_once __DIR__ . '/../src/bootstrap/session.php';
+require_once __DIR__ . '/../src/bootstrap/app.php';
      ob_start();
      if (strlen(session_id()) < 1){
          session_start();//Validamos si existe o no la sesión
      }
     if(!isset($_SESSION['admin']) && !isset($_SESSION['comite'])){
         header('Location: ../index.php');
+        exit;
     }else{
-        if(isset($_SESSION['admin'])){
-            $id_login = $_SESSION['admin'];
+        $candidatosLogin = [];
+        foreach (['login', 'admin', 'comite', 'docente'] as $claveSesion) {
+            if (isset($_SESSION[$claveSesion]) && is_scalar($_SESSION[$claveSesion])) {
+                $candidatoLogin = (int) $_SESSION[$claveSesion];
+                if ($candidatoLogin > 0) {
+                    $candidatosLogin[] = $candidatoLogin;
+                }
+            }
         }
-        if(isset($_SESSION['comite'])){
-            $id_login = $_SESSION['comite'];
-        } 
+        $candidatosLogin = array_values(array_unique($candidatosLogin));
+        $id_login = count($candidatosLogin) === 1 ? $candidatosLogin[0] : 0;
+        if($id_login < 1){
+            header('Location: ../index.php');
+            exit;
+        }
+
+        $consultaDocente = conexion()->prepare(
+            'SELECT u.id_usuario FROM usuario u '
+            . 'JOIN profesor p ON p.usuario = u.id_usuario '
+            . 'JOIN permiso_login pl ON pl.id_login = u.login AND pl.id_permiso = 4 '
+            . 'WHERE u.login = :id_login'
+        );
+        $consultaDocente->execute(['id_login' => $id_login]);
+        $usuariosDocentes = array_map('intval', $consultaDocente->fetchAll(PDO::FETCH_COLUMN));
+        if (count($usuariosDocentes) === 1 && $usuariosDocentes[0] > 0) {
+            $_SESSION['login'] = $id_login;
+            $_SESSION['docente'] = $id_login;
+            $_SESSION['id_usuario'] = [['id_usuario' => $usuariosDocentes[0]]];
+            header('Location: ../form-doc/info.docente.php');
+            exit;
+        }
+
         require '../form-doc/header.php';
     ?>
     <div class="container mt-5">
@@ -46,7 +74,7 @@ require_once __DIR__ . '/../src/bootstrap/session.php';
     <div class="col" id="form_admin_edit">
             <div class="row ">
                 <div class="col">
-                    <h3 class="text-center mb-5">INGRESO ADMINISTRACIÓN</h3>
+                    <h3 class="text-center mb-5">EDICIÓN DE PERFIL ADMINISTRATIVO</h3>
                     <form class=" g-3" method='POST' action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
                         <div class="row ">
                             <div class="col-md-6 mb-3">
@@ -78,18 +106,6 @@ require_once __DIR__ . '/../src/bootstrap/session.php';
                             </div>
                         </div>
                         <div class="row ">
-                            <?php if (isset($_SESSION['admin'])): ?>
-                            <div class="col-lg-6 col- ">
-                                <label class="form-label mb-2">Tipo de Ingreso</label>
-                                <input type='hidden' id='id_per_log'></input>
-                                <select class="form-select" name="permiso" id="permiso">
-                                    <option value="0" selected>Seleccione</option>
-                                    <option value="1">Administrador(a)</option>
-                                    <option value="2">Comite Académico</option>
-                                </select>
-
-                            </div>
-                            <?php endif; ?>
                             <div class="col-md-6 mb-3 mt-2">
                                 <input type="button" class="btn btn-outline-dark mt-4" value="Cambiar Constraseña"
                                     id="btn_cambiar_pass">
@@ -137,6 +153,4 @@ ob_end_flush();
         
 
     
-    
-
     

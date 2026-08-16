@@ -1,305 +1,260 @@
+function mensajeRespuesta(xhr, mensajePredeterminado){
+  if(xhr.responseJSON && xhr.responseJSON.mensaje){
+    return xhr.responseJSON.mensaje;
+  }
+  try {
+    const respuesta = JSON.parse(xhr.responseText);
+    return respuesta.mensaje || mensajePredeterminado;
+  } catch (error) {
+    return mensajePredeterminado;
+  }
+}
+
+function textoSeguro(valor){
+  return $('<div>').text(valor == null ? '' : valor).html();
+}
+
+function mostrarErrorLista(mensaje){
+  $('#mnsj_elim').show();
+  $('#eliminado').removeClass('alert-success').addClass('alert-danger');
+  $('#eliminado').text(mensaje);
+}
 
 function mostrarAdmin(){
   $.ajax({
-      url:'../ajax/admin.php',
-      type: 'POST',
-      data: {op:'read'},
-      success: function(response){ 
-       let listas = JSON.parse(response);
-       console.log(listas);       
-      let template ='';
-      listas.forEach(list => {
+    url:'../ajax/admin.php',
+    type:'POST',
+    dataType:'json',
+    data:{op:'read'},
+    success:function(cuentas){
+      if(!Array.isArray(cuentas)){
+        mostrarErrorLista('No fue posible cargar las cuentas administrativas.');
+        return;
+      }
+      let template='';
+      cuentas.forEach(function(cuenta){
+        const conDocencia=cuenta.representacion==='con_docencia';
+        const accionDocencia=conDocencia
+          ? '<span class="text-muted">Incorporada</span>'
+          : `<button type="button" class="btn btn-link link-success btn-sm agregarDocencia" data-login="${cuenta.id_login}">Agregar Docencia</button>`;
+        const accionEditar=conDocencia
+          ? (cuenta.es_actor
+              ? '<a class="btn btn-link link-success btn-sm" href="../form-doc/info.docente.php">Mi Perfil</a>'
+              : `<button type="button" class="btn btn-link link-success btn-sm editarAdmin" data-login="${cuenta.id_login}">Perfil Docente</button>`)
+          : `<button type="button" class="btn btn-link link-success btn-sm editarAdmin" data-login="${cuenta.id_login}">Editar</button>`;
+        const accionEliminar=cuenta.es_actor
+          ? '<span class="text-muted">No disponible</span>'
+          : `<button type="button" class="btn btn-link link-danger btn-sm eliminarAdmin" data-login="${cuenta.id_login}" data-accion="${conDocencia?'retiro':'eliminacion'}" data-rol="${textoSeguro(cuenta.rol)}">${conDocencia?'Retirar rol':'Eliminar'}</button>`;
         template += `
-      
-      <tr>
-      
-      <td >${cadenaMay(list.nombre)}</td>
-      <td>${list.correo}</td>
-      <td>${list.id_permiso==1?'Administrador':'C.A.'}</td>
-      <td><button type="button" class="btn btn-link link-success btn-sm " id="">Agregar Docencia</button></td>
-      <td><button type="button" class="btn btn-link link-success btn-sm editarAdmin" id="${list.id_login}">Editar</button></td>
-      <td><button type="button" class="btn btn-link link-danger btn-sm eliminarAdmin" id="${list.id_login}" >Eliminar</button></td>
-      </tr>
-   
-      `});
-    $('#datos_admin').html(template);
-  }
-})
+          <tr>
+            <td>${textoSeguro(cadenaMay(cuenta.nombre))}</td>
+            <td>${textoSeguro(cuenta.correo)}</td>
+            <td>${textoSeguro(cuenta.rol)}</td>
+            <td>${conDocencia?'Docente':'Administrativo'}</td>
+            <td>${accionDocencia}</td>
+            <td>${accionEditar}</td>
+            <td>${accionEliminar}</td>
+          </tr>`;
+      });
+      $('#datos_admin').html(template);
+    },
+    error:function(xhr){
+      mostrarErrorLista(mensajeRespuesta(xhr, 'No fue posible cargar las cuentas administrativas.'));
+    }
+  });
 }
-function  mensajeError(mensaje){
+
+function mensajeError(mensaje){
   $('#mnsj_row').show();
-  $('#mnsj').addClass('alert-danger');
-  $('#mnsj').html(mensaje);
+  $('#mnsj').removeClass('alert-success').addClass('alert-danger');
+  $('#mnsj').text(mensaje);
 }
+
 function limpiar(){
   $('#nom_admin').val('');
   $('#correo').val('');
   $('#pass').val('');
   $('#pass2').val('');
+  $('#permiso').val('0');
   $('#id_login').val('');
+  $('#box-pass').attr('name',0);
   limpiarInput('#nom_admin','#col_nom_admin');
   limpiarInput('#correo','#col_correo');
   limpiarInput('#pass','#col_pass');
   limpiarInput('#pass2','#col_pass2');
   limpiarSelect('#permiso','#col_tipo');
 }
+
 function mostrarform(flag){
-  if (flag)
-  {
-      $("#btn_cambiar_pass").hide();
-      $("#box-pass").show();
-      $("#list_admin").hide();
-      $("#form_admin").show();
-      // $("#btnGuardar").prop("disabled",false);
-      $(".titulo_comite").hide();
-    }
-    else
-    {
-      $("#list_admin").show();
-      $("#form_admin").hide();
-      $(".titulo_comite").show();
-    }
+  if(flag){
+    $('#list_admin').hide();
+    $('#form_admin').show();
+    $('.titulo_comite').hide();
+  }else{
+    $('#list_admin').show();
+    $('#form_admin').hide();
+    $('.titulo_comite').show();
   }
-function cancelarform(){
+}
+
+function mostrarExitoFormulario(mensaje){
+  $('#mnsj_row').show();
+  $('#mnsj').removeClass('alert-danger').addClass('alert-success');
+  $('#mnsj').text(mensaje);
+  setTimeout(function(){
+    $('#mnsj_row').fadeOut(1500);
     mostrarform(false);
-    
+    mostrarAdmin();
+    limpiar();
+  },3000);
+}
+
+$('#btn-agr-admin').click(function(){
+  limpiar();
+  $('#col_tipo').show();
+  $('#btn_cambiar_pass').hide();
+  $('#box-pass').show().attr('name',1);
+  mostrarform(true);
+});
+
+$('#btn-ver-comite').click(function(){
+  limpiar();
+  mostrarform(false);
+});
+
+$('body').click(function(){
+  $('#mnsj_row').hide();
+});
+
+$('#form_admin').submit(function(e){
+  e.preventDefault();
+  const nombre=guardar($('#nom_admin').val());
+  const correo=guardar($('#correo').val());
+  const pass=$('#pass').val();
+  const pass2=$('#pass2').val();
+  const permiso=Number($('#permiso').val());
+  const id_login=$('#id_login').val()===''?0:Number($('#id_login').val());
+  const editado=id_login>0;
+
+  if(nombre==='' || correo===''){
+    mensajeError('Nombre y correo electrónico son obligatorios.');
+    return;
   }
-  $('#btn-agr-comite').click(function(){
-      mostrarform(true);
-  })
-  $('#btn-ver-comite').click(function(){
-      cancelarform(true);
-  })
-  $('body').click(function(){
-    $('#mnsj_row').hide();
-  })
-  $('#form_admin').submit(function(e){
-      e.preventDefault();
-      let campos_llenos;
-      let mensaje='';
-      let nombre=guardar($('#nom_admin').val());
-      let correo=guardar($('#correo').val());
-      let pass=$('#pass').val();
-      let pass2=$('#pass2').val();
-      let permiso=$('#permiso').val();
-      let id_login=$('#id_login').val()==''?0:$('#id_login').val();
-      let editado=id_login==0?false:true;
-      console.log('login es: '+id_login);
-      if(nombre==''||correo==''||pass==''||pass2==''||permiso==0){
-        if(editado){          
-            $.ajax({
-              url:'../ajax/admin.php',
-              type: 'POST',
-              data: {op:'query_id',id_login:id_login},
-              async:false,
-              success: function(response){ 
-               let dato = JSON.parse(response);
-               console.log(dato)
-               nombre=nombre==''?dato['nombre']:nombre;
-               correo=correo==''?dato['correo']:correo;
-               pass=pass==''?dato['pass']:pass;              
-               permiso=permiso==0?dato['id_permiso']:permiso;
-              }
-            })          
-        }else{
-          validCampoVacio('#nom_admin');
-          validCampoVacio('#correo');
-          validCampoVacio('#pass');
-          validCampoVacio('#pass2');
-          validSelect('#permiso');
-          console.log('entra if')
-          mensajeError('<p>Por favor rellene todos los campos requeridos</p>');
-          campos_llenos=false;
-          //validacion con clases
-        }
-      }else{
-        campos_llenos=true;
+  if(!editado && ![1,2].includes(permiso)){
+    mensajeError('Seleccione Admin o Comité.');
+    return;
+  }
+  if(!editado && pass===''){
+    mensajeError('La contraseña es obligatoria para crear la cuenta.');
+    return;
+  }
+  if(pass!==pass2){
+    $('#pass').addClass('is-invalid');
+    $('#pass2').addClass('is-invalid');
+    mensajeError('Las contraseñas no coinciden.');
+    return;
+  }
+
+  $.ajax({
+    url:'../ajax/admin.php',
+    type:'POST',
+    dataType:'json',
+    data:{nombre,correo,pass,permiso:editado?0:permiso,id_login,op:'insert-update'},
+    success:function(respuesta){
+      if(!respuesta.ok){
+        mensajeError(respuesta.mensaje || 'No fue posible guardar la cuenta.');
+        return;
       }
-      
-      
-        
-        
-      //limpiar campos
-      $('#nom_admin').click(function(){limpiarInput('#nom_admin','#col_nom_admin')})
-      $('#correo').click(function(){limpiarInput('#correo','#col_correo')})
-      $('#pass').click(function(){limpiarInput('#pass','#col_pass')})
-      $('#pass2').click(function(){limpiarInput('#pass2','#col_pass2')})
-      $('#permiso').click(function(){limpiarSelect('#permiso','#col_tipo')})
-      //valido los campos vacios
-      
-      
-      if((campos_llenos || editado)){
-        if( (pass !== pass2 && !editado) || ($('#box-pass').attr('name')==1&&pass!== pass2)){
-          $('#col_pass').remove();
-          $('#col_pass2').remove();
-          $('#pass').addClass('is-invalid');
-          $('#pass2').addClass('is-invalid');
-          mensajeError('<p>Las Contraseñas no coinciden</p>');
-        }else {         
-          op='insert-update';
-          const lista_admin = {
-            nombre,correo,pass,permiso,id_login,op
-          }            
-        $.post('../ajax/admin.php', lista_admin, function(response){
-          console.log(response);
-          mensaje=JSON.parse(response);
-          //limpiar();
-          $('#mnsj_row').show();
-          $('#mnsj').removeClass('alert-danger');
-          $('#mnsj').addClass('alert-success');
-          $('#mnsj').html(mensaje);
-          setTimeout(function() {
-            $("#mnsj_row").fadeOut(1500);
-             mostrarform(false);
-             mostrarAdmin();
-             limpiar();
-            },3000);
-            
-            
-            
-          })
-        }  
-      }
+      mostrarExitoFormulario(respuesta.mensaje);
+    },
+    error:function(xhr){
+      mensajeError(mensajeRespuesta(xhr, 'No fue posible guardar la cuenta.'));
+    }
   });
-  //editar admin
-  $('body').on('click','.editarAdmin',function(){
-    id_login = $(this).attr('id');
-    const mostrarErrorCarga = function(){
+});
+
+$('body').on('click','.editarAdmin',function(){
+  const id_login=$(this).data('login');
+  $.ajax({
+    url:'../ajax/admin.php',
+    type:'POST',
+    dataType:'json',
+    data:{id_login,op:'query_id'},
+    success:function(cuenta){
+      if(!cuenta || !cuenta.id_login){
+        mostrarErrorLista('No fue posible cargar la cuenta seleccionada.');
+        return;
+      }
+      if(cuenta.perfil==='docente'){
+        window.location.href=`ver.docente.php?id_usuario=${encodeURIComponent(cuenta.id_usuario)}`;
+        return;
+      }
       limpiar();
-      mostrarform(false);
-      $('#eliminado').removeClass('alert-success').addClass('alert-danger');
-      $('#eliminado').text('No fue posible cargar el usuario seleccionado.');
+      mostrarform(true);
+      $('#col_tipo').hide();
+      $('#box-pass').hide().attr('name',0);
+      $('#btn_cambiar_pass').show();
+      $('#id_login').val(cuenta.id_login);
+      $('#nom_admin').val(letraMay(cuenta.nombre));
+      $('#correo').val(cuenta.correo);
+    },
+    error:function(xhr){
+      mostrarErrorLista(mensajeRespuesta(xhr, 'No fue posible cargar la cuenta seleccionada.'));
+    }
+  });
+});
+
+$('body').on('click','.agregarDocencia',function(){
+  const id_login=$(this).data('login');
+  window.location.href=`../form-doc/docente.php?agregar_docencia=${encodeURIComponent(id_login)}`;
+});
+
+$('body').on('click','.eliminarAdmin',function(){
+  const boton=$(this);
+  const id_login=boton.data('login');
+  const accion=boton.data('accion');
+  const rol=boton.data('rol');
+  const pregunta=accion==='retiro'
+    ? `Se retirará únicamente el rol ${rol}; el perfil Docente permanecerá. ¿Desea continuar?`
+    : `Se eliminará completamente la cuenta ${rol} sin Docencia. ¿Desea continuar?`;
+  if(!window.confirm(pregunta)){
+    return;
+  }
+  $.ajax({
+    url:'../ajax/admin.php',
+    type:'POST',
+    dataType:'json',
+    data:{id_login,op:'delete'},
+    success:function(respuesta){
+      if(!respuesta.ok){
+        mostrarErrorLista(respuesta.mensaje || 'No fue posible completar la operación.');
+        return;
+      }
       $('#mnsj_elim').show();
+      $('#eliminado').removeClass('alert-danger').addClass('alert-success');
+      $('#eliminado').text(respuesta.mensaje);
+      mostrarAdmin();
       setTimeout(function(){
-        $('#mnsj_elim').fadeOut(1500, function(){
-          $('#eliminado').removeClass('alert-danger').addClass('alert-success');
-        });
+        $('#mnsj_elim').fadeOut(1500);
       },3000);
-    };
-    $.ajax({
-      url:'../ajax/admin.php',
-      type: 'POST',
-      data: {id_login:id_login,op:'query_id'},
-      success: function(response){
-        let admin;
-        try {
-          admin = JSON.parse(response);
-        } catch (error) {
-          console.error('Respuesta inválida al cargar el usuario.', error, {
-            responseType: typeof response,
-            responseLength: typeof response === 'string' ? response.length : null
-          });
-          mostrarErrorCarga();
-          return;
-        }
-
-        const propiedadesObligatorias = ['id_login','nombre','correo','id_permiso'];
-        const respuestaValida = typeof admin === 'object' &&
-          admin !== null &&
-          !Array.isArray(admin) &&
-          propiedadesObligatorias.every(function(propiedad){
-            return Object.prototype.hasOwnProperty.call(admin, propiedad);
-          }) &&
-          admin['id_login'] !== null &&
-          admin['id_login'] !== '' &&
-          typeof admin['nombre'] === 'string' &&
-          typeof admin['correo'] === 'string' &&
-          admin['id_permiso'] !== null &&
-          admin['id_permiso'] !== '';
-
-        if (!respuestaValida) {
-          const propiedadesFaltantes = typeof admin === 'object' && admin !== null && !Array.isArray(admin)
-            ? propiedadesObligatorias.filter(function(propiedad){
-                return !Object.prototype.hasOwnProperty.call(admin, propiedad);
-              })
-            : propiedadesObligatorias;
-          console.error('Respuesta incompleta al cargar el usuario.', {
-            responseType: admin === null ? 'null' : Array.isArray(admin) ? 'array' : typeof admin,
-            missingProperties: propiedadesFaltantes
-          });
-          mostrarErrorCarga();
-          return;
-        }
-
-        console.log(admin);
-        limpiar();
-        mostrarform(true);
-        $("#box-pass").hide();
-        $('#btn_cambiar_pass').show();
-        $('#id_login').attr('value',admin['id_login']);
-        $('#nom_admin').val(letraMay(admin['nombre']));
-        $('#correo').val(admin['correo']);
-        $('#permiso').val(admin['id_permiso']);
-      },
-      error: function(xhr, textStatus, errorThrown){
-        console.error('Error HTTP al cargar el usuario.', {
-          status: xhr.status,
-          statusText: xhr.statusText,
-          textStatus: textStatus,
-          errorThrown: errorThrown,
-          responseLength: typeof xhr.responseText === 'string' ? xhr.responseText.length : null
-        });
-        mostrarErrorCarga();
-      }
-    })
-  })
-  //eliminar admin
-  $('body').on('click','.eliminarAdmin',function(){
-    id_login = $(this).attr('id');
-    $.ajax({
-      url:'../ajax/admin.php',
-      type: 'POST',
-      data: {id_login:id_login,op:'delete'},
-      success: function(response){
-        let mensaje = JSON.parse(response);
-        $('#mnsj_elim').show();
-        $('#eliminado').addClass('alert-success');
-        $('#eliminado').html(mensaje);
-        mostrarAdmin();
-        setTimeout(function() {
-          $("#mnsj_elim").fadeOut(1500);
-        },3000);
-      }
-  })
-})
+    },
+    error:function(xhr){
+      mostrarErrorLista(mensajeRespuesta(xhr, 'No fue posible completar la operación.'));
+    }
+  });
+});
 
 $('#btn_cambiar_pass').click(function(){
-  $("#box-pass").show();
+  $('#box-pass').show().attr('name',1);
   $('#btn_cambiar_pass').hide();
-  $('#box-pass').attr('name',1);
-})
+});
 
 function init(){
   $('#mnsj_row').hide();
+  $('#mnsj_elim').hide();
   mostrarform(false);
   mostrarAdmin();
   $('.loadPage').fadeOut();
-  $('#mnsj_elim').hide();
-  
 }
+
 init();
-      
- 
-
-
-  
-
-  
-
-        
-        
-          
-          
-
-
-
-
-    
-
-    
-
-
-
-
-
-

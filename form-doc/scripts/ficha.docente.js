@@ -1,15 +1,29 @@
 //cargar ficha doce //cargar formulario datos programa desde ajax
+  function mensajeErrorDocente(xhr,mensajePredeterminado){
+    if(xhr.responseJSON&&xhr.responseJSON.mensaje){
+      return xhr.responseJSON.mensaje
+    }
+    try{
+      let respuesta=JSON.parse(xhr.responseText)
+      return respuesta.mensaje||mensajePredeterminado
+    }catch(error){
+      return mensajePredeterminado
+    }
+  }
+  function mostrarErrorPrograma(mensaje){
+    $('#mnsj_row_prog_doc').show();
+    $('#mnsj_prog_doc').removeClass('alert-success');
+    $('#mnsj_prog_doc').addClass('alert-danger');
+    $('#mnsj_prog_doc').html(mensaje);
+  }
   function llenarFormProgDoc(id_usu){
     $.ajax({
         async: false,
         url: "../ajax/docente.php",
         type: "POST",
         data: { op: "read_prof_prog", id_usu },
-        success: function (response) {
-          let usu = JSON.parse(response);
-          let admin=false
-          let comite=false
-          let docente=false
+        dataType:'json',
+        success: function (usu) {
           $('#login').attr('name',usu[0]['id_login'])
           $('#inst_unid_trabajo').val(usu[0]['inst_usuario']);
           $('#cat_acad').val(usu[0]['cat_academica']);
@@ -18,19 +32,8 @@
   
           usu.forEach(u => {
             $("input[type='checkbox'][name='linea'][id='"+u['linea_inv']+"']").attr('checked',true);
-            if(u['permisos']==1){
-              admin=true
-            }else if(u['permisos']==2){
-              comite=true
-            }else if(u['permisos']==4){
-              docente=true
-            }
           });
-          valorPer=admin?1:!admin&&comite?2:!admin&&!comite&&docente?3:0
-          console.log(valorPer)
-          $('#permiso').val(valorPer);
-          console.log('admin: '+admin+' comite:'+comite+' docente:'+docente)
-              }
+        }
        });
   }
 
@@ -127,8 +130,6 @@ function cargarFichaDoc(id_usu) {
     data: { op: "read_prof_id", id_usu },
     success: function (response) {
       let usu = JSON.parse(response);
-      console.log(usu);
-      console.log(id_usu)
       let template;
       nombre =
         cadenaMay(usu[0]["nombres"]) +
@@ -306,8 +307,6 @@ function cargarFichaDoc(id_usu) {
         data: { op: "read_prof_id", id_usu },
         success: function (response) {
           let usu = JSON.parse(response);
-          console.log('editar usu')
-          console.log(usu[0]['id_pueblo'])
           $('#login').attr('name',usu[0]['id_login'])
           $('#nombres').val(cadenaMay(usu[0]['nombres']));
           $('#ap_pat').val(cadenaMay(usu[0]['ap_pat']));
@@ -320,7 +319,6 @@ function cargarFichaDoc(id_usu) {
           if(usu[0]['id_pueblo']==1){
             $("input[type='radio'][name='pueblo'][value='no']").attr('checked',true);
           }else{
-            console.log(usu[0]['id_pueblo'])
             $("input[type='radio'][name='pueblo'][value='si']").attr('checked',true);
             $('#p').remove()          
             $('#row_pueb').append('<div class="col-md-6 mb-3" id="p"><label for="pueb_ind" class="form-label" >Pueblo Indígena</label><select id="select_pueb" name="select_pueb" class="form-select"></select></div>')
@@ -367,25 +365,16 @@ $('#form_edit_pers').submit(function(e){
   usuario=leerDatPers()
   usuario.id_usu=$('#info_doc').attr('name')
   usuario.id_login=$('#login').attr('name')
-  console.log(usuario)
   if($('#box-pass').attr('name')=="1"&&usuario['pass']!=usuario['pass2']){
     $('#pass').addClass('is-invalid')
     $('#pass2').addClass('is-invalid')
     $('#mnsj_row_per_doc').show();
     $('#mnsj_per_doc').addClass('alert-danger');
     $('#mnsj_per_doc').html('Las contraseñas no coniciden');
-  }else if($('#box-pass').attr('name')=="1"&&usuario['pass']==''){
-    $('#pass').addClass('is-invalid')
-    $('#pass2').addClass('is-invalid')
-    $('#mnsj_row_per_doc').show();
-    $('#mnsj_per_doc').addClass('alert-danger');
-    $('#mnsj_per_doc').html('Rellene los campos con su nueva contraseña');
-
-  }
-  else{
+  }else{
     $('#pass').removeClass('is-invalid')
     $('#pass2').removeClass('is-invalid')
-      
+      let datosCargados=true;
       $.ajax({
           url:'../ajax/docente.php',
           type: 'POST',
@@ -393,7 +382,6 @@ $('#form_edit_pers').submit(function(e){
           data: {op:'read_prof_id',id_usu:usuario['id_usu']},
           success: function(response){ 
            let usu = JSON.parse(response);
-           console.log(usu)
            usuario['nombres']=usuario['nombres']==''?usu[0]['nombres']:usuario['nombres']
            usuario['ap_pat']=usuario['ap_pat']==''?usu[0]['ap_pat']:usuario['ap_pat']
            usuario['ap_mat']=usuario['ap_mat']==''?usu[0]['ap_mat']:usuario['ap_mat']
@@ -406,75 +394,105 @@ $('#form_edit_pers').submit(function(e){
            usuario['pais_nac']=usuario['pais_nac']==0?usu[0]['pais_nac']:usuario['pais_nac']
            usuario['genero']=usuario['genero']==''?usu[0]['genero']:usuario['genero']
            usuario['pais_res']=usuario['pais_res']==''?usu[0]['pais_res']:usuario['pais_res']
-           usuario['pass']=usuario['pass']==''?usu[0]['pass']:usuario['pass']
            usuario['pueblo']=usuario['pueblo']==null?1:usuario['pueblo']
            usuario['region']=usuario['region']==''?usu[0]['region']:usuario['region']
            usuario['tel_em']=usuario['tel_em']==''?usu[0]['tel_em']:usuario['tel_em']
            usuario['telefono']=usuario['telefono']==''?usu[0]['telefono']:usuario['telefono']
-          }
+          },
+          error:function(xhr){
+            datosCargados=false;
+            $('#mnsj_row_per_doc').show();
+            $('#mnsj_per_doc').removeClass('alert-success').addClass('alert-danger');
+            $('#mnsj_per_doc').html(mensajeErrorDocente(xhr,'No fue posible cargar los datos del Profesor.'));
+           }
         })
+        if(!datosCargados){
+          return;
+        }
         usuario.op='update-inf-pers'
-        console.log(usuario)
-        $.post('../ajax/docente.php',usuario,function(response){
-          let dato = JSON.parse(response);
-          $('#mnsj_row_per_doc').show();
-          $('#mnsj_per_doc').removeClass('alert-danger');
-          $('#mnsj_per_doc').addClass('alert-success');
-          $('#mnsj_per_doc').html(dato);
-          setTimeout(function() {
-              $("#mnsj_row_per_doc").fadeOut(1500);
-              reiniciarInfoDoc()
-          },3000);
+        $.ajax({
+          url:'../ajax/docente.php',
+          type:'POST',
+          dataType:'json',
+          data:usuario,
+          success:function(dato){
+            if(!dato||dato.ok!==true){
+              $('#mnsj_row_per_doc').show();
+              $('#mnsj_per_doc').removeClass('alert-success').addClass('alert-danger');
+              $('#mnsj_per_doc').text(dato&&dato.mensaje?dato.mensaje:'No fue posible editar los datos personales.');
+              return;
+            }
+            $('#mnsj_row_per_doc').show();
+            $('#mnsj_per_doc').removeClass('alert-danger');
+            $('#mnsj_per_doc').addClass('alert-success');
+            $('#mnsj_per_doc').text(dato.mensaje);
+            setTimeout(function() {
+                $("#mnsj_row_per_doc").fadeOut(1500);
+                reiniciarInfoDoc()
+            },3000);
+          },
+          error:function(xhr){
+            $('#mnsj_row_per_doc').show();
+            $('#mnsj_per_doc').removeClass('alert-success').addClass('alert-danger');
+            $('#mnsj_per_doc').html(mensajeErrorDocente(xhr,'No fue posible editar los datos personales.'));
+          }
        }) 
 
         
    }
 })
 $('#form_edit_prog').submit(function(e){
-e.preventDefault();
-datProg=leerDatProgDoc()
-console.log(datProg)
-datProg.id_usu=$('#info_doc').attr('name')
-datProg.id_login=$('#login').attr('name')
-// actualizo la variable op para editar los valores en el modelo
-datProg.op='update-inf-prog'
-console.log(datProg)     
-    $.ajax({
-        url:'../ajax/docente.php',
-        type: 'POST',
-        async:false,
-        data: {op:'read_prof_prog',id_usu:datProg['id_usu']},
-        success: function(response){ 
-          console.log('usu cargado con ajax')
-         let usu = JSON.parse(response);
-         console.log(usu)
-         // creo un array para guardar los permisos que no han sido actualizados 
-         datProg['instTrab']=datProg['instTrab']==0?usu[0]['inst_usuario']:datProg['instTrab']
-         datProg['catAcad']=datProg['catAcad']==0?usu[0]['cat_academica']:datProg['catAcad']
-         datProg['anio_ing']=datProg['anio_ing']==0?usu[0]['anio_ingreso']:datProg['anio_ing']
-         datProg['vinculo']=datProg['vinculo']==0?usu[0]['vinculo']:datProg['vinculo']
-        //  datProg['permisos']=datProg['vinculo']==0?usu[0]['vinculo']:datProg['vinculo']
-        
-        }
-      })
-      console.log(datProg)
-      
-        $('#permiso').removeClass('is-invalid')
-        $.post('../ajax/docente.php',datProg,function(response){
-          let dato = JSON.parse(response);
-          console.log(dato)
-          $('#mnsj_row_prog_doc').show();
-          $('#mnsj_prog_doc').removeClass('alert-danger');
-          $('#mnsj_prog_doc').addClass('alert-success');
-          $('#mnsj_prog_doc').html(dato);
-          setTimeout(function() {
-              $("#mnsj_row_prog_doc").fadeOut(1500);
-              reiniciarInfoDoc()
-              cargarDocentes()
-          },3000);
-       }) 
+  e.preventDefault();
+  datProg=leerDatProgDoc()
+  datProg.id_usu=$('#info_doc').attr('name')
+  datProg.id_login=$('#login').attr('name')
+  datProg.op='update-inf-prog'
+  let datosProgramaCargados=true;
+  $.ajax({
+    url:'../ajax/docente.php',
+    type:'POST',
+    async:false,
+    dataType:'json',
+    data:{op:'read_prof_prog',id_usu:datProg['id_usu']},
+    success:function(usu){
+      datProg['instTrab']=datProg['instTrab']==0?usu[0]['inst_usuario']:datProg['instTrab']
+      datProg['catAcad']=datProg['catAcad']==0?usu[0]['cat_academica']:datProg['catAcad']
+      datProg['anio_ing']=datProg['anio_ing']==0?usu[0]['anio_ingreso']:datProg['anio_ing']
+      datProg['vinculo']=datProg['vinculo']==0?usu[0]['vinculo']:datProg['vinculo']
+    },
+    error:function(xhr){
+      datosProgramaCargados=false;
+      mostrarErrorPrograma(mensajeErrorDocente(xhr,'No fue posible cargar los datos del Profesor.'));
+    }
+  })
+  if(!datosProgramaCargados){
+    return;
+  }
 
-      
+  $.ajax({
+    url:'../ajax/docente.php',
+    type:'POST',
+    dataType:'json',
+    data:datProg,
+    success:function(dato){
+      if(!dato||dato.ok!==true){
+        mostrarErrorPrograma(dato&&dato.mensaje?dato.mensaje:'No fue posible editar los datos de programa.');
+        return;
+      }
+      $('#mnsj_row_prog_doc').show();
+      $('#mnsj_prog_doc').removeClass('alert-danger');
+      $('#mnsj_prog_doc').addClass('alert-success');
+      $('#mnsj_prog_doc').text(dato.mensaje);
+      setTimeout(function() {
+        $("#mnsj_row_prog_doc").fadeOut(1500);
+        reiniciarInfoDoc()
+        cargarDocentes()
+      },3000);
+    },
+    error:function(xhr){
+      mostrarErrorPrograma(mensajeErrorDocente(xhr,'No fue posible editar los datos de programa.'));
+    }
+  })
 })
 // mostrar formulario editar password
   $('#btn_cambiar_pass').click(function(){

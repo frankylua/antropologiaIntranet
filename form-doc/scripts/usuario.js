@@ -4,6 +4,58 @@ ajaxSelect('#inst_unid_trabajo','../ajax/institucion.php','Seleccione','read','i
 ajaxSelect('#pais_nac','../ajax/pais.php','Seleccione','read', undefined, 'id_pais', 'pais');
 ajaxSelect('#pais_res','../ajax/pais.php','Seleccione','read', undefined, 'id_pais', 'pais');
 
+window.contextoAgregarDocencia = {
+    solicitado: false,
+    listo: false,
+    id_login: 0,
+    correo: ''
+};
+
+function cargarContextoAgregarDocencia(){
+    const parametros = new URLSearchParams(window.location.search);
+    const idLogin = parametros.get('agregar_docencia');
+    if(!idLogin){
+        return;
+    }
+
+    window.contextoAgregarDocencia.solicitado = true;
+    $('#btn_pers').prop('disabled',true);
+    $.ajax({
+        url:'../ajax/admin.php',
+        type:'POST',
+        dataType:'json',
+        data:{op:'docencia-context',id_login:idLogin},
+        success:function(respuesta){
+            if(!respuesta.ok || !respuesta.id_login || !respuesta.correo){
+                $('#mnsj_row_per').show();
+                $('#mnsj_per').removeClass('alert-success').addClass('alert-danger');
+                $('#mnsj_per').text('No fue posible iniciar la transición a Docencia.');
+                return;
+            }
+            window.contextoAgregarDocencia.listo = true;
+            window.contextoAgregarDocencia.id_login = Number(respuesta.id_login);
+            window.contextoAgregarDocencia.correo = respuesta.correo;
+            $('#correo').val(respuesta.correo).prop('readonly',true);
+            $('#pass').val('');
+            $('#pass2').val('');
+            $('#box-pass').hide();
+            $('#btn_cambiar_pass').hide();
+            $('#text-tit').text('INFORMACIÓN PERSONAL DOCENTE');
+            $('#tipo_ing').html('<div class="d-flex justify-content-end">Agregar Docencia</div>');
+            $('#btn_pers').prop('disabled',false);
+        },
+        error:function(xhr){
+            let mensaje='No fue posible iniciar la transición a Docencia.';
+            if(xhr.responseJSON && xhr.responseJSON.mensaje){
+                mensaje=xhr.responseJSON.mensaje;
+            }
+            $('#mnsj_row_per').show();
+            $('#mnsj_per').removeClass('alert-success').addClass('alert-danger');
+            $('#mnsj_per').text(mensaje);
+        }
+    });
+}
+
 function crearInstitucionContextual(nombre, usuario, contexto) {
     const resultado = {
         ok: false,
@@ -104,6 +156,12 @@ function leerDatPers(){
         }
     }
     usuario={nombres,ap_pat,ap_mat,fech_nac,documento,nro_doc,pais_nac,genero,pais_res,region,comuna,telefono,direccion,cont_em,tel_em,correo,pass,pass2,pueblo}
+    if(window.contextoAgregarDocencia.listo){
+        usuario.id_login=window.contextoAgregarDocencia.id_login;
+        usuario.correo=window.contextoAgregarDocencia.correo;
+        usuario.pass='';
+        usuario.pass2='';
+    }
     return usuario;
 }
 //lista lectura datos programa docente
@@ -113,13 +171,12 @@ function leerDatProgDoc(){
     let anio_ing=$('#anio_ing').val();;
     let vinculo=$('#vinculo').val();
     let lineaInv=[]
-    let permiso= $('#permiso').val();  
-    let permisos=permiso==1?[1,4]:permiso==2?[2,4]:permiso==3?[4]:3;
-    // let id_login=$('#id_login').val()==''?0:$('#id_login').val();
     $("input:checkbox:checked").each(function() {
-        lineaInv.push($(this).val())
+        if($(this).attr('name')==='linea'){
+            lineaInv.push($(this).val())
+        }
     });
-    datProg={instTrab,catAcad,anio_ing,vinculo,lineaInv,permisos}
+    datProg={instTrab,catAcad,anio_ing,vinculo,lineaInv}
     return datProg
 
 }
@@ -150,7 +207,14 @@ function valMail(){
 
 // validar datos personales
 function validarDatosPers(){//campos variable para dar accion de cambiar clases de validacion
-    let mensaje='';        
+    let mensaje='';
+    const esTransicion=window.contextoAgregarDocencia.listo;
+    if(window.contextoAgregarDocencia.solicitado && !esTransicion){
+        $('#mnsj_row_per').show();
+        $('#mnsj_per').addClass('alert-danger');
+        $('#mnsj_per').html('No fue posible validar la cuenta administrativa de origen');
+        return false;
+    }
     validCampoVacio('#ap_mat');
     validCampoVacio('#ap_pat');
     validCampoVacio('#fech_nac');
@@ -167,22 +231,24 @@ function validarDatosPers(){//campos variable para dar accion de cambiar clases 
     validCampoVacio('#correo');
     validCampoVacio('#otro_pueb');
     validSelect('#select_pueb');
-    validCampoVacio('#pass2')
     validCampoVacio('#nombres')
-    validCampoVacio('#pass2')
+    if(!esTransicion){
+        validCampoVacio('#pass');
+        validCampoVacio('#pass2');
+    }
     // if(valMail()){
     //     mensaje+='el correo ya existe '
     // }else{
     //     mensaje+='no existe'
     // }
-     if(validCampoVacio('#pass')||validCampoVacio('#pass2')||validCampoVacio('#nombres') || validCampoVacio('#ap_mat') || validCampoVacio('#ap_pat') || validCampoVacio('#fech_nac') || validCampoVacio('#nro_doc') ||validSelect('#pais_nac') || validSelect('#genero') || validSelect('#pais_res') || validCampoVacio('#region')|| validCampoVacio('#comuna') || validCampoVacio('#telefono') || validCampoVacio('#direccion') || validCampoVacio('#cont_em') || validCampoVacio('#tel_em') || validCampoVacio('#correo')  || validSelect('#pueblo')){
+     if((!esTransicion && (validCampoVacio('#pass')||validCampoVacio('#pass2'))) || validCampoVacio('#nombres') || validCampoVacio('#ap_mat') || validCampoVacio('#ap_pat') || validCampoVacio('#fech_nac') || validCampoVacio('#nro_doc') ||validSelect('#pais_nac') || validSelect('#genero') || validSelect('#pais_res') || validCampoVacio('#region')|| validCampoVacio('#comuna') || validCampoVacio('#telefono') || validCampoVacio('#direccion') || validCampoVacio('#cont_em') || validCampoVacio('#tel_em') || validCampoVacio('#correo')  || validSelect('#pueblo')){
         mensaje+='Rellene todos los campos';
         console.log('rellene todos los campos')
         $('#mnsj_row_per').show();
         $('#mnsj_per').addClass('alert-danger');
         $('#mnsj_per').html(mensaje);
         return false;
-    }else if($('#pass').val()!==$('#pass2').val()){
+    }else if(!esTransicion && $('#pass').val()!==$('#pass2').val()){
         $('#mnsj_row_per').show();
         $('#mnsj_per').addClass('alert-danger');
         $('#pass').addClass('is-invalid');
@@ -190,7 +256,7 @@ function validarDatosPers(){//campos variable para dar accion de cambiar clases 
         mensaje ='Las contraseñas no coinciden';
         $('#mnsj_per').html(mensaje);
         return false;
-    }else if(valMail()){
+    }else if(!esTransicion && valMail()){
         mensaje='El correo electrónico ya se encuentra registrado';
         $('#correo').addClass('is-invalid');
         $('#mnsj_row_per').show();
@@ -306,6 +372,8 @@ $('#btn_pers').click(function(){
 function btn_editar_acad(contenedor,id){
     $(contenedor).append(' <div class="row mt-5 justify-content-between "><div class="col-md-4 mb-3"><button type="button" class="col-12 btn btn-dark col-6 verFicha" id="'+id+'" >Volver</button></div><div class="col-md-4 mb-3"><button type="submit" class="col-12 btn btn-dark col-6">Editar</button></div></div>')
 }
+
+cargarContextoAgregarDocencia();
 
 
 

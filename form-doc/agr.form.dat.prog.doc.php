@@ -36,18 +36,6 @@
   <?php
   require ('../form-doc/lineaInv.php');
   ?>
-  <!-- validar permiso otorgar permisos de sesion -->
-  <?php if (isset ($_SESSION['admin'])): ?>
-    <div class="col-md-6 mb-3">
-      <label for="permiso" class="form-label">Permiso de Sesión del comite</label>
-      <select id="permiso" class="form-select">
-        <option selected value="0">Seleccione</option>
-        <option value="1">Administrador(a)</option>
-        <option value="2">Comite Académico</option>
-        <option value="3">Docente</option>
-      </select>
-    </div>
-    <?php endif; ?>
   </div>
     
 

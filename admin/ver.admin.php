@@ -20,9 +20,9 @@ if (!isset($_SESSION['admin'])) {
                 <div class="col-12">
                     <div class="row titulo_comite " id="titulo_comite">
                         <div class="col ">
-                            <h3 class=" text-center mb-3">COMITE ACADÉMICO
+                            <h3 class=" text-center mb-3">ADMINISTRACIÓN Y COMITÉ
 
-                                <button class="btn btn-dark text-light px-3 mx-3" id="btn-agr-comite">Agregar
+                                <button class="btn btn-dark text-light px-3 mx-3" id="btn-agr-admin">Agregar
                                     Registro</button>
                             </h3>
                         </div>
@@ -39,8 +39,9 @@ if (!isset($_SESSION['admin'])) {
                             <tr>
                                 <th class="col-3">Nombre</th>
                                 <th class="col-3">Correo Electrónico</th>
-                                <th class="col-2">Rol</th>
-                                <th class="col-2">Datos Docente</th>
+                                <th class="col-1">Rol</th>
+                                <th class="col-1">Perfil</th>
+                                <th class="col-2">Docencia</th>
                                 <th class="col-1">Editar</th>
                                 <th class="col-1">Eliminar</th>
                             </tr>
@@ -58,7 +59,7 @@ if (!isset($_SESSION['admin'])) {
         <div class="col" id="form_admin">
             <div class="row ">
                 <div class="col">
-                    <h3 class="text-center mb-5">INGRESO ADMINISTRACIÓN</h3>
+                    <h3 class="text-center mb-5">GESTIÓN ADMINISTRATIVA</h3>
                     <form class=" g-3" method='POST' action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
                         <div class="row ">
                             <div class="col-md-6 mb-3">
@@ -91,15 +92,13 @@ if (!isset($_SESSION['admin'])) {
                         </div>
 
                         <div class="row ">
-                            <div class="col-lg-6 col- ">
-                                <label class="form-label mb-2">Tipo de Ingreso</label>
-                                <input type='hidden' id='id_per_log'></input>
+                            <div class="col-lg-6" id="col_tipo">
+                                <label class="form-label mb-2" for="permiso">Tipo de Ingreso</label>
                                 <select class="form-select" name="permiso" id="permiso">
                                     <option value="0" selected>Seleccione</option>
                                     <option value="1">Administrador(a)</option>
-                                    <option value="2">Comite Académico</option>
+                                    <option value="2">Comité Académico</option>
                                 </select>
-
                             </div>
                             <div class="col-md-6 mb-3 mt-2">
                                 <input type="button" class="btn btn-outline-dark mt-4" value="Cambiar Constraseña"
