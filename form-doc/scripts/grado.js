@@ -1,4 +1,15 @@
 //Agregar grado académico
+function mostrarErrorTituloContextual(xhr) {
+    const mensaje = xhr.status == 403 && xhr.responseJSON && xhr.responseJSON.mensaje
+        ? xhr.responseJSON.mensaje
+        : xhr.status == 403
+            ? 'Usuario sin permisos para crear titulos academicos'
+            : 'No fue posible crear el titulo academico';
+    $('#mnsj_row_grad').show();
+    $('#mnsj_grad').removeClass('alert-success');
+    $('#mnsj_grad').addClass('alert-danger');
+    $('#mnsj_grad').html(mensaje);
+}
 //se construye el contenedor para edit grado
 function formGrado(contenedor,valorInst = null) {
     $(contenedor).append('<div class="row " id="grad_row"><div class="col-md-6 mb-3"><label class="form-label" for="grad_acad">Tipo Grado</label><select id="grad_acad" class="form-select grado"><option selected value="0">Seleccione tipo</option><option value="1">Pregrado</option><option value="2">Postgrado</option></select></div><div class="col-md-6 mb-3" id="grado_ac"><label class="form-label" for="">Grado Académico</label><select id="grado" class="form-select tit post" name="grado"><option value="0"></option></select></div></div>');
@@ -312,6 +323,7 @@ $('#form_grado').submit(function (e) {
     } else {
         nuevo_inst = $('#inst_grado').val() == 'otro' ? true : false;//agregar nuevo instituto
         nuevo_tit = $('#s_tit').val() == 'otro' ? true : false;//agregar nuevo titulo
+        let titulo_contextual_valido = true;
         // en caso de ser "true" ingresar en tabla titulo y/o instituto y devolver id para guardar grado academico
         if (nuevo_inst) {
             op = 'insert';
@@ -332,12 +344,34 @@ $('#form_grado').submit(function (e) {
                 async: false,
                 type: 'POST',
                 url: '../ajax/titulo.php',
-                data: { op, nombre: titulo, tipo_grado: grado },
+                data: { op, nombre: titulo, tipo_grado: grado, usuario, id_grado: 0 },
                 success: function (response) {
-                    let dato = JSON.parse(response);
-                    $('#titulo').attr('name', dato);
+                    let dato;
+                    try {
+                        dato = JSON.parse(response);
+                    } catch (error) {
+                        titulo_contextual_valido = false;
+                        mostrarErrorTituloContextual({ status: 0 });
+                        return;
+                    }
+                    const id_titulo = typeof dato == 'string' && /^[1-9]\d*$/.test(dato.trim())
+                        ? Number(dato.trim())
+                        : dato;
+                    if (!Number.isSafeInteger(id_titulo) || id_titulo <= 0) {
+                        titulo_contextual_valido = false;
+                        mostrarErrorTituloContextual({ status: 0 });
+                        return;
+                    }
+                    $('#titulo').attr('name', id_titulo);
+                },
+                error: function (xhr) {
+                    titulo_contextual_valido = false;
+                    mostrarErrorTituloContextual(xhr);
                 }
             })
+        }
+        if (!titulo_contextual_valido) {
+            return;
         }
         inst = $('#id_inst').attr('name') == 0 ? inst : $('#id_inst').attr('name')
         titulo = $('#titulo').attr('name') == 0 ? titulo : titulo = $('#titulo').attr('name')
@@ -364,6 +398,7 @@ $('#form_grado').submit(function (e) {
 $('#form_edit_grado').submit(function (e) {
     e.preventDefault();
     let id_grado = $('#edit_academicos').attr('name');
+    let usuario = $('#id_usuario').attr('name');
     let tipo_grado = $('#grad_acad').val();
     let grado = $('#grado').val() == 0 ? $('#grado').attr('name') : $('#grado').val();
     let inst = $('#inst_grado').val() == 'otro' ? espacios($('#input_inst').val()) : $('#inst_grado').val();
@@ -373,6 +408,7 @@ $('#form_edit_grado').submit(function (e) {
     let fecha = $('#fech_grado').val() == '' ? $('#fech_grado').attr('name') : $('#fech_grado').val();
     nuevo_inst = $('#inst_grado').val() == 'otro' ? true : false;//agregar nuevo instituto
     nuevo_tit = $('#s_tit').val() == 'otro' ? true : false;//agregar nuevo titulo
+    let titulo_contextual_valido = true;
     // en caso de ser "true" ingresar en tabla titulo y/o instituto y devolver id para guardar grado academico
     if (nuevo_inst) {
         op = 'insert';
@@ -393,12 +429,34 @@ $('#form_edit_grado').submit(function (e) {
             async: false,
             type: 'POST',
             url: '../ajax/titulo.php',
-            data: { op, nombre: titulo, tipo_grado: grado },
+            data: { op, nombre: titulo, tipo_grado: grado, usuario, id_grado },
             success: function (response) {
-                let dato = JSON.parse(response);
-                $('#titulo').attr('name', dato);
+                let dato;
+                try {
+                    dato = JSON.parse(response);
+                } catch (error) {
+                    titulo_contextual_valido = false;
+                    mostrarErrorTituloContextual({ status: 0 });
+                    return;
+                }
+                const id_titulo = typeof dato == 'string' && /^[1-9]\d*$/.test(dato.trim())
+                    ? Number(dato.trim())
+                    : dato;
+                if (!Number.isSafeInteger(id_titulo) || id_titulo <= 0) {
+                    titulo_contextual_valido = false;
+                    mostrarErrorTituloContextual({ status: 0 });
+                    return;
+                }
+                $('#titulo').attr('name', id_titulo);
+            },
+            error: function (xhr) {
+                titulo_contextual_valido = false;
+                mostrarErrorTituloContextual(xhr);
             }
         })
+    }
+    if (!titulo_contextual_valido) {
+        return;
     }
     inst = $('#id_inst').attr('name') == 0 ? inst : $('#id_inst').attr('name')
     titulo = $('#titulo').attr('name') == 0 ? titulo : titulo = $('#titulo').attr('name')

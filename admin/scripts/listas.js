@@ -17,10 +17,13 @@ function insertUpdate(url, dato_lista) {// funcion para llamar ajax;
     }
     click();
   }).fail(function (xhr) {
-    if (dato_lista.tipo == 'pueb' && xhr.status == 403) {
+    const esTitulo = ['lic', 'un', 'mag', 'doc'].includes(dato_lista.tipo);
+    if ((dato_lista.tipo == 'pueb' || esTitulo) && xhr.status == 403) {
       const mensaje = xhr.responseJSON && xhr.responseJSON.mensaje
         ? xhr.responseJSON.mensaje
-        : 'Usuario sin permisos para crear o editar';
+        : esTitulo
+          ? 'Usuario sin permisos para crear o editar titulos academicos'
+          : 'Usuario sin permisos para crear o editar';
       mostrarMensajeCRUD({
         contenedor: '#mnsj_row_listas',
         mensaje: mensaje,

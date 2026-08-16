@@ -1,10 +1,17 @@
 <?php
 require_once __DIR__ . '/../src/bootstrap/app.php';
+use App\Model\Grado;
 use App\Model\Titulo;
+use App\Security\Authorization;
 require 'validaciones.php';
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 $titulo=new Titulo();
 $nombre=isset($_POST['nombre'])?limpiar_datos($_POST['nombre']):"";
 $id_titulo=isset($_POST['id'])?limpiar_datos($_POST['id']):"";
+$id_grado=isset($_POST['id_grado'])?(int)$_POST['id_grado']:0;
+$usuario=isset($_POST['usuario'])?(int)$_POST['usuario']:0;
 $tipo=isset($_POST['tipo'])?limpiar_datos($_POST['tipo']):"";
 $tipo_grado=isset($_POST['tipo_grado'])?(int)$_POST['tipo_grado']:'';
 $tipog=null;
@@ -26,11 +33,52 @@ $op=isset($_POST['op'])?$_POST['op']:'';
 
 switch($op){
     case 'insert':
+        if (!Authorization::hasAny(['admin', 'comite'])) {
+            $actorContextual = Authorization::hasAny(['estudiante', 'docente']);
+            $usuarioSesion = isset($_SESSION['id_usuario'][0]['id_usuario'])
+                ? (int) $_SESSION['id_usuario'][0]['id_usuario']
+                : 0;
+
+            if (!$actorContextual || $usuarioSesion <= 0 || $usuario !== $usuarioSesion) {
+                http_response_code(403);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['ok' => false, 'codigo' => 'NO_AUTORIZADO', 'mensaje' => 'Usuario sin permisos para crear el titulo academico'], JSON_UNESCAPED_UNICODE);
+                break;
+            }
+
+            if ($id_grado > 0) {
+                $grado = new Grado();
+                $gradosUsuario = $grado->mostrar($usuarioSesion);
+                $gradoPropio = false;
+
+                if (is_array($gradosUsuario)) {
+                    foreach ($gradosUsuario as $gradoUsuario) {
+                        if (isset($gradoUsuario['id_grado']) && (int) $gradoUsuario['id_grado'] === $id_grado) {
+                            $gradoPropio = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!$gradoPropio) {
+                    http_response_code(403);
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode(['ok' => false, 'codigo' => 'NO_AUTORIZADO', 'mensaje' => 'No esta autorizado para modificar estos antecedentes academicos'], JSON_UNESCAPED_UNICODE);
+                    break;
+                }
+            }
+        }
         $respuesta=$titulo->insertarObtenerId($nombre,$tipo_grado);
         echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
    
     break;
     case 'insert-update':
+        if (!Authorization::hasAny(['admin', 'comite'])) {
+            http_response_code(403);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['ok' => false, 'codigo' => 'NO_AUTORIZADO', 'mensaje' => 'Usuario sin permisos para crear o editar titulos academicos'], JSON_UNESCAPED_UNICODE);
+            break;
+        }
         if(($id_titulo == 0) ){
             $respuesta=$titulo->insertar($nombre,$tipog);
              $respuesta ? $pueblor="Titulo Registrado" : $pueblor="Titulo no ha sido registrado";
@@ -46,11 +94,8 @@ switch($op){
          echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
          break;
     case'delete':
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            session_start();
-        }
         header('Content-Type: application/json; charset=utf-8');
-        if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
+        if (!Authorization::hasAny(['admin', 'comite'])) {
             http_response_code(403);
             echo json_encode(['ok' => false, 'codigo' => 'NO_AUTORIZADO', 'mensaje' => 'Usuario sin permisos para eliminar'], JSON_UNESCAPED_UNICODE);
             break;
