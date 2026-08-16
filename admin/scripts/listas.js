@@ -8,22 +8,32 @@ function click() {
   $('#canc_edit').remove();
   $('#dato_lista').val('');
 }
+function cargarListaAdministrativa(tipo) {
+  if (tipo == 'inst') {
+    ajaxListas('#listas', '../ajax/institucion.php', 'read', undefined, 'id_inst', 'inst', true);
+    return;
+  }
+  cargarListas(tipo);
+}
 function insertUpdate(url, dato_lista) {// funcion para llamar ajax;
   $.post(url, dato_lista, function (response) {
     console.log(response)
-    cargarListas(n_input);
+    cargarListaAdministrativa(dato_lista.tipo);
     if ($('#agregar_lista').val() == 'Editar') {
       $('#agregar_lista').val('Agregar');
     }
     click();
   }).fail(function (xhr) {
     const esTitulo = ['lic', 'un', 'mag', 'doc'].includes(dato_lista.tipo);
-    if ((dato_lista.tipo == 'pueb' || esTitulo) && xhr.status == 403) {
+    const esInstitucion = dato_lista.tipo == 'inst';
+    if ((dato_lista.tipo == 'pueb' || esTitulo || esInstitucion) && xhr.status == 403) {
       const mensaje = xhr.responseJSON && xhr.responseJSON.mensaje
         ? xhr.responseJSON.mensaje
         : esTitulo
           ? 'Usuario sin permisos para crear o editar titulos academicos'
-          : 'Usuario sin permisos para crear o editar';
+          : esInstitucion
+            ? 'Usuario sin permisos para crear o editar instituciones'
+            : 'Usuario sin permisos para crear o editar';
       mostrarMensajeCRUD({
         contenedor: '#mnsj_row_listas',
         mensaje: mensaje,
@@ -54,7 +64,7 @@ function clickListas(nom) {
     cargarListas('doc');
   }
   if (nom == 'inst') {
-    cargarListas('inst');
+    cargarListaAdministrativa('inst');
   }
   if (nom == 'bec_int') {
     cargarListas('bec_int');
@@ -65,6 +75,39 @@ function clickListas(nom) {
   if (nom == 'financ') {
     cargarListas('financ');
   }
+}
+
+function eliminarInstitucion(id, descripcion) {
+  confirmarEliminacion({
+    tipo: 'Institución',
+    nombre: typeof descripcion === 'string' ? descripcion.trim() : '',
+    onConfirm: function () {
+      $.ajax({
+        url: '../ajax/institucion.php',
+        type: 'POST',
+        data: { id: id, op: 'delete' },
+        dataType: 'json',
+        success: function (response) {
+          mostrarMensajeCRUD({
+            contenedor: '#mnsj_row_listas',
+            mensaje: response.mensaje,
+            tipo: response.ok ? 'success' : 'danger'
+          });
+          if (response.ok) {
+            cargarListaAdministrativa('inst');
+          }
+        },
+        error: function (xhr) {
+          const response = xhr.responseJSON;
+          mostrarMensajeCRUD({
+            contenedor: '#mnsj_row_listas',
+            mensaje: response && response.mensaje ? response.mensaje : 'No fue posible eliminar la institución',
+            tipo: 'danger'
+          });
+        }
+      });
+    }
+  });
 }
 
 // function eliminarLista(id, n_input) {
@@ -168,6 +211,10 @@ $(document).ready(function () {
     n_lista = $('#dato_lista').attr('name');
     const descripcion_elim = $(this).closest('li').find('.col-auto').first().text().trim();
     console.log('id eliminar' + n_lista)
+    if (n_lista == 'inst') {
+      eliminarInstitucion(id_elim, descripcion_elim);
+      return;
+    }
     eliminarLista(id_elim, n_lista, descripcion_elim);
   })
   $('#form_lista').submit(function (e) {

@@ -119,17 +119,12 @@ $('#form_pasantia').submit(function (e) {
     } else {
         nuevo_inst = $('#inst_pasant').val() == 'otro' ? true : false;//agregar nuevo instituto
         if (nuevo_inst) {
-            op = 'insert';
-            $.ajax({
-                async: false,
-                type: 'POST',
-                url: '../ajax/institucion.php',
-                data: { op, nombre: inst },
-                success: function (response) {
-                    let dato = JSON.parse(response);
-                    $('#id_inst_pasant').attr('name', dato);
-                }
-            })
+            const altaInstitucion = crearInstitucionContextual(inst, usuario, 'pasantia');
+            if (!altaInstitucion.ok) {
+                mostrarErrorInstitucionContextual('#mnsj_row_pasant', '#mnsj_pasant', altaInstitucion);
+                return;
+            }
+            $('#id_inst_pasant').attr('name', altaInstitucion.id);
         }
         if ($('#id_inst_pasant').attr('name') != 0) {
             inst = $('#id_inst_pasant').attr('name')

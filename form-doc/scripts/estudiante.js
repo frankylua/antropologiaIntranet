@@ -137,17 +137,12 @@ $('#form_usuario').submit(function(e){
     if(valDatAcad(lineaInv)){
         nuevo_inst=$('#inst_unid').val()=='otro'?true:false;
         if(nuevo_inst){
-            op='insert';
-            $.ajax({
-                async: false,
-                type : 'POST',
-                url : '../ajax/institucion.php',
-                data : {op,nombre:inst},
-                success : function(response) {
-                    let dato = JSON.parse(response);
-                    $('#id_inst_est').attr('name',dato);
-                }
-            })
+            const altaInstitucion = crearInstitucionContextual(inst, 0, 'registro');
+            if (!altaInstitucion.ok) {
+                mostrarErrorInstitucionContextual('#mnsj_row_acad_est', '#mnsj_acad_est', altaInstitucion);
+                return;
+            }
+            $('#id_inst_est').attr('name', altaInstitucion.id);
         }
         inst=$('#id_inst_est').attr('name')==0?inst:$('#id_inst_est').attr('name')
         op='insert-update';

@@ -30,8 +30,32 @@ class Institucion {
 
     }
     public function eliminar($id){
-        $sql="DELETE FROM institucion  WHERE id_inst='$id'";
-        return ejecutarConsulta($sql);
+        $pdo = conexion();
+        $pdo->beginTransaction();
+
+        try {
+            $registro = $pdo->prepare('SELECT id_inst FROM institucion WHERE id_inst = :id FOR UPDATE');
+            $registro->execute(['id' => (int) $id]);
+
+            if ($registro->fetch() === false) {
+                $pdo->rollBack();
+                return ['ok' => false, 'codigo' => 'NO_ENCONTRADO', 'mensaje' => 'La institución no existe'];
+            }
+
+            // Las FK vigentes resuelven sus dependencias mediante ON DELETE CASCADE.
+            $eliminar = $pdo->prepare('DELETE FROM institucion WHERE id_inst = :id');
+            $eliminar->execute(['id' => (int) $id]);
+            $pdo->commit();
+
+            return ['ok' => true, 'codigo' => 'ELIMINADO', 'mensaje' => 'Registro eliminado correctamente'];
+        } catch (\PDOException $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            error_log('[Institucion::eliminar] ' . $e->getMessage());
+            return ['ok' => false, 'codigo' => 'ERROR_ELIMINACION', 'mensaje' => 'No fue posible eliminar el registro'];
+        }
     }
 }
 ?>

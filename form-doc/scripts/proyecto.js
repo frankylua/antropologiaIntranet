@@ -63,7 +63,7 @@ $('body').on('click', '.listProy', function () {
                     $('#financ').prop('disabled', true);
                     $('#nombre_rol').append('<input type="text" class="form-control" id="input_rol" >')
                     $('#id_inst_proy').append('<label for="instituto" class="form-label">Institución Coinvestigador</label><select id="inst_proy" class="form-select"></select>')
-                    ajaxSelect('#inst_proy', ruta + 'ajax/institucion.php', 'Seleccione', 'read');
+                    ajaxSelect('#inst_proy', ruta + 'ajax/institucion.php', 'Seleccione', 'read', undefined, 'id_inst', 'inst');
 
                     if (proy[0]['id_inv'] == null) {
                         $('#rol_proy').val(1);
@@ -127,7 +127,7 @@ $(document).on('change', '#rol_proy', function () {
         $('#label_rol').append('Investigador/a')
         $('#nombre_rol').append('<input type="text" class="form-control" id="input_rol" >')
         $('#id_inst_proy').append('<label for="inst_proy" class="form-label">Institución</label><select id="inst_proy" class="form-select"></select>')
-        ajaxSelect('#inst_proy', ruta + 'ajax/institucion.php', 'Seleccione', 'read');
+        ajaxSelect('#inst_proy', ruta + 'ajax/institucion.php', 'Seleccione', 'read', undefined, 'id_inst', 'inst');
 
     }
     if ($('#rol_proy').val() == '1') {
@@ -299,6 +299,7 @@ $('#form_proyecto').submit(function (e) {
     let nom_coinv = rol == 1 ? $('#input_rol').val() : '';
     let inv = rol == 1 ? $('#id_usuario').attr('name') : '';
     let coinv = rol == 2 ? $('#id_usuario').attr('name') : '';
+    let usuario = $('#id_usuario').attr('name');
     let inst = document.getElementById("inst_proy") == null ? '' : $('#inst_proy').val();
     inst = $('#inst_proy').val() == 'otro' ? $('#input_inst_proy').val() : inst;
     let financ = $('#financ').val() == 'otro' ? $('#input_financ').val() : $('#financ').val();
@@ -344,17 +345,12 @@ $('#form_proyecto').submit(function (e) {
             })
         }
         if (nuevo_inst) {
-            op = 'insert';
-            $.ajax({
-                async: false,
-                type: 'POST',
-                url: '../ajax/institucion.php',
-                data: { op, nombre: inst },
-                success: function (response) {
-                    let dato = JSON.parse(response);
-                    $('#id_inst_proy').attr('name', dato);
-                }
-            })
+            const altaInstitucion = crearInstitucionContextual(inst, usuario, 'proyecto');
+            if (!altaInstitucion.ok) {
+                mostrarErrorInstitucionContextual('#mnsj_row_proy', '#mnsj_proy', altaInstitucion);
+                return;
+            }
+            $('#id_inst_proy').attr('name', altaInstitucion.id);
         }
         //obtener id de nueva fuente financiamiento e institucion
         financ = $('#id_financ').attr('name') != 0 ? $('#id_financ').attr('name') : financ

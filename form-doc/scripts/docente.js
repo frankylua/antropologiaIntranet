@@ -58,18 +58,12 @@ $('#form_usuario').submit(function(e){
     if(valAcadProf(profProg['lineaInv'])){
         nuevo_inst=$('#inst_unid_trabajo').val()=='otro'?true:false;
         if(nuevo_inst){
-            op='insert';
-            $.ajax({
-                async: false,
-                type : 'POST',
-                url : '../ajax/institucion.php',
-                data : {op,nombre:profProg['instTrab']},
-                success : function(response) {
-                    console.log(response)
-                    let dato = JSON.parse(response);
-                    $('#id_inst_doc').attr('name',dato);
-                }
-            })
+            const altaInstitucion = crearInstitucionContextual(profProg['instTrab'], 0, 'registro');
+            if (!altaInstitucion.ok) {
+                mostrarErrorInstitucionContextual('#mnsj_row_prog_doc', '#mnsj_prog_doc', altaInstitucion);
+                return;
+            }
+            $('#id_inst_doc').attr('name', altaInstitucion.id);
         }
         profProg['instTrab']=$('#id_inst_doc').attr('name')==0?profProg['instTrab']:$('#id_inst_doc').attr('name')
         jQuery.extend(usuario,profProg);

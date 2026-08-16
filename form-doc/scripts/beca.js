@@ -125,17 +125,12 @@ $('#form_beca').submit(function(e){
         nuevo_bec=$('#nom_beca').val()=='otro'?true:false;//agregar nuevo beca
         // en caso de ser "true" ingresar en tabla beca y/o instituto y devolver id para guardar grado academico
         if(nuevo_inst){
-            op='insert';
-            $.ajax({
-                async: false,
-                type : 'POST',
-                url : '../ajax/institucion.php',
-                data : {op,nombre:inst},
-                success : function(response) {
-                    let dato = JSON.parse(response);
-                    $('#id_inst_beca').attr('name',dato);
-                }
-            })
+            const altaInstitucion = crearInstitucionContextual(inst, usuario, 'beca');
+            if (!altaInstitucion.ok) {
+                mostrarErrorInstitucionContextual('#mnsj_row_beca', '#mnsj_beca', altaInstitucion);
+                return;
+            }
+            $('#id_inst_beca').attr('name', altaInstitucion.id);
         }
         if(nuevo_bec){
             op='insert';

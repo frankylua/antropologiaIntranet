@@ -4,6 +4,45 @@ ajaxSelect('#inst_unid_trabajo','../ajax/institucion.php','Seleccione','read','i
 ajaxSelect('#pais_nac','../ajax/pais.php','Seleccione','read', undefined, 'id_pais', 'pais');
 ajaxSelect('#pais_res','../ajax/pais.php','Seleccione','read', undefined, 'id_pais', 'pais');
 
+function crearInstitucionContextual(nombre, usuario, contexto) {
+    const resultado = {
+        ok: false,
+        id: 0,
+        mensaje: 'No fue posible crear la institución'
+    };
+
+    $.ajax({
+        async: false,
+        type: 'POST',
+        url: '../ajax/institucion.php',
+        dataType: 'json',
+        data: { op: 'insert', nombre, usuario, contexto },
+        success: function (response) {
+            const id = typeof response == 'string' && /^[1-9]\d*$/.test(response.trim())
+                ? Number(response.trim())
+                : response;
+            if (Number.isSafeInteger(id) && id > 0) {
+                resultado.ok = true;
+                resultado.id = id;
+            }
+        },
+        error: function (xhr) {
+            if (xhr.responseJSON && xhr.responseJSON.mensaje) {
+                resultado.mensaje = xhr.responseJSON.mensaje;
+            }
+        }
+    });
+
+    return resultado;
+}
+
+function mostrarErrorInstitucionContextual(fila, mensaje, resultado) {
+    $(fila).show();
+    $(mensaje).removeClass('alert-success');
+    $(mensaje).addClass('alert-danger');
+    $(mensaje).html(resultado.mensaje);
+}
+
 
   
 function infoPers(){

@@ -10,7 +10,7 @@ function agregarCotutela() {
   $('#card_cotutela').append('<div class="row" id="row_pais"><label for="pais_cot" class="form-label">País</label><div class="col-md-6 mb-3"><select id="pais_cot" class="form-select"></select></div></div>')
   $('#card_cotutela').append('<div class="row></div>')
   ajaxSelect('#pais_cot', '../ajax/pais.php', 'Seleccione', 'pais');
-  ajaxSelect('#inst_cot', '../ajax/institucion.php', 'Seleccione', 'read');
+  ajaxSelect('#inst_cot', '../ajax/institucion.php', 'Seleccione', 'read', undefined, 'id_inst', 'inst');
 
 }
 function cargarTesis(usu, id) {
@@ -202,7 +202,7 @@ $('#btn_tesis').click(function () {
   $('#card_tesis').append('<div class="row justify-content-center"><div class="col-md-6 mt-3 d-grid gap-2"><button type="submit" class="btn btn-dark">Guardar Tesis</button></div></div>');
   $('#mnsj_row_tesis').hide();
   ajaxSelect('#pais_tesis', ruta + 'ajax/pais.php', 'Seleccione', 'pais');
-  ajaxSelect('#inst_tesis', ruta + 'ajax/institucion.php', 'Seleccione', 'read');
+  ajaxSelect('#inst_tesis', ruta + 'ajax/institucion.php', 'Seleccione', 'read', undefined, 'id_inst', 'inst');
   anios('#anio_tesis', 2006)
   $('#nom_est').keyup(function () {
     //$('#list_est').hide();
@@ -507,6 +507,7 @@ $('#form_tesis').submit(function (e) {
   let fondo = $('#fondo').val();
   let ciudad_cot = $('#ciudad_cot').val();
   let pais_cot = $('#pais_cot').val();
+  let usuario = $('#id_usuario').attr('name');
   if (rol == 1) {
     guia = $('#id_usuario').attr('name');
     nom_coguia = $('#prof_tesis').attr('name') == 0 ? $('#prof_tesis').val() : '';
@@ -561,30 +562,20 @@ $('#form_tesis').submit(function (e) {
       })
     }
     if (nuevo_inst_tesis) {
-      op = 'insert';
-      $.ajax({
-        async: false,
-        type: 'POST',
-        url: '../ajax/institucion.php',
-        data: { op, nombre: inst_tesis },
-        success: function (response) {
-          let dato = JSON.parse(response);
-          $('#id_inst_tesis').attr('name', dato);
-        }
-      })
+      const altaInstitucion = crearInstitucionContextual(inst_tesis, usuario, 'tesis');
+      if (!altaInstitucion.ok) {
+        mostrarErrorInstitucionContextual('#mnsj_row_tesis', '#mnsj_tesis', altaInstitucion);
+        return;
+      }
+      $('#id_inst_tesis').attr('name', altaInstitucion.id);
     }
     if (nuevo_inst_cot) {
-      op = 'insert';
-      $.ajax({
-        async: false,
-        type: 'POST',
-        url: '../ajax/institucion.php',
-        data: { op, nombre: inst_cot },
-        success: function (response) {
-          let dato = JSON.parse(response);
-          $('#id_inst_cot').attr('name', dato);
-        }
-      })
+      const altaInstitucion = crearInstitucionContextual(inst_cot, usuario, 'tesis');
+      if (!altaInstitucion.ok) {
+        mostrarErrorInstitucionContextual('#mnsj_row_tesis', '#mnsj_tesis', altaInstitucion);
+        return;
+      }
+      $('#id_inst_cot').attr('name', altaInstitucion.id);
     }
     //obtener id de nueva fuente financiamiento e institucion
     financ = $('#id_financ').attr('name') != 0 ? $('#id_financ').attr('name') : financ

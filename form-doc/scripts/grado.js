@@ -326,17 +326,12 @@ $('#form_grado').submit(function (e) {
         let titulo_contextual_valido = true;
         // en caso de ser "true" ingresar en tabla titulo y/o instituto y devolver id para guardar grado academico
         if (nuevo_inst) {
-            op = 'insert';
-            $.ajax({
-                async: false,
-                type: 'POST',
-                url: '../ajax/institucion.php',
-                data: { op, nombre: inst },
-                success: function (response) {
-                    let dato = JSON.parse(response);
-                    $('#id_inst').attr('name', dato);
-                }
-            })
+            const altaInstitucion = crearInstitucionContextual(inst, usuario, 'grado');
+            if (!altaInstitucion.ok) {
+                mostrarErrorInstitucionContextual('#mnsj_row_grad', '#mnsj_grad', altaInstitucion);
+                return;
+            }
+            $('#id_inst').attr('name', altaInstitucion.id);
         }
         if (nuevo_tit) {
             op = 'insert';
@@ -411,17 +406,12 @@ $('#form_edit_grado').submit(function (e) {
     let titulo_contextual_valido = true;
     // en caso de ser "true" ingresar en tabla titulo y/o instituto y devolver id para guardar grado academico
     if (nuevo_inst) {
-        op = 'insert';
-        $.ajax({
-            async: false,
-            type: 'POST',
-            url: '../ajax/institucion.php',
-            data: { op, nombre: inst },
-            success: function (response) {
-                let dato = JSON.parse(response);
-                $('#id_inst').attr('name', dato);
-            }
-        })
+        const altaInstitucion = crearInstitucionContextual(inst, usuario, 'grado');
+        if (!altaInstitucion.ok) {
+            mostrarErrorInstitucionContextual('#mnsj_row_grad', '#mnsj_grad', altaInstitucion);
+            return;
+        }
+        $('#id_inst').attr('name', altaInstitucion.id);
     }
     if (nuevo_tit) {
         op = 'insert';

@@ -188,17 +188,12 @@ $('#form_postdoc').submit(function (e) {
     } else {
         nuevo_inst = $('#inst_postdoc').val() == 'otro' ? true : false;
         if (nuevo_inst) {
-            op = 'insert';
-            $.ajax({
-                async: false,
-                type: 'POST',
-                url: '../ajax/institucion.php',
-                data: { op, nombre: lista['inst'] },
-                success: function (response) {
-                    let dato = JSON.parse(response);
-                    $('#id_instpostdoc').attr('name', dato);
-                }
-            })
+            const altaInstitucion = crearInstitucionContextual(lista['inst'], lista['usuario'], 'postdoctorado');
+            if (!altaInstitucion.ok) {
+                mostrarErrorInstitucionContextual('#mnsj_row_postdoc', '#mnsj_postdoc', altaInstitucion);
+                return;
+            }
+            $('#id_instpostdoc').attr('name', altaInstitucion.id);
         }
         if ($('#id_instpostdoc').attr('name') != 0) {
             lista['inst'] = $('#id_instpostdoc').attr('name')
@@ -231,17 +226,12 @@ $('#form_edit_postdoc').submit(function (e) {
     datos_postdoc['fech_ter'] = $('#fech_ter_postdoc').val() == '' ? $('#fech_ter_postdoc').attr('name') : datos_postdoc['fech_ter'];
     nuevo_inst = $('#inst_postdoc').val() == 'otro' ? true : false;
     if (nuevo_inst) {
-        op = 'insert';
-        $.ajax({
-            async: false,
-            type: 'POST',
-            url: '../ajax/institucion.php',
-            data: { op, nombre: datos_postdoc['inst'] },
-            success: function (response) {
-                let dato = JSON.parse(response);
-                $('#id_instpostdoc').attr('name', dato);
-            }
-        })
+        const altaInstitucion = crearInstitucionContextual(datos_postdoc['inst'], datos_postdoc['usuario'], 'postdoctorado');
+        if (!altaInstitucion.ok) {
+            mostrarErrorInstitucionContextual('#mnsj_row_postdoc', '#mnsj_postdoc', altaInstitucion);
+            return;
+        }
+        $('#id_instpostdoc').attr('name', altaInstitucion.id);
     }
     datos_postdoc['inst'] = $('#id_instpostdoc').attr('name') == 0 ? datos_postdoc['inst'] : $('#id_instpostdoc').attr('name')
     datos_postdoc.op = 'update';
