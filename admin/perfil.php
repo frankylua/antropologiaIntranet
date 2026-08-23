@@ -26,17 +26,35 @@ require_once __DIR__ . '/../src/bootstrap/app.php';
         }
 
         $consultaDocente = conexion()->prepare(
-            'SELECT u.id_usuario FROM usuario u '
+            'SELECT u.id_usuario, p.estado_profesor FROM usuario u '
             . 'JOIN profesor p ON p.usuario = u.id_usuario '
             . 'JOIN permiso_login pl ON pl.id_login = u.login AND pl.id_permiso = 4 '
             . 'WHERE u.login = :id_login'
         );
         $consultaDocente->execute(['id_login' => $id_login]);
-        $usuariosDocentes = array_map('intval', $consultaDocente->fetchAll(PDO::FETCH_COLUMN));
-        if (count($usuariosDocentes) === 1 && $usuariosDocentes[0] > 0) {
+        $usuariosDocentes = $consultaDocente->fetchAll(PDO::FETCH_ASSOC);
+        if (
+            count($usuariosDocentes) === 1
+            && isset($usuariosDocentes[0]['id_usuario'], $usuariosDocentes[0]['estado_profesor'])
+            && (int) $usuariosDocentes[0]['id_usuario'] > 0
+            && in_array((int) $usuariosDocentes[0]['estado_profesor'], [1, 2, 3], true)
+        ) {
+            $estadoProfesor = (int) $usuariosDocentes[0]['estado_profesor'];
             $_SESSION['login'] = $id_login;
             $_SESSION['docente'] = $id_login;
-            $_SESSION['id_usuario'] = [['id_usuario' => $usuariosDocentes[0]]];
+            $_SESSION['id_usuario'] = [['id_usuario' => (int) $usuariosDocentes[0]['id_usuario']]];
+            $_SESSION['estado_profesor'] = $estadoProfesor;
+            $capacidades = isset($_SESSION['capacidades']) && is_array($_SESSION['capacidades'])
+                ? array_values(array_filter(
+                    $_SESSION['capacidades'],
+                    static fn ($capacidad): bool => is_string($capacidad)
+                        && $capacidad !== 'docente.habilitado'
+                ))
+                : [];
+            if ($estadoProfesor === 2) {
+                $capacidades[] = 'docente.habilitado';
+            }
+            $_SESSION['capacidades'] = array_values(array_unique($capacidades));
             header('Location: ../form-doc/info.docente.php');
             exit;
         }

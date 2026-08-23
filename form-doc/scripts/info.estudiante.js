@@ -102,12 +102,16 @@ function cargarFichaEst() {
         `
             //profesor guia
             $.ajax({
-                
+                async: false,
                 type: 'POST',
-                url: '../ajax/docente.php',
-                data: { op: 'read_prof_id', id_usu: usu[0]['prof_guia'] },
+                url: '../ajax/estudiante.php',
+                dataType: 'json',
+                data: { op: 'read_nom_prof' },
                 success: function (response) {
-                    let prof = JSON.parse(response);
+                    if (!response.ok || !response.datos || response.datos.length !== 1) {
+                        return;
+                    }
+                    let prof = response.datos;
                     console.log(prof)
                     nombre = cadenaMay(prof[0]['nombres']) + ' ' + cadenaMay(prof[0]['ap_pat']) + ' ' + cadenaMay(prof[0]['ap_mat'])
                     docente = nombre
@@ -116,6 +120,9 @@ function cargarFichaEst() {
                     <td>Profesor Guía</td>
                     <td>${docente}</td>
                     </tr>`
+                },
+                error: function () {
+                    console.error('No fue posible cargar el profesor guía del Estudiante.');
                 }
             })
 

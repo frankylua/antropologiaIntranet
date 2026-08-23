@@ -61,9 +61,16 @@ class Estudiante extends Usuario{
         return ejecutarConsultaResultados($sql);
     }
 
-    public function mostrarNomProf($id_usuario){    
-        $sql="SELECT u.id_usuario,u.nombres,u.ap_pat,u.ap_mat FROM usuario u JOIN profesor p ON u.id_usuario=p.usuario WHERE u.id_usuario='$id_usuario'";
-        return ejecutarConsultaResultados($sql);
+    public function mostrarNomProf(int $idEstudiante){
+        $consulta = conexion()->prepare(
+            'SELECT guia.id_usuario, guia.nombres, guia.ap_pat, guia.ap_mat '
+            . 'FROM estudiante e '
+            . 'JOIN usuario guia ON guia.id_usuario = e.prof_guia '
+            . 'JOIN profesor p ON p.usuario = guia.id_usuario '
+            . 'WHERE e.usuario = :id_estudiante'
+        );
+        $consulta->execute(['id_estudiante' => $idEstudiante]);
+        return $consulta->fetchAll();
     }
 
 
@@ -103,4 +110,3 @@ class Estudiante extends Usuario{
        
   
 }
-

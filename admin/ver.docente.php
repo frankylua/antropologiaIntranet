@@ -17,8 +17,9 @@ require_once __DIR__ . '/../src/bootstrap/session.php';
   <div class="row" id="lista_doc">
     <div class="col g-3 m-5">
       <h3 class=" text-center "> DOCENTES</h3>      
+      <div class="alert d-none" id="mensaje_estado_docente" role="alert"></div>
       <div class="row mt-5">
-        <div class="col-md-6 mb-3">
+        <div class="col-md-4 mb-3">
           <select id="tipo_doc" class="form-select">
             <option value="0" selected>Todos(as)</option>
             <option value="1">Claustro</option>
@@ -26,7 +27,15 @@ require_once __DIR__ . '/../src/bootstrap/session.php';
             <option value="3">Colaborador(a)</option>
           </select>
         </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-md-4 mb-3">
+          <select id="estado_profesor_filtro" class="form-select">
+            <option value="0" selected>Todos los estados</option>
+            <option value="1">Pendientes</option>
+            <option value="2">Aceptados</option>
+            <option value="3">Rechazados</option>
+          </select>
+        </div>
+        <div class="col-md-4 mb-3">
           <div class="row justify-content-end">
             <div class="col-8">
               <input type="text" class="form-control" placeholder="Buscar" id="buscar_doc" >
@@ -39,11 +48,13 @@ require_once __DIR__ . '/../src/bootstrap/session.php';
           <table class="table table-hover">
             <thead>
               <tr>
-                <th class="col-5">Nombre</th>
-                <th class="col-2">Vínculo</th>
-                <th class="col-2 text-center">Ficha Académica</th>
-                <th class="col-2 text-center">Información</th>
-                <th class="col-1 text-center">Eliminar</th>                   
+                <th>Nombre</th>
+                <th>Vínculo</th>
+                <th>Estado</th>
+                <th class="text-center">Acciones estado</th>
+                <th class="text-center">Ficha Académica</th>
+                <th class="text-center">Información</th>
+                <th class="text-center">Eliminar</th>
               </tr>
             </thead>
             <tbody id="table_doc">

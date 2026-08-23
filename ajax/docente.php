@@ -7,6 +7,8 @@ require_once __DIR__ . '/../src/bootstrap/app.php';
 use App\Model\Docente;
 use App\Security\Authorization;
 
+const AUTOALTA_PROFESOR_TTL = 1800;
+
 function responderDocente(int $estado, array $respuesta): void
 {
     http_response_code($estado);
@@ -42,22 +44,142 @@ function loginActorDocente(): int
     return count($candidatos) === 1 ? $candidatos[0] : 0;
 }
 
-function identidadDocenteValida(int $idUsuario, int $idLogin): bool
+function exigirAdminComiteDocente(): void
 {
-    if ($idUsuario < 1 || $idLogin < 1) {
+    if (!Authorization::hasAny(['admin', 'comite'])) {
+        responderDocente(403, [
+            'ok' => false,
+            'error' => 'NO_AUTORIZADO',
+            'mensaje' => 'No tiene autorización para gestionar esta operación Docente.',
+        ]);
+    }
+}
+
+function sesionAutenticadaProfesor(): bool
+{
+    foreach (['login', 'admin', 'comite', 'docente', 'estudiante', 'aceptado'] as $clave) {
+        if (isset($_SESSION[$clave])) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function contextoAutoaltaProfesorVigente(): bool
+{
+    if (
+        !isset($_SESSION['autoalta_profesor'])
+        || !is_array($_SESSION['autoalta_profesor'])
+        || !isset($_SESSION['autoalta_profesor']['token'], $_SESSION['autoalta_profesor']['emitido'])
+        || !is_string($_SESSION['autoalta_profesor']['token'])
+        || !is_scalar($_SESSION['autoalta_profesor']['emitido'])
+    ) {
         return false;
     }
+    $emitido = (int) $_SESSION['autoalta_profesor']['emitido'];
+    return $emitido > 0 && (time() - $emitido) <= AUTOALTA_PROFESOR_TTL;
+}
 
-    $consulta = conexion()->prepare(
-        'SELECT p.id_profesor FROM profesor p '
-        . 'JOIN usuario u ON u.id_usuario = p.usuario '
-        . 'WHERE u.id_usuario = :id_usuario AND u.login = :id_login'
-    );
-    $consulta->execute([
-        'id_usuario' => $idUsuario,
-        'id_login' => $idLogin,
+function tokenAutoaltaProfesorValido(): bool
+{
+    if (!contextoAutoaltaProfesorVigente()) {
+        return false;
+    }
+    $tokenRecibido = isset($_POST['token_autoalta']) && is_string($_POST['token_autoalta'])
+        ? $_POST['token_autoalta']
+        : '';
+    return $tokenRecibido !== ''
+        && hash_equals($_SESSION['autoalta_profesor']['token'], $tokenRecibido);
+}
+
+function contextoAltaProfesor(): string
+{
+    if (Authorization::hasAny(['admin', 'comite'])) {
+        return 'administrativa';
+    }
+    if (!sesionAutenticadaProfesor() && tokenAutoaltaProfesorValido()) {
+        return 'autoalta';
+    }
+    responderDocente(403, [
+        'ok' => false,
+        'error' => 'NO_AUTORIZADO',
+        'mensaje' => 'No existe un contexto autorizado para crear el perfil Docente.',
     ]);
-    return count($consulta->fetchAll(\PDO::FETCH_COLUMN)) === 1;
+}
+
+function estadoFiltroProfesor(): int
+{
+    if (!array_key_exists('estado', $_POST)) {
+        return 0;
+    }
+    if (!is_scalar($_POST['estado']) || !ctype_digit((string) $_POST['estado'])) {
+        responderDocente(400, [
+            'ok' => false,
+            'error' => 'ESTADO_FILTRO_INVALIDO',
+            'mensaje' => 'El filtro de estado no es valido.',
+        ]);
+    }
+    $estado = (int) $_POST['estado'];
+    if (!in_array($estado, [0, 1, 2, 3], true)) {
+        responderDocente(400, [
+            'ok' => false,
+            'error' => 'ESTADO_FILTRO_INVALIDO',
+            'mensaje' => 'El filtro de estado no es valido.',
+        ]);
+    }
+    return $estado;
+}
+
+function usuarioSesionProfesor(): int
+{
+    if (
+        !Authorization::hasAny(['docente'])
+        || !isset($_SESSION['id_usuario'][0]['id_usuario'])
+        || !is_scalar($_SESSION['id_usuario'][0]['id_usuario'])
+    ) {
+        return 0;
+    }
+    $idUsuario = (int) $_SESSION['id_usuario'][0]['id_usuario'];
+    return $idUsuario > 0 ? $idUsuario : 0;
+}
+
+function resolverObjetivoEdicionDocente(
+    Docente $docente,
+    int $actorLogin,
+    int $idUsuarioCliente,
+    int $idLoginCliente,
+    bool $perfilPropio
+): array {
+    if ($perfilPropio) {
+        $idUsuario = usuarioSesionProfesor();
+        $idLogin = $actorLogin;
+        if ($idUsuario < 1 || $idLogin < 1) {
+            responderDocente(403, [
+                'ok' => false,
+                'error' => 'NO_AUTORIZADO',
+                'mensaje' => 'No existe un perfil Docente válido en la sesión.',
+            ]);
+        }
+    } elseif (Authorization::hasAny(['admin', 'comite'])) {
+        $idUsuario = $idUsuarioCliente;
+        $idLogin = $idLoginCliente;
+    } else {
+        responderDocente(403, [
+            'ok' => false,
+            'error' => 'NO_AUTORIZADO',
+            'mensaje' => 'No tiene autorización para editar información Docente.',
+        ]);
+    }
+
+    $identidad = $docente->obtenerIdentidadProfesorPorUsuario($idUsuario);
+    if ($identidad === null || (int) $identidad['id_login'] !== $idLogin) {
+        responderDocente(409, [
+            'ok' => false,
+            'error' => 'IDENTIDAD_DOCENTE_INCOMPATIBLE',
+            'mensaje' => 'No fue posible validar la identidad del Profesor.',
+        ]);
+    }
+    return ['id_usuario' => $idUsuario, 'id_login' => $idLogin];
 }
 
 $operacionSolicitada = isset($_POST['op']) && is_string($_POST['op']) ? $_POST['op'] : '';
@@ -86,7 +208,7 @@ if ($operacionSolicitada === 'delete') {
 require 'usuario.php';
 
 $doc = new Docente();
-$busqueda = isset ($_POST['busqueda']) ? $_POST['busqueda'] : '';
+$busqueda = isset($_POST['busqueda']) && is_scalar($_POST['busqueda']) ? (string) $_POST['busqueda'] : '';
 $inst = isset ($_POST['instTrab']) && is_scalar($_POST['instTrab']) ? (int) $_POST['instTrab'] : 0;
 $nuevaInstitucion = isset($_POST['nueva_institucion']) && is_string($_POST['nueva_institucion'])
     ? trim(limpiar_datos($_POST['nueva_institucion']))
@@ -96,9 +218,9 @@ $anioIng = isset ($_POST['anio_ing']) ? (int) $_POST['anio_ing'] : '';
 $vinculo = isset ($_POST['vinculo']) ? (int) $_POST['vinculo'] : '';
 $op = $operacionSolicitada;
 $lineaInv = isset($_POST['lineaInv']) && is_array($_POST['lineaInv']) ? $_POST['lineaInv'] : [];
-$prof = isset ($_SESSION['id_usuario']) ?$_SESSION['id_usuario'] : 0;
-$id_prof=$prof!=0?$prof[0]['id_usuario']:0;
+$id_prof = usuarioSesionProfesor();
 $actorLogin = loginActorDocente();
+header('X-Puede-Eliminar-Docente: ' . (Authorization::hasAny(['admin']) ? '1' : '0'));
 $excluirLoginListado = $actorLogin > 0
     && Authorization::hasAny(['admin', 'comite'])
         ? $actorLogin
@@ -107,71 +229,194 @@ $excluirLoginListado = $actorLogin > 0
 // *******para ingresar los datos de formularios dinamicos hacer un for con un contador 
 // para validar si existe el id del formulario dinamico******
 switch ($op) {
+    case 'contexto_autoalta':
+        if (Authorization::hasAny(['admin', 'comite'])) {
+            responderDocente(200, ['ok' => true, 'autoalta' => false, 'token' => '']);
+        }
+        if (sesionAutenticadaProfesor() || !contextoAutoaltaProfesorVigente()) {
+            responderDocente(403, [
+                'ok' => false,
+                'error' => 'CONTEXTO_AUTOALTA_INVALIDO',
+                'mensaje' => 'El contexto de registro Docente no es valido.',
+            ]);
+        }
+        responderDocente(200, [
+            'ok' => true,
+            'autoalta' => true,
+            'token' => $_SESSION['autoalta_profesor']['token'],
+        ]);
     case 'read_prof':
-        $resp = $doc->buscarProf($busqueda, $excluirLoginListado);
+        if ($actorLogin < 1) {
+            responderDocente(403, [
+                'ok' => false,
+                'error' => 'NO_AUTORIZADO',
+                'mensaje' => 'Debe iniciar sesión para consultar Profesores.',
+            ]);
+        }
+        if (Authorization::hasAny(['docente']) && !Authorization::hasCapability('docente.habilitado')) {
+            responderDocente(403, [
+                'ok' => false,
+                'error' => 'DOCENTE_NO_HABILITADO',
+                'mensaje' => 'El estado actual del Profesor no permite utilizar este selector.',
+            ]);
+        }
+        $resp = $doc->buscarProf($busqueda);
         echo json_encode($resp, JSON_UNESCAPED_UNICODE);
         break;
     case 'read_prof_id':
+        exigirAdminComiteDocente();
+        if ((int) $id_usu < 1) {
+            responderDocente(400, [
+                'ok' => false,
+                'error' => 'IDENTIFICADOR_INVALIDO',
+                'mensaje' => 'El Profesor indicado no es válido.',
+            ]);
+        }
+        $identidadProfesor = $doc->obtenerIdentidadProfesorPorUsuario((int) $id_usu);
+        if ($identidadProfesor === null) {
+            responderDocente(409, [
+                'ok' => false,
+                'error' => 'IDENTIDAD_DOCENTE_INCOMPATIBLE',
+                'mensaje' => 'El objetivo no representa un Profesor válido.',
+            ]);
+        }
         $resp = $doc->mostrarProfId($id_usu);
-        echo json_encode($resp, JSON_UNESCAPED_UNICODE);
-        break;
+        responderDocente(200, [
+            'ok' => true,
+            'datos' => $resp,
+            'puede_gestionar_rol' => Authorization::hasAny(['admin'])
+                && $actorLogin !== (int) $identidadProfesor['id_login']
+                && (int) $identidadProfesor['estado_profesor'] === 2,
+            'rol_administrativo' => Authorization::hasAny(['admin'])
+                ? $doc->obtenerRolAdministrativo((int) $identidadProfesor['id_login'])
+                : null,
+        ]);
     case 'read_prof_perfil':
+        if ($id_prof < 1) {
+            responderDocente(403, [
+                'ok' => false,
+                'error' => 'NO_AUTORIZADO',
+                'mensaje' => 'No existe un perfil Docente válido en la sesión.',
+            ]);
+        }
         $resp = $doc->mostrarProfId($id_prof);
         echo json_encode($resp, JSON_UNESCAPED_UNICODE);
         break;
     case 'read_prof_prog':
-        $resp = $doc->mostrarDatosProg($id_usu);
+        exigirAdminComiteDocente();
+        $idPrograma = (int) $id_usu;
+        if ($doc->obtenerIdentidadProfesorPorUsuario($idPrograma) === null) {
+            responderDocente(409, [
+                'ok' => false,
+                'error' => 'IDENTIDAD_DOCENTE_INCOMPATIBLE',
+                'mensaje' => 'El objetivo no representa un Profesor válido.',
+            ]);
+        }
+        $resp = $doc->mostrarDatosProg($idPrograma);
+        echo json_encode($resp, JSON_UNESCAPED_UNICODE);
+        break;
+    case 'read_prof_prog_perfil':
+        if ($id_prof < 1) {
+            responderDocente(403, [
+                'ok' => false,
+                'error' => 'NO_AUTORIZADO',
+                'mensaje' => 'No existe un perfil Docente válido en la sesión.',
+            ]);
+        }
+        if ($doc->obtenerIdentidadProfesorPorUsuario($id_prof) === null) {
+            responderDocente(409, [
+                'ok' => false,
+                'error' => 'IDENTIDAD_DOCENTE_INCOMPATIBLE',
+                'mensaje' => 'El objetivo no representa un Profesor válido.',
+            ]);
+        }
+        $resp = $doc->mostrarDatosProg($id_prof);
         echo json_encode($resp, JSON_UNESCAPED_UNICODE);
         break;
     case 'read-doc':
-        $resp = $doc->mostrarProf($excluirLoginListado);// muestra todos los docentes
+        exigirAdminComiteDocente();
+        $resp = $doc->mostrarProf($excluirLoginListado, estadoFiltroProfesor());// muestra todos los docentes
         echo json_encode($resp, JSON_UNESCAPED_UNICODE);
         break;
     case 'read-filtrada':// lista de los docentes segun vinculo con el programa
-        $resp = $doc->mostrarProfTipo($tipo, $excluirLoginListado);
+        exigirAdminComiteDocente();
+        $resp = $doc->mostrarProfTipo($tipo, $excluirLoginListado, estadoFiltroProfesor());
+        echo json_encode($resp, JSON_UNESCAPED_UNICODE);
+        break;
+    case 'read-doc-search':
+        exigirAdminComiteDocente();
+        $resp = $doc->buscarProfAdministrativo($busqueda, $excluirLoginListado, estadoFiltroProfesor());
         echo json_encode($resp, JSON_UNESCAPED_UNICODE);
         break;
     case 'insert-update':
+        $contextoAlta = contextoAltaProfesor();
+        $esAutoalta = $contextoAlta === 'autoalta';
+        $estadoProfesor = $esAutoalta ? 1 : 2;
+        $lineasValidas = array_values(array_unique(array_filter(
+            array_map('intval', $lineaInv),
+            static fn (int $linea): bool => $linea > 0
+        )));
+        $datosTexto = [
+            $nombres, $ap_mat, $ap_pat, $fech_nac, $nro_doc, $region, $comuna,
+            $telefono, $direccion, $cont_em, $tel_em, $correo, $pass,
+        ];
+        $datosNumericos = [
+            (int) $pais_res, (int) $pais_nac, (int) $documento, (int) $genero,
+            (int) $catAcad, (int) $anioIng, (int) $vinculo,
+        ];
+        if (
+            in_array('', $datosTexto, true)
+            || min($datosNumericos) < 1
+            || $lineasValidas === []
+            || ($inst < 1 && $nuevaInstitucion === '')
+        ) {
+            responderDocente(400, [
+                'ok' => false,
+                'error' => 'DATOS_INVALIDOS',
+                'mensaje' => 'Debe completar todos los antecedentes requeridos del Profesor.',
+            ]);
+        }
+        if ($esAutoalta) {
+            unset($_SESSION['autoalta_profesor']);
+        }
         try {
-            $login = (int) $doc->insertarLogin($correo, $pass);
-            if ($login < 1) {
-                throw new \RuntimeException('No fue posible crear el login Docente.');
+            $resultadoCrear = $doc->crearProfesorIntegral([
+                'correo' => $correo,
+                'pass' => $pass,
+                'pueblo' => (int) $pueblo,
+                'pais_res' => (int) $pais_res,
+                'pais_nac' => (int) $pais_nac,
+                'fecha_nac' => $fech_nac,
+                'nombres' => $nombres,
+                'ap_mat' => $ap_mat,
+                'ap_pat' => $ap_pat,
+                'tipo_doc' => (int) $documento,
+                'nro_doc' => $nro_doc,
+                'inst_usuario' => $inst,
+                'nueva_institucion' => $nuevaInstitucion,
+                'genero' => (int) $genero,
+                'region' => $region,
+                'comuna' => $comuna,
+                'telefono' => $telefono,
+                'direccion' => $direccion,
+                'cont_em' => $cont_em,
+                'tel_em' => $tel_em,
+                'cat_academica' => $catAcad,
+                'anio_ingreso' => $anioIng,
+                'vinculo' => $vinculo,
+                'lineas' => $lineasValidas,
+            ], $estadoProfesor);
+            if (!$resultadoCrear['ok']) {
+                responderDocente(409, [
+                    'ok' => false,
+                    'error' => $resultadoCrear['codigo'],
+                    'mensaje' => 'Los antecedentes del Profesor no permiten completar el alta.',
+                ]);
             }
-
-            if(isset($_SESSION['admin'])){
-                $permiso = [4];
-            }else if(isset($_SESSION['comite'])){
-                $permiso = [4];
-            }else{
-                $permiso = [3];
-            }
-            foreach ($permiso as $per) {
-                $resultadoPermiso = $doc->insertarPermisos($login, (int) $per);
-                if (!($resultadoPermiso instanceof \PDOStatement) || $resultadoPermiso->rowCount() !== 1) {
-                    throw new \RuntimeException('No fue posible asignar el permiso Docente.');
-                }
-            }
-
-            $usuario = (int) $doc->insertarUsuario($pueblo, $pais_res, $pais_nac, $login, $fech_nac, $nombres, $ap_mat, $ap_pat, $documento, $nro_doc, $inst, $genero, $region, $comuna, $telefono, $direccion, $cont_em, $tel_em);
-            if ($usuario < 1) {
-                throw new \RuntimeException('No fue posible crear el usuario Docente.');
-            }
-
-            $resultadoProfesor = $doc->insertar($catAcad, $anioIng, $vinculo, $usuario);
-            if (!($resultadoProfesor instanceof \PDOStatement) || $resultadoProfesor->rowCount() !== 1) {
-                throw new \RuntimeException('No fue posible crear el Profesor.');
-            }
-            foreach ($lineaInv as $linea) {
-                $resultadoLinea = $doc->insertarLineaInv($usuario, $linea);
-                if (!($resultadoLinea instanceof \PDOStatement) || $resultadoLinea->rowCount() !== 1) {
-                    throw new \RuntimeException('No fue posible guardar una línea de investigación.');
-                }
-            }
-
             responderDocente(200, [
                 'ok' => true,
                 'codigo' => 'DOCENTE_CREADO',
-                'id_usuario' => $usuario,
+                'id_usuario' => $resultadoCrear['id_usuario'],
                 'mensaje' => 'Usuario guardado correctamente.',
             ]);
         } catch (\Throwable $error) {
@@ -248,6 +493,12 @@ switch ($op) {
                 $_SESSION['login'] = $actorLogin;
                 $_SESSION['docente'] = (int) $idLoginTransicion;
                 $_SESSION['id_usuario'] = [['id_usuario' => $resultadoTransicion['id_usuario']]];
+                $_SESSION['estado_profesor'] = 2;
+                $capacidades = isset($_SESSION['capacidades']) && is_array($_SESSION['capacidades'])
+                    ? array_filter($_SESSION['capacidades'], 'is_string')
+                    : [];
+                $capacidades[] = 'docente.habilitado';
+                $_SESSION['capacidades'] = array_values(array_unique($capacidades));
             }
             responderDocente(200, [
                 'ok' => true,
@@ -266,6 +517,92 @@ switch ($op) {
             ]);
         }
         break;
+    case 'update-estado-profesor':
+        exigirAdminComiteDocente();
+        $idLoginEstado = isset($_POST['id_login']) && is_scalar($_POST['id_login'])
+            ? filter_var($_POST['id_login'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])
+            : false;
+        $estadoObjetivo = isset($_POST['estado_objetivo']) && is_scalar($_POST['estado_objetivo'])
+            && ctype_digit((string) $_POST['estado_objetivo'])
+                ? (int) $_POST['estado_objetivo']
+                : 0;
+        if ($idLoginEstado === false || !in_array($estadoObjetivo, [2, 3], true)) {
+            responderDocente(400, [
+                'ok' => false,
+                'error' => 'ESTADO_OBJETIVO_INVALIDO',
+                'mensaje' => 'La transicion de estado solicitada no es valida.',
+            ]);
+        }
+        try {
+            $resultadoEstado = $doc->cambiarEstadoProfesor((int) $idLoginEstado, $estadoObjetivo);
+            if (!$resultadoEstado['ok']) {
+                responderDocente(409, [
+                    'ok' => false,
+                    'error' => $resultadoEstado['codigo'],
+                    'mensaje' => 'El estado actual del Profesor no permite esta transicion.',
+                ]);
+            }
+            responderDocente(200, [
+                'ok' => true,
+                'codigo' => $resultadoEstado['codigo'],
+                'estado_profesor' => $resultadoEstado['estado_profesor'],
+                'mensaje' => $estadoObjetivo === 2
+                    ? 'Profesor aceptado. Debe volver a iniciar sesion para reflejar la habilitacion.'
+                    : 'Solicitud de Profesor rechazada.',
+            ]);
+        } catch (\Throwable $error) {
+            error_log('[DOCENTE_ESTADO] ' . $error->getMessage());
+            responderDocente(500, [
+                'ok' => false,
+                'error' => 'ERROR_TECNICO',
+                'mensaje' => 'No fue posible actualizar el estado del Profesor.',
+            ]);
+        }
+    case 'update-rol-admin':
+        exigirAdminDocente();
+        $idLoginRol = isset($_POST['id_login']) && is_scalar($_POST['id_login'])
+            ? filter_var($_POST['id_login'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])
+            : false;
+        $rolObjetivo = isset($_POST['rol_admin']) && is_string($_POST['rol_admin'])
+            ? $_POST['rol_admin']
+            : '';
+        if ($idLoginRol === false || !in_array($rolObjetivo, ['none', 'admin', 'comite'], true)) {
+            responderDocente(400, [
+                'ok' => false,
+                'error' => 'ROL_OBJETIVO_INVALIDO',
+                'mensaje' => 'El rol administrativo solicitado no es válido.',
+            ]);
+        }
+        if ($actorLogin === (int) $idLoginRol) {
+            responderDocente(409, [
+                'ok' => false,
+                'error' => 'AUTORROL_PROHIBIDO',
+                'mensaje' => 'No puede modificar su propio rol administrativo.',
+            ]);
+        }
+        try {
+            $resultadoRol = $doc->cambiarRolAdministrativo((int) $idLoginRol, $rolObjetivo);
+            if (!$resultadoRol['ok']) {
+                responderDocente(409, [
+                    'ok' => false,
+                    'error' => $resultadoRol['codigo'],
+                    'mensaje' => 'El estado actual del Profesor no permite modificar su rol.',
+                ]);
+            }
+            responderDocente(200, [
+                'ok' => true,
+                'codigo' => $resultadoRol['codigo'],
+                'rol' => $resultadoRol['rol'],
+                'mensaje' => 'Rol administrativo actualizado correctamente.',
+            ]);
+        } catch (\Throwable $error) {
+            error_log('[DOCENTE_ROL] ' . $error->getMessage());
+            responderDocente(500, [
+                'ok' => false,
+                'error' => 'ERROR_TECNICO',
+                'mensaje' => 'No fue posible actualizar el rol administrativo.',
+            ]);
+        }
     case 'delete':
         if (!Authorization::hasAny(['admin'])) {
             responderDocente(403, [
@@ -313,14 +650,17 @@ switch ($op) {
         }
         break;
     case 'update-inf-pers':
+    case 'update-inf-pers-perfil':
         try {
-            if (!identidadDocenteValida((int) $id_usu, (int) $id_login)) {
-                responderDocente(409, [
-                    'ok' => false,
-                    'error' => 'IDENTIDAD_DOCENTE_INCOMPATIBLE',
-                    'mensaje' => 'No fue posible validar la identidad del Profesor para editar sus datos.',
-                ]);
-            }
+            $objetivoEdicion = resolverObjetivoEdicionDocente(
+                $doc,
+                $actorLogin,
+                (int) $id_usu,
+                (int) $id_login,
+                $op === 'update-inf-pers-perfil'
+            );
+            $id_usu = $objetivoEdicion['id_usuario'];
+            $id_login = $objetivoEdicion['id_login'];
 
             $resp_pers = $doc->editarInfPers($nombres, $ap_mat, $ap_pat, $fech_nac, $documento, $nro_doc, $pais_nac, $genero, $pais_res, $region, $comuna, $telefono, $direccion, $cont_em, $tel_em, $correo, $pass, $pueblo, $id_usu, $id_login);
             if (!($resp_pers instanceof \PDOStatement)) {
@@ -350,14 +690,17 @@ switch ($op) {
             ]);
         }
     case 'update-inf-prog':
+    case 'update-inf-prog-perfil':
         try {
-            if (!identidadDocenteValida((int) $id_usu, (int) $id_login)) {
-                responderDocente(409, [
-                    'ok' => false,
-                    'error' => 'IDENTIDAD_DOCENTE_INCOMPATIBLE',
-                    'mensaje' => 'No fue posible validar la identidad del Profesor para editar sus datos de programa.',
-                ]);
-            }
+            $objetivoEdicion = resolverObjetivoEdicionDocente(
+                $doc,
+                $actorLogin,
+                (int) $id_usu,
+                (int) $id_login,
+                $op === 'update-inf-prog-perfil'
+            );
+            $id_usu = $objetivoEdicion['id_usuario'];
+            $id_login = $objetivoEdicion['id_login'];
 
             //editar Linea Inv
             //validar las lineas que no existen en la base de datoa

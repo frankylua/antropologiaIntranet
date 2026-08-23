@@ -36,8 +36,13 @@ switch($op){
         echo json_encode($resp, JSON_UNESCAPED_UNICODE);
         break;
     case'read_prof':
-        $resp=$tesis->mostrarProf($busqueda);
-        echo json_encode($resp, JSON_UNESCAPED_UNICODE);
+        http_response_code(410);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'ok' => false,
+            'error' => 'OPERACION_RETIRADA',
+            'mensaje' => 'Utilice el selector Profesor centralizado.',
+        ], JSON_UNESCAPED_UNICODE);
         break;
     case'read_est':
         $resp=$tesis->mostrarEst($busqueda);

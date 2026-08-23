@@ -41,5 +41,14 @@ class Login
         $sql="SELECT e.tipo_est FROM usuario u JOIN estudiante e ON u.id_usuario=e.usuario WHERE u.login='$id_login'";
         return ejecutarConsultaResultados($sql);
     }
+    public function obtenerEstadosProfesorPorLogin(int $idLogin): array{
+        $consulta = conexion()->prepare(
+            'SELECT p.estado_profesor FROM usuario u '
+            . 'JOIN profesor p ON p.usuario = u.id_usuario '
+            . 'WHERE u.login = :id_login'
+        );
+        $consulta->execute(['id_login' => $idLogin]);
+        return $consulta->fetchAll(\PDO::FETCH_ASSOC);
+    }
 }
 ?>

@@ -1,4 +1,25 @@
 //cargar ficha doce //cargar formulario datos programa desde ajax
+  function contextoTerceroDocente(){
+    return window.contextoDocenteTercero===true
+  }
+  function solicitudFichaDocente(id_usu){
+    return contextoTerceroDocente()
+      ? {op:'read_prof_id',id_usu}
+      : {op:'read_prof_perfil'}
+  }
+  function solicitudProgramaDocente(id_usu){
+    return contextoTerceroDocente()
+      ? {op:'read_prof_prog',id_usu}
+      : {op:'read_prof_prog_perfil'}
+  }
+  function datosFichaDocente(respuesta){
+    if(Array.isArray(respuesta)){
+      return respuesta
+    }
+    return respuesta&&respuesta.ok===true&&Array.isArray(respuesta.datos)
+      ? respuesta.datos
+      : []
+  }
   function mensajeErrorDocente(xhr,mensajePredeterminado){
     if(xhr.responseJSON&&xhr.responseJSON.mensaje){
       return xhr.responseJSON.mensaje
@@ -21,7 +42,7 @@
         async: false,
         url: "../ajax/docente.php",
         type: "POST",
-        data: { op: "read_prof_prog", id_usu },
+        data: solicitudProgramaDocente(id_usu),
         dataType:'json',
         success: function (usu) {
           $('#login').attr('name',usu[0]['id_login'])
@@ -127,10 +148,14 @@ function cargarFichaDoc(id_usu) {
     async: false,
     url: "../ajax/docente.php",
     type: "POST",
-    data: { op: "read_prof_id", id_usu },
+    dataType: "json",
+    data: solicitudFichaDocente(id_usu),
     success: function (response) {
-      let usu = JSON.parse(response);
-      let template;
+      let usu = datosFichaDocente(response);
+      if(usu.length===0){
+        return
+      }
+      let template = "";
       nombre =
         cadenaMay(usu[0]["nombres"]) +
         " " +
@@ -304,9 +329,13 @@ function cargarFichaDoc(id_usu) {
         async: false,
         url: "../ajax/docente.php",
         type: "POST",
-        data: { op: "read_prof_id", id_usu },
+        dataType: "json",
+        data: solicitudFichaDocente(id_usu),
         success: function (response) {
-          let usu = JSON.parse(response);
+          let usu = datosFichaDocente(response);
+          if(usu.length===0){
+            return
+          }
           $('#login').attr('name',usu[0]['id_login'])
           $('#nombres').val(cadenaMay(usu[0]['nombres']));
           $('#ap_pat').val(cadenaMay(usu[0]['ap_pat']));
@@ -379,9 +408,14 @@ $('#form_edit_pers').submit(function(e){
           url:'../ajax/docente.php',
           type: 'POST',
           async:false,
-          data: {op:'read_prof_id',id_usu:usuario['id_usu']},
+          dataType:'json',
+          data: solicitudFichaDocente(usuario['id_usu']),
           success: function(response){ 
-           let usu = JSON.parse(response);
+           let usu = datosFichaDocente(response);
+           if(usu.length===0){
+             datosCargados=false;
+             return;
+           }
            usuario['nombres']=usuario['nombres']==''?usu[0]['nombres']:usuario['nombres']
            usuario['ap_pat']=usuario['ap_pat']==''?usu[0]['ap_pat']:usuario['ap_pat']
            usuario['ap_mat']=usuario['ap_mat']==''?usu[0]['ap_mat']:usuario['ap_mat']
@@ -409,7 +443,7 @@ $('#form_edit_pers').submit(function(e){
         if(!datosCargados){
           return;
         }
-        usuario.op='update-inf-pers'
+        usuario.op=contextoTerceroDocente()?'update-inf-pers':'update-inf-pers-perfil'
         $.ajax({
           url:'../ajax/docente.php',
           type:'POST',
@@ -446,14 +480,14 @@ $('#form_edit_prog').submit(function(e){
   datProg=leerDatProgDoc()
   datProg.id_usu=$('#info_doc').attr('name')
   datProg.id_login=$('#login').attr('name')
-  datProg.op='update-inf-prog'
+  datProg.op=contextoTerceroDocente()?'update-inf-prog':'update-inf-prog-perfil'
   let datosProgramaCargados=true;
   $.ajax({
     url:'../ajax/docente.php',
     type:'POST',
     async:false,
     dataType:'json',
-    data:{op:'read_prof_prog',id_usu:datProg['id_usu']},
+    data:solicitudProgramaDocente(datProg['id_usu']),
     success:function(usu){
       datProg['instTrab']=datProg['instTrab']==0?usu[0]['inst_usuario']:datProg['instTrab']
       datProg['catAcad']=datProg['catAcad']==0?usu[0]['cat_academica']:datProg['catAcad']
@@ -486,7 +520,9 @@ $('#form_edit_prog').submit(function(e){
       setTimeout(function() {
         $("#mnsj_row_prog_doc").fadeOut(1500);
         reiniciarInfoDoc()
-        cargarDocentes()
+        if(typeof cargarDocentes==='function'){
+          cargarDocentes()
+        }
       },3000);
     },
     error:function(xhr){

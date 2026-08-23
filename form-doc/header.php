@@ -91,7 +91,7 @@ $miperfil = isset($_SESSION['docente']) ? RUTA . 'form-doc/info.docente.php' : (
                                     <li><a href="<?php echo RUTA; ?>admin/act.list.php" class="dropdown-item">Actualizar
                                         Listas</a></li>
                                         <?php endif; ?>
-                                        <?php if ((isset($_SESSION['docente']) && isset($_SESSION['aceptado'])) || isset($_SESSION['admin']) || isset($_SESSION['comite']) ): ?>
+                                        <?php if (Authorization::hasCapability('docente.habilitado') || isset($_SESSION['aceptado']) || isset($_SESSION['admin']) || isset($_SESSION['comite']) ): ?>
                                         <li><a href="<?php echo RUTA; ?>form-doc/ver.curso.php" class="dropdown-item">Cursos</a>
                                         </li>
                                         <?php endif; ?>

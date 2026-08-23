@@ -1,13 +1,20 @@
+window.contextoDocenteTercero = true;
 
 function cargarFichaDoc(id_usu) {
+  let fichaCargada = false;
   $.ajax({
     async: false,
     url: "../ajax/docente.php",
     type: "POST",
+    dataType: "json",
     data: { op: "read_prof_id", id_usu },
-    success: function (response) {
-      let usu = JSON.parse(response);
-      let template;
+    success: function (respuesta) {
+      if (!respuesta.ok || !respuesta.datos || respuesta.datos.length === 0) {
+        return;
+      }
+      fichaCargada = true;
+      let usu = respuesta.datos;
+      let template = "";
       nombre =
         cadenaMay(usu[0]["nombres"]) +
         " " +
@@ -26,6 +33,7 @@ function cargarFichaDoc(id_usu) {
           : "Sin Jerarquía";
       $("#info_doc").attr("name", usu[0]["id_usuario"]);
       $("#id_usuario").attr("name", usu[0]["id_usuario"]);
+      $("#login").attr("name", usu[0]["id_login"]);
       template += `
         <tr>
         <td class="col-4" ><h4 class=" mt-3">ANTECEDENTES PERSONALES</h4></td>
@@ -113,9 +121,9 @@ function cargarFichaDoc(id_usu) {
         <tr>
         <td class="col-4">Vínculo con el Programa</td>
         <td class="col-8">${
-          usu["vinculo"] == 1
+          usu[0]["vinculo"] == 1
             ? "Claustro"
-            : usu["vinculo"] == 2
+            : usu[0]["vinculo"] == 2
             ? "Visitante"
             : "Colaborador/a"
         }</td>
@@ -130,6 +138,26 @@ function cargarFichaDoc(id_usu) {
         </tr>
      
         `;
+        if (respuesta.puede_gestionar_rol) {
+          template += `<tr>
+          <td class="col-4">Rol administrativo</td>
+          <td class="col-8">
+            <div class="row g-2 align-items-center">
+              <div class="col-md-7">
+                <select class="form-select" id="rol_admin_docente">
+                  <option value="none">Ninguno</option>
+                  <option value="admin">Administrador</option>
+                  <option value="comite">Comité Académico</option>
+                </select>
+              </div>
+              <div class="col-md-5">
+                <button type="button" class="btn btn-dark" id="guardar_rol_docente">Guardar rol</button>
+              </div>
+            </div>
+            <div class="alert mt-2 mb-0 d-none" id="mensaje_rol_docente" role="alert"></div>
+          </td>
+          </tr>`;
+        }
         template+=`<tr>
         <td class="col-4">Linea(s) de Investigación</td>
         <td class="col-8">
@@ -142,8 +170,22 @@ function cargarFichaDoc(id_usu) {
         });
         template+=`</ul></td></tr>`
       $("#datos_fichadoc").html(template);
+      if (respuesta.puede_gestionar_rol) {
+        if (["none", "admin", "comite"].includes(respuesta.rol_administrativo)) {
+          $("#rol_admin_docente").val(respuesta.rol_administrativo);
+        } else {
+          $("#rol_admin_docente, #guardar_rol_docente").prop("disabled", true);
+          $("#mensaje_rol_docente")
+            .removeClass("d-none alert-success")
+            .addClass("alert-danger")
+            .text("El estado actual de permisos requiere revisión técnica.");
+        }
+      }
     },
   });
+  if (!fichaCargada) {
+    return;
+  }
   $("#ant_acad_doc").html('')
   $("#ant_acad_doc").append(
     '<div class="row m-2"><div class="col-md-4 m-0 p-2 ps-0 ms-0 mt-2 "><h4 class="text-left m-0 p-0">ANTECEDENTES ACADÉMICOS</h4></div><div class="col-md-8 m-0 p-2"><h4><button type="button" class="btn btn-dark btn-sm text-center " id="agrAcadDoc">Agregar Datos Académicos</button></h4></div></div>'
@@ -164,41 +206,69 @@ function cargarFichaDoc(id_usu) {
   cargarTesis($("#info_doc").attr("name"), "#ficha_tesis");
   $('.titulo_acad').html('')
 }
-function cargarDocentes(tipo, busqueda) {
-  op =
-    tipo == 0
+function cargarDocentes(tipo, busqueda, estado) {
+  const tipoFiltro = tipo === undefined ? Number($("#tipo_doc").val()) : Number(tipo);
+  const estadoFiltro = estado === undefined ? Number($("#estado_profesor_filtro").val()) : Number(estado);
+  const op =
+    tipoFiltro == 0
       ? "read-doc"
-      : tipo == 1 || tipo == 2 || tipo == 3
+      : tipoFiltro == 1 || tipoFiltro == 2 || tipoFiltro == 3
       ? "read-filtrada"
-      : "read_prof";
+      : "read-doc-search";
   $.ajax({
     async: false,
     url: "../ajax/docente.php",
     type: "POST",
-    data: { op, tipo, busqueda },
-    success: function (response) {
+    data: { op, tipo: tipoFiltro, busqueda, estado: estadoFiltro },
+    success: function (response, textStatus, xhr) {
       let docentes = JSON.parse(response);
-      let template;
+      let template = "";
+      const puedeEliminar = xhr.getResponseHeader("X-Puede-Eliminar-Docente") === "1";
+      if (!puedeEliminar) {
+        $("#table_doc").closest("table").find("thead th").filter(function () {
+          return $(this).text().trim() === "Eliminar";
+        }).remove();
+      }
       if (docentes.length > 0) {
         docentes.forEach((doc) => {
-          nombre =
+          const nombre =
             cadenaMay(doc["nombres"]) +
             " " +
             letraMay(doc["ap_pat"]) +
             " " +
             letraMay(doc["ap_mat"]);
-          vinculo =
+          const vinculo =
             doc["vinculo"] == 1
               ? "Claustro"
               : doc["vinculo"] == 2
               ? "Visitante"
               : "Colaborador(a)";
+          const estadoProfesor = Number(doc["estado_profesor"]);
+          const etiquetaEstado = estadoProfesor === 1
+            ? "Pendiente"
+            : estadoProfesor === 2
+            ? "Aceptado"
+            : estadoProfesor === 3
+            ? "Rechazado"
+            : "Invalido";
+          let accionesEstado = "";
+          if (estadoProfesor === 1) {
+            accionesEstado = `<button type="button" class="btn btn-outline-success btn-sm cambiarEstadoProfesor" data-login="${doc["id_login"]}" data-estado="2">Aceptar</button>
+              <button type="button" class="btn btn-outline-danger btn-sm cambiarEstadoProfesor" data-login="${doc["id_login"]}" data-estado="3">Rechazar</button>`;
+          } else if (estadoProfesor === 3) {
+            accionesEstado = `<button type="button" class="btn btn-outline-success btn-sm cambiarEstadoProfesor" data-login="${doc["id_login"]}" data-estado="2">Aceptar</button>`;
+          }
+          const accionEliminar = puedeEliminar
+            ? `<td class="text-center"><button type="button" class="btn btn-outline-danger btn-sm eliminarDoc text-center" id="${doc["id_login"]}" ><i class="fa-solid fa-trash-can"></i></button></td>`
+            : "";
           template += `<tr>
                         <td >${nombre}</td>
                         <td>${vinculo}</td>
+                        <td>${etiquetaEstado}</td>
+                        <td class="text-center">${accionesEstado}</td>
                         <td class="text-center"><button type="button" class="btn btn-outline-success btn-sm  text-center" id="${doc["id_usuario"]}"><i class="fa-solid fa-eye"></i></button></td>
                         <td class="text-center"><button type="button" class="btn btn-outline-success btn-sm verFicha text-center" id="${doc["id_usuario"]}"><i class="fa-solid fa-eye"></i></button></td>
-                        <td class="text-center"><button type="button" class="btn btn-outline-danger btn-sm eliminarDoc text-center" id="${doc["id_login"]}" ><i class="fa-solid fa-trash-can"></i></button></td>
+                        ${accionEliminar}
                         </tr>
                         `;
         });
@@ -222,19 +292,54 @@ function listaDoc() {
   $("#edit_acad_doc").fadeOut();
 }
 // filtrar docentes x categoria
-$(document).on("change", "#tipo_doc", function () {
-  cargarDocentes($("#tipo_doc").val());
+$(document).on("change", "#tipo_doc, #estado_profesor_filtro", function () {
+  cargarDocentes($("#tipo_doc").val(), undefined, $("#estado_profesor_filtro").val());
 });
 
 // buscar docentes con el nombre
 $("#buscar_doc").keyup(function () {
   busqueda = $("#buscar_doc").val();
   if (busqueda !== "") {
-    cargarDocentes(4, busqueda);
+    cargarDocentes(4, busqueda, $("#estado_profesor_filtro").val());
     $("#tipo_doc").val(0);
   } else {
-    cargarDocentes($("#tipo_doc").val());
+    cargarDocentes($("#tipo_doc").val(), undefined, $("#estado_profesor_filtro").val());
   }
+});
+$("body").on("click", ".cambiarEstadoProfesor", function () {
+  const id_login = Number($(this).data("login"));
+  const estado_objetivo = Number($(this).data("estado"));
+  const mensaje = $("#mensaje_estado_docente");
+  if (!Number.isInteger(id_login) || id_login < 1 || ![2, 3].includes(estado_objetivo)) {
+    mensaje.removeClass("d-none alert-success").addClass("alert-danger").text("No fue posible validar la transicion solicitada.");
+    return;
+  }
+  const accion = estado_objetivo === 2 ? "aceptar" : "rechazar";
+  if (!window.confirm(`¿Desea ${accion} esta solicitud de Profesor?`)) {
+    return;
+  }
+  $.ajax({
+    url: "../ajax/docente.php",
+    type: "POST",
+    dataType: "json",
+    data: { op: "update-estado-profesor", id_login, estado_objetivo },
+    success: function (respuesta) {
+      if (!respuesta || respuesta.ok !== true) {
+        mensaje.removeClass("d-none alert-success").addClass("alert-danger").text(
+          respuesta && respuesta.mensaje ? respuesta.mensaje : "No fue posible actualizar el estado del Profesor."
+        );
+        return;
+      }
+      mensaje.removeClass("d-none alert-danger").addClass("alert-success").text(respuesta.mensaje);
+      cargarDocentes($("#tipo_doc").val(), undefined, $("#estado_profesor_filtro").val());
+    },
+    error: function (xhr) {
+      const texto = xhr.responseJSON && xhr.responseJSON.mensaje
+        ? xhr.responseJSON.mensaje
+        : "No fue posible actualizar el estado del Profesor.";
+      mensaje.removeClass("d-none alert-success").addClass("alert-danger").text(texto);
+    },
+  });
 });
 //boton ver ficha academica
 $("body").on("click", ".verFicha", function () {
@@ -248,6 +353,34 @@ $("body").on("click", ".verFicha", function () {
   $('#campos_congreso').html('')
   $('#campos_pasantia').html('')
   $('#campos_tesis').html('')
+});
+$("body").on("click", "#guardar_rol_docente", function () {
+  const id_login = Number($("#login").attr("name"));
+  const rol_admin = $("#rol_admin_docente").val();
+  const mensaje = $("#mensaje_rol_docente");
+  if (!Number.isInteger(id_login) || id_login < 1) {
+    mensaje.removeClass("d-none alert-success").addClass("alert-danger").text("No fue posible validar el Profesor.");
+    return;
+  }
+  $.ajax({
+    url: "../ajax/docente.php",
+    type: "POST",
+    dataType: "json",
+    data: { op: "update-rol-admin", id_login, rol_admin },
+    success: function (respuesta) {
+      if (respuesta.ok !== true) {
+        mensaje.removeClass("d-none alert-success").addClass("alert-danger").text(respuesta.mensaje || "No fue posible actualizar el rol.");
+        return;
+      }
+      mensaje.removeClass("d-none alert-danger").addClass("alert-success").text(respuesta.mensaje);
+    },
+    error: function (xhr) {
+      const texto = xhr.responseJSON && xhr.responseJSON.mensaje
+        ? xhr.responseJSON.mensaje
+        : "No fue posible actualizar el rol.";
+      mensaje.removeClass("d-none alert-success").addClass("alert-danger").text(texto);
+    },
+  });
 });
 $("body").on("click", ".eliminarDoc", function () {
   const id_login = $(this).attr("id");
@@ -269,7 +402,7 @@ $("body").on("click", ".eliminarDoc", function () {
       $("#mnsj_elim").show();
       $("#eliminado").removeClass("alert-danger").addClass("alert-success");
       $("#eliminado").text(response.mensaje);
-      cargarDocentes();
+      cargarDocentes($("#tipo_doc").val(), undefined, $("#estado_profesor_filtro").val());
       setTimeout(function () {
         $("#mnsj_elim").fadeOut(1500);
       }, 3000);
@@ -294,7 +427,7 @@ $("body").on("click", ".eliminarDoc", function () {
 function init() {
   listaDoc();
   $('#lista_doc').attr('name','true')
-  cargarDocentes($("#tipo_doc").val());
+  cargarDocentes($("#tipo_doc").val(), undefined, $("#estado_profesor_filtro").val());
   const idUsuario=new URLSearchParams(window.location.search).get('id_usuario');
   if(idUsuario && /^[1-9]\d*$/.test(idUsuario)){
     fichaDoc();

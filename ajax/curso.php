@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../src/bootstrap/app.php';
 use App\Model\Curso;
+use App\Security\Authorization;
 require 'validaciones.php';
 
 if (strlen(session_id()) < 1) {
@@ -11,10 +12,10 @@ function capacidadCursoPermitida($capacidad) {
         // Las capacidades se distinguen aquí, pero conservan las mismas claves
         // históricas hasta que exista una política funcional aprobada.
         $permisosActuales = array(
-                'visualizacion' => array('admin', 'comite', 'aceptado', 'docente'),
-                'creacion' => array('admin', 'comite', 'aceptado', 'docente'),
-                'actualizacion' => array('admin', 'comite', 'aceptado', 'docente'),
-                'eliminacion' => array('admin', 'comite', 'aceptado', 'docente')
+                'visualizacion' => array('admin', 'comite', 'aceptado'),
+                'creacion' => array('admin', 'comite', 'aceptado'),
+                'actualizacion' => array('admin', 'comite', 'aceptado'),
+                'eliminacion' => array('admin', 'comite', 'aceptado')
         );
 
         if (!isset($permisosActuales[$capacidad])) {
@@ -25,6 +26,10 @@ function capacidadCursoPermitida($capacidad) {
                 if (isset($_SESSION[$permiso])) {
                         return true;
                 }
+        }
+
+        if (Authorization::hasCapability('docente.habilitado')) {
+                return true;
         }
 
         return false;

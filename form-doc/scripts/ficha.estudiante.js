@@ -111,12 +111,19 @@ function llenarFormProgEst(id_usu) {
             $.ajax({
                 url: "../ajax/estudiante.php",
                 type: "POST",
-                data: { op: "read_nom_prof", id_usu_prof: usu[0]['prof_guia'] },
+                dataType: "json",
+                data: { op: "read_nom_prof", id_estudiante: usu[0]['id_usuario'] },
                 success: function (response) {
-                    let prof = JSON.parse(response);
+                    if (!response.ok || !response.datos || response.datos.length !== 1) {
+                        return;
+                    }
+                    let prof = response.datos;
                     let nombre = prof[0]['nombres'] + ' ' + prof[0]['ap_pat'] + ' ' + prof[0]['ap_mat']
                     $('#prof_guia').val(cadenaMay(nombre));
                     $('#prof_guia').attr('name', prof[0]['id_usuario']);
+                },
+                error: function () {
+                    console.error('No fue posible cargar el profesor guía del Estudiante.');
                 }
             });
 

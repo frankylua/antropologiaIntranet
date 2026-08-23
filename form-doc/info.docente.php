@@ -4,7 +4,7 @@ ob_start();
 if (strlen(session_id()) < 1) {
     session_start();//Validamos si existe o no la sesión
 }
-if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSION['docente'])) {
+if (!isset($_SESSION['docente'])) {
     header('Location:../index.php');
 } else {
     require ('header.php');
@@ -21,6 +21,7 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSIO
     <?php
     require 'footer.php';
     ?>
+    <script>window.contextoDocenteTercero = false;</script>
     <script src="scripts/ficha.docente.js"></script>
     <script src="scripts/info.docente.js"></script>
     <?php

@@ -25,6 +25,66 @@ function limpiarClickProf(){
     $('#vinculo').click(function(){limpiarSelect('#vinculo');})
     $('.linea-inv').click(function(){$('.linea-inv').removeClass('is-invalid');})    
 }
+function obtenerContextoAltaProfesor(){
+    return $.ajax({
+        url:'../ajax/docente.php',
+        type:'POST',
+        dataType:'json',
+        data:{op:'contexto_autoalta'}
+    });
+}
+function mostrarErrorAltaProfesor(mensaje){
+    $('#mnsj_row_prog_doc').show();
+    $('#mnsj_prog_doc').removeClass('alert-success').addClass('alert-danger');
+    $('#mnsj_prog_doc').text(mensaje);
+}
+function enviarAltaProfesor(usuario,esTransicion,contexto){
+    usuario.op=esTransicion?'agregar-docencia':'insert-update';
+    if(contexto.autoalta===true){
+        usuario.token_autoalta=contexto.token;
+    }
+    $.ajax({
+        url:'../ajax/docente.php',
+        type:'POST',
+        dataType:'json',
+        data:usuario,
+        success:function(respuesta){
+            if(!respuesta || respuesta.ok!==true){
+                mostrarErrorAltaProfesor(
+                    respuesta&&respuesta.mensaje
+                        ? respuesta.mensaje
+                        : (esTransicion?'No fue posible agregar Docencia.':'No fue posible guardar el perfil Docente.')
+                );
+                return;
+            }
+            $('#id_usuario').attr('name',respuesta.id_usuario);
+            $('#mnsj_row_prog_doc').show();
+            $('#mnsj_prog_doc').removeClass('alert-danger').addClass('alert-success');
+            $('#mnsj_prog_doc').text(respuesta.mensaje);
+            setTimeout(function(){
+                if(contexto.autoalta===true){
+                    window.location.href='../index.php';
+                    return;
+                }
+                $('#mnsj_row_prog_prof').fadeOut(1500);
+                AntecAcad();
+            },3000);
+        },
+        error:function(xhr){
+            let mensaje='No fue posible guardar el perfil Docente.';
+            if(xhr.responseJSON&&xhr.responseJSON.mensaje){
+                mensaje=xhr.responseJSON.mensaje;
+            }else{
+                try{
+                    const respuesta=JSON.parse(xhr.responseText);
+                    mensaje=respuesta.mensaje||mensaje;
+                }catch(error){
+                }
+            }
+            mostrarErrorAltaProfesor(mensaje);
+        }
+    });
+}
 function init(){
     infoPers();
     //AntecAcad();
@@ -52,64 +112,31 @@ $('#form_usuario').submit(function(e){
     if(valAcadProf(profProg['lineaInv'])){
         const nuevo_inst=$('#inst_unid_trabajo').val()==='otro';
         if(nuevo_inst){
-            if(esTransicion){
-                usuario.nueva_institucion=profProg.instTrab;
-                profProg.instTrab=0;
-            }else{
-                const altaInstitucion=crearInstitucionContextual(profProg['instTrab'],0,'registro');
-                if(!altaInstitucion.ok){
-                    mostrarErrorInstitucionContextual('#mnsj_row_prog_doc','#mnsj_prog_doc',altaInstitucion);
-                    return;
-                }
-                $('#id_inst_doc').attr('name',altaInstitucion.id);
-            }
+            usuario.nueva_institucion=profProg.instTrab;
+            profProg.instTrab=0;
         }
-        if(!esTransicion || !nuevo_inst){
+        if(!nuevo_inst){
             profProg['instTrab']=$('#id_inst_doc').attr('name')==0?profProg['instTrab']:$('#id_inst_doc').attr('name');
         }
         jQuery.extend(usuario,profProg);
-        usuario.op=esTransicion?'agregar-docencia':'insert-update';
-        $.ajax({
-            url:'../ajax/docente.php',
-            type:'POST',
-            dataType:'json',
-            data:usuario,
-            success:function(respuesta){
-                if(!respuesta || respuesta.ok!==true){
-                    $('#mnsj_row_prog_doc').show();
-                    $('#mnsj_prog_doc').removeClass('alert-success').addClass('alert-danger');
-                    $('#mnsj_prog_doc').text(
-                        respuesta&&respuesta.mensaje
-                            ? respuesta.mensaje
-                            : (esTransicion?'No fue posible agregar Docencia.':'No fue posible guardar el perfil Docente.')
-                    );
+        if(esTransicion){
+            enviarAltaProfesor(usuario,true,{autoalta:false,token:''});
+            return;
+        }
+        obtenerContextoAltaProfesor()
+            .done(function(contexto){
+                if(!contexto || contexto.ok!==true){
+                    mostrarErrorAltaProfesor('No fue posible validar el contexto de alta Docente.');
                     return;
                 }
-                $('#id_usuario').attr('name',respuesta.id_usuario);
-                $('#mnsj_row_prog_doc').show();
-                $('#mnsj_prog_doc').removeClass('alert-danger').addClass('alert-success');
-                $('#mnsj_prog_doc').text(respuesta.mensaje);
-                setTimeout(function(){
-                    $('#mnsj_row_prog_prof').fadeOut(1500);
-                    AntecAcad();
-                },3000);
-            },
-            error:function(xhr){
-                let mensaje='No fue posible guardar el perfil Docente.';
-                if(xhr.responseJSON&&xhr.responseJSON.mensaje){
-                    mensaje=xhr.responseJSON.mensaje;
-                }else{
-                    try{
-                        const respuesta=JSON.parse(xhr.responseText);
-                        mensaje=respuesta.mensaje||mensaje;
-                    }catch(error){
-                    }
-                }
-                $('#mnsj_row_prog_doc').show();
-                $('#mnsj_prog_doc').removeClass('alert-success').addClass('alert-danger');
-                $('#mnsj_prog_doc').text(mensaje);
-            }
-        });
+                enviarAltaProfesor(usuario,false,contexto);
+            })
+            .fail(function(xhr){
+                const mensaje=xhr.responseJSON&&xhr.responseJSON.mensaje
+                    ? xhr.responseJSON.mensaje
+                    : 'No fue posible validar el contexto de alta Docente.';
+                mostrarErrorAltaProfesor(mensaje);
+            });
     }
 })
 init()

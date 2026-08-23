@@ -1,4 +1,27 @@
 <?php
+require_once __DIR__ . '/../src/bootstrap/session.php';
+if (session_status() !== PHP_SESSION_ACTIVE) {
+  session_start();
+}
+$altaAdministrativa = isset($_SESSION['admin']) || isset($_SESSION['comite']);
+$actorAutenticado = false;
+foreach (['login', 'admin', 'comite', 'docente', 'estudiante', 'aceptado'] as $claveSesion) {
+  if (isset($_SESSION[$claveSesion])) {
+    $actorAutenticado = true;
+    break;
+  }
+}
+if (!$altaAdministrativa && $actorAutenticado) {
+  http_response_code(403);
+  header('Location: ../index.php');
+  exit;
+}
+if (!$altaAdministrativa) {
+  $_SESSION['autoalta_profesor'] = [
+    'token' => bin2hex(random_bytes(32)),
+    'emitido' => time(),
+  ];
+}
 require ('datos.pers.php');
 ?>
 <div class="container mt-5">

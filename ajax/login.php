@@ -87,7 +87,8 @@ function isValidAuthContext(
     array $authContext,
     array $permissions,
     int $loginId,
-    bool $shouldGrantRegulations
+    bool $shouldGrantRegulations,
+    ?int $professorState
 ): bool {
     $roleByPermission = [
         1 => 'admin',
@@ -104,6 +105,7 @@ function isValidAuthContext(
         'docente',
         'estudiante',
         'id_usuario',
+        'estado_profesor',
         'capacidades',
     ];
 
@@ -150,7 +152,7 @@ function isValidAuthContext(
         return false;
     }
     foreach ($capabilities as $capability) {
-        if (!is_string($capability) || !in_array($capability, ['perfil.ver', 'reglamento.ver'], true)) {
+        if (!is_string($capability) || !in_array($capability, ['perfil.ver', 'reglamento.ver', 'docente.habilitado'], true)) {
             return false;
         }
     }
@@ -158,6 +160,18 @@ function isValidAuthContext(
     if (
         in_array('perfil.ver', $capabilities, true) !== in_array(5, $permissionIds, true)
         || in_array('reglamento.ver', $capabilities, true) !== $shouldGrantRegulations
+        || in_array('docente.habilitado', $capabilities, true) !== ($professorState === 2)
+    ) {
+        return false;
+    }
+
+    $hasProfessorPermission = in_array(4, $permissionIds, true);
+    if ($hasProfessorPermission !== array_key_exists('estado_profesor', $authContext)) {
+        return false;
+    }
+    if (
+        $hasProfessorPermission
+        && (!in_array($professorState, [1, 2, 3], true) || $authContext['estado_profesor'] !== $professorState)
     ) {
         return false;
     }
@@ -270,6 +284,26 @@ try {
         error_log('AUTHORIZATION_STATE_AMBIGUOUS');
     }
 
+    $professorState = null;
+    if (isset($authContext['docente'])) {
+        $professorStates = $login->obtenerEstadosProfesorPorLogin($loginId);
+        if (
+            count($professorStates) !== 1
+            || !isset($professorStates[0]['estado_profesor'])
+            || !is_scalar($professorStates[0]['estado_profesor'])
+        ) {
+            throw new \UnexpectedValueException('AUTH_CONTEXT_PROFESSOR_STATE_AMBIGUOUS');
+        }
+        $professorState = (int) $professorStates[0]['estado_profesor'];
+        if (!in_array($professorState, [1, 2, 3], true)) {
+            throw new \UnexpectedValueException('AUTH_CONTEXT_PROFESSOR_STATE_INVALID');
+        }
+        $authContext['estado_profesor'] = $professorState;
+        if ($professorState === 2) {
+            $capabilities['docente.habilitado'] = true;
+        }
+    }
+
     $authContext['capacidades'] = array_values(array_keys($capabilities));
 
     if (isset($authContext['docente']) || isset($authContext['estudiante'])) {
@@ -286,7 +320,7 @@ try {
         $authContext['id_usuario'] = $userRows;
     }
 
-    if (!isValidAuthContext($authContext, $permissions, $loginId, $shouldGrantRegulations)) {
+    if (!isValidAuthContext($authContext, $permissions, $loginId, $shouldGrantRegulations, $professorState)) {
         throw new \UnexpectedValueException('AUTH_CONTEXT_VALIDATION_FAILED');
     }
 
@@ -298,6 +332,7 @@ try {
         'docente',
         'estudiante',
         'id_usuario',
+        'estado_profesor',
         'capacidades',
     ];
     $sessionWithoutAuthContext = array_diff_key($_SESSION, array_fill_keys($managedKeys, true));

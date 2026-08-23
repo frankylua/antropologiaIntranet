@@ -1,10 +1,13 @@
 <?php
+use App\Security\Authorization;
+
 require_once __DIR__ . '/../src/bootstrap/session.php';
+require_once __DIR__ . '/../src/bootstrap/app.php';
 ob_start();
 if (strlen(session_id()) < 1) {
   session_start();//Validamos si existe o no la sesión
 }
-if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSION['aceptado']) && !isset($_SESSION['docente'])) {
+if (!isset($_SESSION['admin']) && !isset($_SESSION['comite']) && !isset($_SESSION['aceptado']) && !Authorization::hasCapability('docente.habilitado')) {
   header('Location:../index.php');
 } else {
   require ('header.php');

@@ -1,4 +1,30 @@
 otroCampo('otro_instit','#otra_inst','#inst_unid','Institucion/Unidad Académica'); 
+let tokenAutoaltaEstudianteCache;
+function tokenAutoaltaEstudiante(){
+    if(tokenAutoaltaEstudianteCache!==undefined){
+        return tokenAutoaltaEstudianteCache;
+    }
+    tokenAutoaltaEstudianteCache='';
+    $.ajax({
+        url:'../ajax/estudiante.php',
+        type:'POST',
+        dataType:'json',
+        async:false,
+        data:{op:'contexto_autoalta'},
+        success:function(respuesta){
+            if(respuesta&&respuesta.ok===true&&respuesta.autoalta===true){
+                tokenAutoaltaEstudianteCache=respuesta.token;
+            }
+        }
+    });
+    return tokenAutoaltaEstudianteCache;
+}
+function mostrarErrorCreateEstudiante(mensaje){
+    $('#mnsj_row_acad_est').show();
+    $('#mnsj_acad_est').removeClass('alert-success');
+    $('#mnsj_acad_est').addClass('alert-danger');
+    $('#mnsj_acad_est').html(mensaje||'No fue posible guardar el estudiante.');
+}
 // datos estudiante 
 $('#volver_acad').click(function(){
     infoPers();
@@ -20,10 +46,13 @@ $('#prof_guia').keyup(function(){
     $('#list_prof').hide();
     busqueda=$('#prof_guia').val();
     if(busqueda!==''){       
+        const tokenAutoalta=tokenAutoaltaEstudiante();
         $.ajax({
-            url: '../ajax/docente.php',
+            url: tokenAutoalta ? '../ajax/estudiante.php' : '../ajax/docente.php',
             type: 'POST',
-            data: {op:'read_prof',busqueda},
+            data: tokenAutoalta
+                ? {op:'read_prof_autoalta',busqueda,autoalta_token:tokenAutoalta}
+                : {op:'read_prof',busqueda},
             success: function(response){
             let profes = JSON.parse(response);
             let template ='';
@@ -148,22 +177,44 @@ $('#form_usuario').submit(function(e){
         op='insert-update';
         // nota: para editar datos personales ocultar botones de validacion y aparecer submit del form
         let usuAcad={inst,trabaja,orientacion,sit_ocup,fech_ing,fech_grad,tipo_est,id_login,promedio,op,profesor,lineaInv,permisos}
+        const tokenAutoalta=tokenAutoaltaEstudiante();
+        if(tokenAutoalta){
+            usuAcad.autoalta_token=tokenAutoalta;
+        }
         jQuery.extend(usuario,usuAcad);
         console.log('usuario:')
         console.log(usuario)
-        $.post('../ajax/estudiante.php',usuario,function(response){
-            console.log(response)
-            let dato = JSON.parse(response);
-            $('#id_usuario').attr('name',dato[1]);
-            $('#mnsj_row_acad_est').show();
-            $('#mnsj_acad_est').removeClass('alert-danger');
-            $('#mnsj_acad_est').addClass('alert-success');
-            $('#mnsj_acad_est').html(dato[0]);
-            setTimeout(function() {
-                $("#mnsj_row_acad_est").fadeOut(1500);
-                AntecAcad();
-            },3000);
-        })   
+        $.ajax({
+            url:'../ajax/estudiante.php',
+            type:'POST',
+            dataType:'json',
+            data:usuario,
+            success:function(respuesta){
+                if(!respuesta||respuesta.ok!==true){
+                    mostrarErrorCreateEstudiante(respuesta&&respuesta.mensaje);
+                    return;
+                }
+                $('#id_usuario').attr('name',respuesta.id_usuario);
+                $('#mnsj_row_acad_est').show();
+                $('#mnsj_acad_est').removeClass('alert-danger');
+                $('#mnsj_acad_est').addClass('alert-success');
+                $('#mnsj_acad_est').html(respuesta.mensaje);
+                setTimeout(function() {
+                    $('#mnsj_row_acad_est').fadeOut(1500);
+                    if(tokenAutoalta){
+                        location.href='../index.php';
+                    }else{
+                        AntecAcad();
+                    }
+                },3000);
+            },
+            error:function(xhr){
+                const mensaje=xhr.responseJSON&&xhr.responseJSON.mensaje
+                    ? xhr.responseJSON.mensaje
+                    : 'No fue posible guardar el estudiante.';
+                mostrarErrorCreateEstudiante(mensaje);
+            }
+        });
 
     }
     //if(editado){

@@ -1,4 +1,29 @@
 <?php
+require_once __DIR__ . '/../src/bootstrap/session.php';
+if (session_status() !== PHP_SESSION_ACTIVE) {
+  session_start();
+}
+$esAltaAdministrativa = isset($_SESSION['admin']) || isset($_SESSION['comite']);
+$hayActorAutenticado = isset($_SESSION['login'])
+  || isset($_SESSION['admin'])
+  || isset($_SESSION['comite'])
+  || isset($_SESSION['docente'])
+  || isset($_SESSION['estudiante'])
+  || isset($_SESSION['aceptado']);
+$tokenAutoaltaEstudiante = '';
+
+if (!$esAltaAdministrativa && $hayActorAutenticado) {
+  http_response_code(403);
+  header('Location: ../index.php');
+  exit;
+}
+if (!$esAltaAdministrativa) {
+  $tokenAutoaltaEstudiante = bin2hex(random_bytes(32));
+  $_SESSION['autoalta_estudiante'] = [
+    'token' => $tokenAutoaltaEstudiante,
+    'emitido' => time(),
+  ];
+}
 
 
 //las variables de los datos de usuario

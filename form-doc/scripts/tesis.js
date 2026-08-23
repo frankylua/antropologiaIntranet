@@ -392,7 +392,7 @@ $(document).on('change', '#rol_tesis', function () {
     busqueda = $('#prof_tesis').val();
     if (busqueda !== '') {
       $.ajax({
-        url: '../ajax/tesis.php',
+        url: '../ajax/docente.php',
         type: 'POST',
         data: { op: 'read_prof', busqueda },
         success: function (response) {
