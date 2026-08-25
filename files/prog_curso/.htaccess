@@ -1,0 +1,7 @@
+Options -Indexes -ExecCGI
+Require all denied
+
+<IfModule mod_mime.c>
+    RemoveHandler .php .phtml .phar .cgi .pl .py
+    RemoveType .php .phtml .phar .cgi .pl .py
+</IfModule>

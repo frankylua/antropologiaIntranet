@@ -1,355 +1,504 @@
+(function ($) {
+  "use strict";
 
-function mostrarCurso(){
-    $.ajax({
-        url:'../ajax/curso.php',
-        type: 'POST',
-        data: {op:'read'},
-        success: function(response){ 
-         let listas = JSON.parse(response);      
-        let template ='';
-        listas.forEach(list => {
-        template += `
-        <tr>
-        <td >${cadenaMay(list['nom_curso'])}</td>
-        <td>${list['periodo']==1?'I Semestre':list['periodo']==2?'II Semestre':'III Semestre'}</td>
-        <td >${list['anio_curso']}</td>
-        <td class="text-center"><button type="button" class="btn btn-link link-success btn-sm verCurso text-center" data-capacidad="visualizacion" id="${list[0]}">Ver</button></td>
-        <td class="text-center"><button type="button" class="btn btn-link link-danger btn-sm eliminarCurso" data-capacidad="eliminacion" id="${list[0]}" >Eliminar</button></td>
-        </tr>
-        
-        `});
-      $('#datos_curso').html(template);
+  const endpointCurso = "../ajax/curso.php";
+  const endpointProfesor = "../ajax/docente.php";
+  const maxPdfBytes = 5 * 1024 * 1024;
+  const $app = $("#curso_app");
+  const puedeCrear = $app.data("puede-crear") === 1;
+  const seleccionaProfesor = $app.data("selecciona-profesor") === 1;
+  const csrfToken = $("meta[name='csrf-curso']").attr("content") || "";
+
+  let cursoActual = null;
+  let mutacionActiva = false;
+  let deleteActivo = false;
+  let solicitudProfesores = null;
+  let temporizadorMensaje = null;
+
+  function mensajeDesdeError(xhr, fallback) {
+    if (xhr && xhr.responseJSON && typeof xhr.responseJSON.mensaje === "string") {
+      return xhr.responseJSON.mensaje;
     }
-  })
-}    
-function  mensajeError(mensaje){
-$('#mnsj_row').show();
-$('#mnsj').addClass('alert-danger');
-$('#mnsj').html(mensaje);
-}
-// dejar input vacios
-function limpiar(){
-    $('#creditos').val('');
-    $('#docente_curso').val('');
-    $('#car_hor').val('');
-    $('#id_curso').val('');
-    $('#nom_curso').val(0);
-    $('#caracter').val(0);
-    $('#periodo').val(0);
-    $('#anio_curso').val(0);
-    $('#prog_curso').val('');
-}
-function limpiarValidacion(){
-limpiarSelect('#nom_curso');
-limpiarInput('#creditos');
-limpiarInput('#docente_curso');
-limpiarInput('#car_hor');
-limpiarSelect('#caracter');
-limpiarSelect('#periodo');
-limpiarSelect('#anio_curso');
-}
-function mostrarform(flag){
-if (flag)
-{
-    limpiarValidacion();
-    // $("#btn_cambiar_pass").hide();
-    // $("#box-pass").show();
-    $("#list_curso").hide();
-    $("#form_curso").show();
-    // $("#btnGuardar").prop("disabled",false);
-    $(".titulo_curso").hide();
-    }
-    else
-    {
-    $("#list_curso").show();
-    $("#form_curso").hide();
-    $(".titulo_curso").show();
-    }
-}
-function cancelarform(){
-    mostrarform(false);
-    //limpiar();
-}
-function detalleCurso(flag){
-    if(flag){
-        mostrarform(false);
-        $('#list_curso').hide();
-        $('#det_curso').show();
-    }else{
-        $('#det_curso').hide();  
-    }
-
-}
-//ir a formulario ingreso
-$('#btn-agr-curso').click(function(){
-    mostrarform(true);
-})
-// ir a tabla cursos
-$('#btn-ver-curso').click(function(){
-    cancelarform(true);
-    limpiar();
-})
-// ver detalle de curso por id
-$('.detalleCurso').click(function(){
-    cancelarform(true);
-    detalleCurso(false);
-})
-$('body').click(function(){
-    $('#mnsj_row').hide();
-})
-$('#form_curso').submit(function(e){
-    e.preventDefault();
-    let campos_llenos;
-    let mensaje='';
-    let nombre=$('#nom_curso').val();
-    let creditos=$('#creditos').val();
-    let docente=$('#docente_curso').attr('name');
-    let carga_hor=$('#car_hor').val();
-    let caracter=$('#caracter').val();
-    let periodo=$('#periodo').val();
-    let anio_curso=$('#anio_curso').val();
-    let prog_curso=$('#prog_curso')[0].files[0];   
-    let id_curso=$('#id_curso').val();
-    let editado=id_curso==0?false:true;
-    if(nombre==0||creditos==''||docente==0||car_hor==''||caracter==0 || periodo==0 || anio_curso==0||$('#prog_curso').val()==''){
-        if(editado){
-            limpiarValidacion()
-            $.ajax({
-            url:'../ajax/curso.php',
-            type: 'POST',
-            data: {op:'query_id',id_curso:id_curso},
-            async:false,
-            success: function(response){ 
-                let dato = JSON.parse(response);
-                nombre=nombre==0?dato['nombre_curso']:nombre;
-                creditos=creditos==''?dato['creditos']:creditos;
-                caracter=caracter==0?dato['caracter']:caracter;
-                periodo=periodo==0?dato['periodo']:periodo;
-                anio_curso=anio_curso==0?dato['anio_curso']:anio_curso;
-                carga_hor=carga_hor==''?dato['carga_hor']:carga_hor;
-                docente=docente==''?dato['profesor']:docente;
-                nombre=nombre==''?dato['nombre_curso']:nombre;
-                prog_curso=$('#prog_curso').val()==''?$('#prog_curso').attr('name'):dato['arch_prog'];
-            }
-            })
-        }else{
-            validSelect('#nom_curso');
-            validCampoVacio('#creditos');
-            validCampoVacio('#docente_curso');
-            validSelect('#caracter');
-            validSelect('#periodo');
-            validSelect('#anio_curso');
-            mensajeError('<p>Por favor rellene todos los campos requeridos</p>');
-            campos_llenos=false;
-        }           
-    }else{
-        //console.log('extencion de archivo....'+prog_curso.type)
-        if($('#prog_curso').val()!=''){
-            if(prog_curso.type == "application/pdf"){
-                campos_llenos=true;
-            }else{
-                $('#prog_curso').removeClass('is-valid');
-                $('#prog_curso').addClass('is-invalid');
-                mensajeError('<p>Suba un archivo con extención .pdf</p>')
-                campos_llenos=false;
-            }
-        }
-    }
-    //limpiar campos
-    $('#nom_curso').click(function(){limpiarSelect('#nom_curso')});
-    $('#creditos').click(function(){limpiarInput('#creditos')});
-    $('#docente_curso').click(function(){limpiarInput('#docente_curso')});
-    $('#car_hor').click(function(){limpiarInput('#car_hor')});
-    $('#prog_curso').click(function(){limpiarInput('#prog_curso')});
-    $('#caracter').click(function(){limpiarSelect('#caracter')});
-    $('#periodo').click(function(){limpiarSelect('#periodo')});
-    $('#anio_curso').click(function(){limpiarSelect('#anio_curso')});
-
-    //valido los campos vacios
-    if((campos_llenos || editado)){
-        op=editado ? 'update' : 'create';
-        curso=new FormData();
-        curso.append('nombre',nombre);
-        curso.append('creditos',creditos);
-        curso.append('docente',docente);
-        curso.append('carga_hor',carga_hor);
-        curso.append('caracter',caracter);
-        curso.append('periodo',periodo);
-        curso.append('anio_curso',anio_curso);
-        curso.append('prog_curso',prog_curso); 
-        curso.append('id_curso',id_curso);
-        curso.append('op',op); 
-        curso.append('arch_actual',$('#prog_curso').attr('name'));    
-
-        $.ajax({
-            type: "POST",           
-            contentType: false,
-            processData: false,
-            data: curso,
-            url: "../ajax/curso.php",
-            success: function(response) {
-                mensaje=JSON.parse(response);
-                $('#mnsj_row').show();
-                $('#mnsj').removeClass('alert-danger');
-                $('#mnsj').addClass('alert-success');
-                $('#mnsj').html(mensaje);
-                setTimeout(function() {
-                    $("#mnsj_row").fadeOut(1500);
-                    cancelarform();
-                    mostrarCurso();
-                    limpiar();
-            },3000);
-            }
-        })
-    }  
-});
-//ver curso 
-$('body').on('click','.verCurso',function(){
-id_curso = $(this).attr('id');
-$.ajax({
-url:'../ajax/curso.php',
-type: 'POST',
-data: {id_curso,op:'query_id'},
-success: function(response){
-    let curso = JSON.parse(response); 
-    nombre=curso['nombres']+' '+curso['ap_pat']+' '+curso['ap_pat'];
-    nombre=cadenaMay(nombre);
-    $('#id_curso').attr('value',curso['id_curso']);
-    $('#nom').html(curso['nom_curso']);
-    $('#cred').html(curso['creditos']);
-    $('#car').html(curso['caracter']==1?'Obligatorio':'Seminario');
-    $('#per').html(curso['periodo']==1?'I Semestre':curso['periodo']==2?'II Semestre':'III Semestre');
-    $('#year').html(curso['anio_curso']);
-    $('#carg').html(curso['carga_hor']+'  horas cronológicas');
-    $('#prof').html(nombre);
-    $('#prog').html('<a href="../files/prog_curso/'+curso['arch_prog']+'" class="link-secondary" download="'+curso['arch_prog']+'">Descargar Programa</a>')
-    detalleCurso(true);
-}
-})
-})
-// editar curso
-$('body').on('click','#editar_curso',function(){
-    mostrarform(true);
-    detalleCurso(false);
-    id_curso = $('#id_curso').val();
-    $.ajax({
-    url:'../ajax/curso.php',
-    type: 'POST',
-    data: {id_curso:id_curso,op:'query_id'},
-    success: function(response){
-        let curso = JSON.parse(response); 
-        $('#id_curso').attr('value',curso['id_curso']);
-        $('#nom_curso').val(curso['id_nom_curso']);
-        $('#creditos').val(curso['creditos']);
-        $('#caracter').val(curso['caracter']);
-        $('#periodo').val(curso['periodo']);
-        $('#anio_curso').val(curso['anio_curso']);
-        $('#car_hor').val(curso['carga_hor']);
-        $('#docente').val(curso['profesor']);
-        $('#prog_curso').attr('name',curso['arch_prog'])
-       
-    }
-    })
-    })
-//eliminar curso
-$('body').on('click','.eliminarCurso',function(){
-id_curso = $(this).attr('id');
-$.ajax({
-    url:'../ajax/curso.php',
-    type: 'POST',
-    data: {id_curso,op:'delete'},
-    success: function(response){
-    let mensaje = JSON.parse(response);
-    $('#mnsj_elim').show();
-    $('#eliminado').addClass('alert-secondary');
-    $('#eliminado').html(mensaje);
-    mostrarCurso();
-    setTimeout(function() {
-        $("#mnsj_elim").fadeOut(1500);
-    },1000);
-    }
-})
-})
-
-$('#docente_curso').keyup(function(){    
-    $('#list_prof_curso').hide();
-    busqueda=$('#docente_curso').val();
-    if(busqueda!==''){       
-        $.ajax({
-            url: '../ajax/docente.php',
-            type: 'POST',
-            data: {op:'read_prof',busqueda},
-            success: function(response){
-            let profes_curso = JSON.parse(response);
-            let template ='';            
-            if(profes_curso=='' && $('#docente_curso').attr('name')==''){
-            template='<li class="list-group-item text-rosado">Ingrese un nombre válido</li>';                
-            }else{
-                $('#docente_curso').attr('name','');
-                profes_curso.forEach(list => {
-                prof=list[1]+' '+list[2]+' '+list[3];
-                prof=cadenaMay(prof);
-                template += `
-                
-                <li class='list-group-item listProfCurso' id='${list[0]}' name='${prof}'> ${prof}</li>`});
-
-            }  
-          $('#list_prof_curso').html(template);
-          $('#list_prof_curso').show();
-             }
-         })
-
-    }
-        
-
-})
-$('body').on('click','.listProfCurso',function(){
-    id=$(this).attr('id');
-    prof=$(this).attr('name');
-    $('#docente_curso').val(prof);
-    $('#docente_curso').attr('name',id);
-    $('#list_prof_curso').hide();
-
-})
-$('#creditos').keyup(function(){
-    car_hor=parseInt($('#creditos').val())*28;
-    $('#car_hor').val(car_hor);    
-})
-
-$('#creditos').click(function(){
-    car_hor=parseInt($('#creditos').val())*28;
-    $('#car_hor').val(car_hor);    
-})
-
-function init(){
-    $('#mnsj_row').hide();
-    $('#det_curso').hide();
-    mostrarform(false);
-    mostrarCurso();
-    $('.loadPage').fadeOut();
-    $('#mnsj_elim').hide();
-    ajaxSelect('#nom_curso','../ajax/curso.php','Seleccione','read_cursos');
-    anios('#anio_curso',2006);
-    $('#car_hor').prop('disabled',true)
-    
+    return fallback;
   }
-  init();
 
-    
-        
-        
-    
-    
-            
-        
-       
-        
-        
-        
-        
-        
-    
+  function mostrarMensaje(mensaje, tipo) {
+    const $contenedor = $("#mnsj_global");
+    const $mensaje = $("#mnsj");
+    if (temporizadorMensaje !== null) {
+      window.clearTimeout(temporizadorMensaje);
+      temporizadorMensaje = null;
+    }
+    $mensaje
+      .removeClass("alert-success alert-danger alert-secondary")
+      .addClass(tipo === "success" ? "alert-success" : "alert-danger")
+      .text(mensaje);
+    $contenedor.prop("hidden", false);
+    if (tipo === "success") {
+      temporizadorMensaje = window.setTimeout(ocultarMensaje, 3000);
+    }
+  }
 
+  function ocultarMensaje() {
+    if (temporizadorMensaje !== null) {
+      window.clearTimeout(temporizadorMensaje);
+      temporizadorMensaje = null;
+    }
+    $("#mnsj_global").prop("hidden", true);
+    $("#mnsj").text("");
+  }
 
+  function etiquetaPeriodo(periodo) {
+    if (periodo === 1) return "I Semestre";
+    if (periodo === 2) return "II Semestre";
+    if (periodo === 3) return "III Semestre";
+    return "Periodo no disponible";
+  }
 
+  function etiquetaCaracter(caracter) {
+    if (caracter === 1) return "Obligatorio";
+    if (caracter === 2) return "Seminario";
+    return "Carácter no disponible";
+  }
 
+  function mostrarListado() {
+    $("#list_curso").prop("hidden", false);
+    $("#form_curso_container").prop("hidden", true);
+    $("#det_curso").prop("hidden", true);
+  }
+
+  function mostrarFormulario() {
+    if (!puedeCrear || !$("#form_curso").length) return;
+    $("#list_curso").prop("hidden", true);
+    $("#det_curso").prop("hidden", true);
+    $("#form_curso_container").prop("hidden", false);
+  }
+
+  function mostrarDetalle() {
+    $("#list_curso").prop("hidden", true);
+    $("#form_curso_container").prop("hidden", true);
+    $("#det_curso").prop("hidden", false);
+  }
+
+  function limpiarFormulario() {
+    cursoActual = null;
+    $("#id_curso").val("0");
+    $("#nom_curso").val("0");
+    $("#creditos").val("");
+    $("#caracter").val("0");
+    $("#periodo").val("0");
+    $("#anio_curso").val("0");
+    $("#car_hor").val("");
+    $("#prog_curso").val("");
+    $("#estado_programa").text("El programa PDF es obligatorio al crear.");
+    $("#titulo_form_curso").text("INGRESAR CURSO");
+    if (seleccionaProfesor) {
+      $("#docente_curso").val("").removeData("id-usuario");
+      $("#list_prof_curso").empty().hide();
+    }
+  }
+
+  function cargarAnios() {
+    const $select = $("#anio_curso");
+    if (!$select.length) return;
+    $select.empty().append($("<option>", { value: "0" }).text("Seleccione"));
+    const anioActual = new Date().getFullYear();
+    for (let anio = anioActual; anio >= 2006; anio -= 1) {
+      $select.append($("<option>", { value: String(anio) }).text(String(anio)));
+    }
+  }
+
+  function cargarCatalogo() {
+    if (!$("#nom_curso").length) return;
+    $.ajax({
+      url: endpointCurso,
+      type: "POST",
+      dataType: "json",
+      data: { op: "read_cursos" },
+      success: function (response) {
+        if (!response || response.ok !== true || !Array.isArray(response.datos)) {
+          mostrarMensaje("No fue posible cargar el catálogo de Cursos.", "error");
+          return;
+        }
+        const $select = $("#nom_curso");
+        $select.empty().append($("<option>", { value: "0" }).text("Seleccione"));
+        response.datos.forEach(function (item) {
+          $select.append(
+            $("<option>", { value: String(item.id_nom_curso) }).text(item.nom_curso)
+          );
+        });
+      },
+      error: function (xhr) {
+        mostrarMensaje(mensajeDesdeError(xhr, "No fue posible cargar el catálogo de Cursos."), "error");
+      },
+    });
+  }
+
+  function botonAccion(texto, clase, idCurso) {
+    return $("<button>", {
+      type: "button",
+      class: clase,
+      "data-id-curso": String(idCurso),
+    }).text(texto);
+  }
+
+  function renderListado(cursos) {
+    const $tbody = $("#datos_curso").empty();
+    cursos.forEach(function (curso) {
+      const $fila = $("<tr>");
+      $fila.append($("<td>").text(curso.nom_curso));
+      $fila.append($("<td>").text(etiquetaPeriodo(curso.periodo)));
+      $fila.append($("<td>").text(String(curso.anio_curso)));
+      $fila.append(
+        $("<td>").append(
+          botonAccion("Ver", "btn btn-link link-success btn-sm verCurso", curso.id_curso)
+        )
+      );
+      const $acciones = $("<td>");
+      if (curso.puede_eliminar === true) {
+        const $eliminar = botonAccion(
+          "Eliminar",
+          "btn btn-link link-danger btn-sm eliminarCurso",
+          curso.id_curso
+        );
+        $eliminar.data("nombre-curso", curso.nom_curso);
+        $acciones.append($eliminar);
+      }
+      $fila.append($acciones);
+      $tbody.append($fila);
+    });
+  }
+
+  function mostrarCursos() {
+    $.ajax({
+      url: endpointCurso,
+      type: "POST",
+      dataType: "json",
+      data: { op: "read" },
+      success: function (response) {
+        if (!response || response.ok !== true || !Array.isArray(response.datos)) {
+          mostrarMensaje("No fue posible obtener los Cursos.", "error");
+          return;
+        }
+        renderListado(response.datos);
+      },
+      error: function (xhr) {
+        mostrarMensaje(mensajeDesdeError(xhr, "No fue posible obtener los Cursos."), "error");
+      },
+    });
+  }
+
+  function cargarDetalle(idCurso, alCompletar) {
+    $.ajax({
+      url: endpointCurso,
+      type: "POST",
+      dataType: "json",
+      data: { op: "query_id", id_curso: idCurso },
+      success: function (response) {
+        if (!response || response.ok !== true || !response.datos) {
+          mostrarMensaje("No fue posible obtener el Curso.", "error");
+          return;
+        }
+        alCompletar(response.datos);
+      },
+      error: function (xhr) {
+        mostrarMensaje(mensajeDesdeError(xhr, "No fue posible obtener el Curso."), "error");
+      },
+    });
+  }
+
+  function renderDetalle(curso) {
+    cursoActual = curso;
+    $("#nom").text(curso.nom_curso);
+    $("#cred").text(curso.creditos);
+    $("#car").text(etiquetaCaracter(curso.caracter));
+    $("#per").text(etiquetaPeriodo(curso.periodo));
+    $("#year").text(String(curso.anio_curso));
+    $("#carg").text(String(curso.carga_hor) + " horas cronológicas");
+    $("#prof").text(curso.nombre_profesor || "Profesor no disponible");
+
+    const $programa = $("#prog").empty();
+    if (curso.programa_disponible === true) {
+      $programa.append(
+        $("<a>", {
+          href: endpointCurso + "?op=download&id_curso=" + encodeURIComponent(curso.id_curso),
+          class: "link-secondary",
+        }).text("Descargar Programa")
+      );
+    } else {
+      $programa.text("Programa no disponible");
+    }
+
+    $("#editar_curso").prop("hidden", curso.puede_editar !== true);
+    mostrarDetalle();
+  }
+
+  function prepararEdicion(curso) {
+    cursoActual = curso;
+    $("#id_curso").val(String(curso.id_curso));
+    $("#nom_curso").val(String(curso.id_nom_curso));
+    $("#creditos").val(curso.creditos);
+    $("#caracter").val(String(curso.caracter));
+    $("#periodo").val(String(curso.periodo));
+    $("#anio_curso").val(String(curso.anio_curso));
+    $("#car_hor").val(String(curso.carga_hor));
+    $("#prog_curso").val("");
+    $("#estado_programa").text(
+      curso.programa_disponible === true
+        ? "Conserve el campo vacío para mantener el programa vigente."
+        : "Debe adjuntar un PDF para reemplazar el programa ausente."
+    );
+    $("#titulo_form_curso").text("EDITAR CURSO");
+    if (seleccionaProfesor) {
+      $("#docente_curso")
+        .val(curso.nombre_profesor || "")
+        .data("id-usuario", Number(curso.profesor));
+    }
+    mostrarFormulario();
+  }
+
+  function validarFormulario() {
+    const idCurso = Number($("#id_curso").val() || 0);
+    const nomCurso = Number($("#nom_curso").val() || 0);
+    const creditos = String($("#creditos").val() || "").trim();
+    const caracter = Number($("#caracter").val() || 0);
+    const periodo = Number($("#periodo").val() || 0);
+    const anioCurso = Number($("#anio_curso").val() || 0);
+    const cargaHor = String($("#car_hor").val() || "").trim();
+    const archivo = $("#prog_curso")[0].files[0] || null;
+
+    if (
+      nomCurso < 1
+      || !/^\d+(?:\.\d+)?$/.test(creditos)
+      || ![1, 2].includes(caracter)
+      || ![1, 2, 3].includes(periodo)
+      || anioCurso < 2006
+      || anioCurso > new Date().getFullYear()
+      || !/^-?\d+$/.test(cargaHor)
+    ) {
+      mostrarMensaje("Debe completar todos los campos del Curso con valores válidos.", "error");
+      return null;
+    }
+    if (idCurso === 0 && archivo === null) {
+      mostrarMensaje("Debe adjuntar el programa PDF del Curso.", "error");
+      return null;
+    }
+    if (archivo && (archivo.size < 1 || archivo.size > maxPdfBytes)) {
+      mostrarMensaje("El programa debe ser un archivo no vacío de hasta 5 MiB.", "error");
+      return null;
+    }
+    if (archivo && archivo.type && archivo.type !== "application/pdf") {
+      mostrarMensaje("El archivo seleccionado debe ser PDF.", "error");
+      return null;
+    }
+
+    let profesor = null;
+    if (seleccionaProfesor) {
+      profesor = Number($("#docente_curso").data("id-usuario") || 0);
+      if (profesor < 1) {
+        mostrarMensaje("Debe seleccionar un Profesor Aceptado de la lista.", "error");
+        return null;
+      }
+    }
+
+    return {
+      idCurso,
+      nomCurso,
+      creditos,
+      caracter,
+      periodo,
+      anioCurso,
+      cargaHor,
+      archivo,
+      profesor,
+    };
+  }
+
+  function enviarCurso(datos) {
+    if (mutacionActiva) return;
+    mutacionActiva = true;
+    const $boton = $("#btn-guardar-curso").prop("disabled", true);
+    const formData = new FormData();
+    formData.append("op", datos.idCurso > 0 ? "update" : "create");
+    formData.append("id_curso", String(datos.idCurso));
+    formData.append("nom_curso", String(datos.nomCurso));
+    formData.append("creditos", datos.creditos);
+    formData.append("caracter", String(datos.caracter));
+    formData.append("periodo", String(datos.periodo));
+    formData.append("anio_curso", String(datos.anioCurso));
+    formData.append("carga_hor", datos.cargaHor);
+    if (seleccionaProfesor) formData.append("profesor", String(datos.profesor));
+    if (datos.archivo) formData.append("arch_prog", datos.archivo);
+
+    $.ajax({
+      url: endpointCurso,
+      type: "POST",
+      dataType: "json",
+      contentType: false,
+      processData: false,
+      data: formData,
+      headers: { "X-CSRF-Token": csrfToken },
+      success: function (response) {
+        if (!response || response.ok !== true) {
+          mostrarMensaje(
+            response && response.mensaje ? response.mensaje : "No fue posible guardar el Curso.",
+            "error"
+          );
+          return;
+        }
+        limpiarFormulario();
+        mostrarListado();
+        mostrarCursos();
+        mostrarMensaje(response.mensaje, "success");
+      },
+      error: function (xhr) {
+        mostrarMensaje(mensajeDesdeError(xhr, "No fue posible guardar el Curso."), "error");
+      },
+      complete: function () {
+        mutacionActiva = false;
+        $boton.prop("disabled", false);
+      },
+    });
+  }
+
+  function eliminarCurso(idCurso) {
+    if (deleteActivo) return;
+    deleteActivo = true;
+    $(".eliminarCurso").prop("disabled", true);
+    $.ajax({
+      url: endpointCurso,
+      type: "POST",
+      dataType: "json",
+      data: { op: "delete", id_curso: idCurso },
+      headers: { "X-CSRF-Token": csrfToken },
+      success: function (response) {
+        if (!response || response.ok !== true) {
+          mostrarMensaje(
+            response && response.mensaje ? response.mensaje : "No fue posible eliminar el Curso.",
+            "error"
+          );
+          return;
+        }
+        mostrarCursos();
+        mostrarMensaje(response.mensaje, "success");
+      },
+      error: function (xhr) {
+        mostrarMensaje(mensajeDesdeError(xhr, "No fue posible eliminar el Curso."), "error");
+      },
+      complete: function () {
+        deleteActivo = false;
+        $(".eliminarCurso").prop("disabled", false);
+      },
+    });
+  }
+
+  $("#btn-agr-curso").on("click", function () {
+    ocultarMensaje();
+    limpiarFormulario();
+    mostrarFormulario();
+  });
+
+  $("#btn-ver-curso, .detalleCurso").on("click", function () {
+    limpiarFormulario();
+    mostrarListado();
+  });
+
+  $("#form_curso").on("submit", function (event) {
+    event.preventDefault();
+    ocultarMensaje();
+    const datos = validarFormulario();
+    if (datos) enviarCurso(datos);
+  });
+
+  $("body").on("click", ".verCurso", function () {
+    const idCurso = Number($(this).attr("data-id-curso"));
+    cargarDetalle(idCurso, renderDetalle);
+  });
+
+  $("#editar_curso").on("click", function () {
+    if (!cursoActual || cursoActual.puede_editar !== true) return;
+    cargarDetalle(cursoActual.id_curso, prepararEdicion);
+  });
+
+  $("body").on("click", ".eliminarCurso", function () {
+    const $boton = $(this);
+    const idCurso = Number($boton.attr("data-id-curso"));
+    const nombreCurso = String($boton.data("nombre-curso") || "Curso");
+    confirmarEliminacion({
+      tipo: "Curso",
+      nombre: nombreCurso,
+      onConfirm: function () {
+        eliminarCurso(idCurso);
+      },
+    });
+  });
+
+  $("#docente_curso").on("input", function () {
+    const $input = $(this);
+    $input.removeData("id-usuario");
+    const busqueda = String($input.val() || "").trim();
+    const $lista = $("#list_prof_curso").empty();
+    if (busqueda === "") {
+      $lista.hide();
+      return;
+    }
+    if (solicitudProfesores) solicitudProfesores.abort();
+    const solicitudActual = $.ajax({
+      url: endpointProfesor,
+      type: "POST",
+      dataType: "json",
+      data: { op: "read_prof", busqueda },
+      success: function (profesores) {
+        $lista.empty();
+        if (!Array.isArray(profesores) || profesores.length === 0) {
+          $lista.append($("<li>", { class: "list-group-item text-rosado" }).text("Sin coincidencias"));
+        } else {
+          profesores.forEach(function (profesor) {
+            const nombre = [profesor.nombres, profesor.ap_pat, profesor.ap_mat]
+              .filter(Boolean)
+              .join(" ");
+            const $opcion = $("<button>", {
+              type: "button",
+              class: "list-group-item list-group-item-action listProfCurso",
+              "data-id-usuario": String(profesor.id_usuario),
+            }).text(nombre);
+            $opcion.data("nombre-profesor", nombre);
+            $lista.append($opcion);
+          });
+        }
+        $lista.show();
+      },
+      error: function (xhr, estado) {
+        if (estado !== "abort") {
+          mostrarMensaje(mensajeDesdeError(xhr, "No fue posible consultar Profesores."), "error");
+        }
+      },
+    });
+    solicitudProfesores = solicitudActual;
+    solicitudActual.always(function () {
+      if (solicitudProfesores === solicitudActual) {
+        solicitudProfesores = null;
+      }
+    });
+  });
+
+  $("body").on("click", ".listProfCurso", function () {
+    const $opcion = $(this);
+    $("#docente_curso")
+      .val(String($opcion.data("nombre-profesor") || ""))
+      .data("id-usuario", Number($opcion.attr("data-id-usuario")));
+    $("#list_prof_curso").empty().hide();
+  });
+
+  $("#creditos").on("input", function () {
+    const creditos = Number.parseFloat(String($(this).val() || ""));
+    $("#car_hor").val(Number.isFinite(creditos) ? String(Math.trunc(creditos * 28)) : "");
+  });
+
+  cargarAnios();
+  cargarCatalogo();
+  limpiarFormulario();
+  mostrarListado();
+  mostrarCursos();
+  $(".loadPage").fadeOut();
+})(jQuery);

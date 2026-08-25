@@ -88,6 +88,7 @@ function isValidAuthContext(
     array $permissions,
     int $loginId,
     bool $shouldGrantRegulations,
+    bool $shouldGrantCourses,
     ?int $professorState
 ): bool {
     $roleByPermission = [
@@ -152,7 +153,7 @@ function isValidAuthContext(
         return false;
     }
     foreach ($capabilities as $capability) {
-        if (!is_string($capability) || !in_array($capability, ['perfil.ver', 'reglamento.ver', 'docente.habilitado'], true)) {
+        if (!is_string($capability) || !in_array($capability, ['perfil.ver', 'reglamento.ver', 'docente.habilitado', 'cursos.ver'], true)) {
             return false;
         }
     }
@@ -161,6 +162,7 @@ function isValidAuthContext(
         in_array('perfil.ver', $capabilities, true) !== in_array(5, $permissionIds, true)
         || in_array('reglamento.ver', $capabilities, true) !== $shouldGrantRegulations
         || in_array('docente.habilitado', $capabilities, true) !== ($professorState === 2)
+        || in_array('cursos.ver', $capabilities, true) !== $shouldGrantCourses
     ) {
         return false;
     }
@@ -304,6 +306,15 @@ try {
         }
     }
 
+    $shouldGrantCourses = isset($authContext['admin'])
+        || isset($authContext['comite'])
+        || isset($authContext['aceptado'])
+        || in_array($studentStatus ?? 0, [2, 3], true)
+        || $professorState === 2;
+    if ($shouldGrantCourses) {
+        $capabilities['cursos.ver'] = true;
+    }
+
     $authContext['capacidades'] = array_values(array_keys($capabilities));
 
     if (isset($authContext['docente']) || isset($authContext['estudiante'])) {
@@ -320,7 +331,14 @@ try {
         $authContext['id_usuario'] = $userRows;
     }
 
-    if (!isValidAuthContext($authContext, $permissions, $loginId, $shouldGrantRegulations, $professorState)) {
+    if (!isValidAuthContext(
+        $authContext,
+        $permissions,
+        $loginId,
+        $shouldGrantRegulations,
+        $shouldGrantCourses,
+        $professorState
+    )) {
         throw new \UnexpectedValueException('AUTH_CONTEXT_VALIDATION_FAILED');
     }
 

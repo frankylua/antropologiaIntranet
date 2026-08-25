@@ -1,228 +1,532 @@
 # AT-EPIC003-AUTORIZACION-CURSOS-001
 
-## Análisis técnico documental: Cursos como segundo piloto de autorización centralizada
+## Autorización integral del objeto Cursos
 
-## 1. Identificación y alcance
+## 1. Identificación y estado
 
-- **EPIC asociado:** EPIC-003 — Separación segura entre estados académicos y roles de acceso.
-- **Feature asociada:** FEATURE-EPIC003-AUTORIZACION-CENTRALIZADA-001.
-- **Clasificación:** [ARQ] evolución de autorización; [TEC] impacto en Cursos; [DOC] documento técnico oficial.
-- **Estado:** bloqueado por falta de decisión institucional. No autoriza implementación.
+- **Objeto:** Curso / Cursos.
+- **EPIC principales:** EPIC-001 — Modernización del modelo de autorización y permisos; EPIC-009 — Consolidación Funcional de Objetos y CRUD Integral.
+- **Coordinación:** EPIC-003 — Separación segura entre estados académicos y roles de acceso; EPIC-004 — Integridad transaccional; EPIC-008 — Gobierno del Modelo de Datos y Persistencia.
+- **ADR vigente:** ADR-001 — Contrato explícito para operaciones de escritura.
+- **Clasificación:** [ARQ] [GOV] [CRUD] [AUTH] [PERSIST] [VF].
+- **Estado:** APROBADO documentalmente; matriz institucional consolidada; pendiente de revisión técnica previa a implementación.
 
-Este documento evalúa si el módulo Cursos puede ser el segundo piloto de centralización del consumo de autorizaciones. Identifica evidencia, riesgos y alternativas para una futura decisión. No modifica código, SQL, modelo de datos, ADR, Roadmap, Manual Maestro, Feature, actas ni TASK.
+Este AT es la fuente técnica vigente para la autorización integral de Cursos. La
+matriz institucional incorporada resuelve el bloqueo registrado anteriormente
+por ausencia de definición por operación. Los AT previos de diagnóstico y
+separación de capacidades se conservan como antecedentes técnicos; sus
+conclusiones de bloqueo no sustituyen la matriz vigente de este documento.
 
-## 2. Marco aplicable
+Este documento no implementa código, no modifica datos o schema y no autoriza
+staging, commit, push ni ejecución de VF.
 
-ADR-002 y la documentación previa de EPIC-003 mantienen separadas identidad, estado académico, rol institucional, participación académica y permiso funcional. La derivación institucional posterior determinó que no existe una autoridad acreditada ni una matriz operativa aprobada para Cursos. El siguiente esquema se conserva únicamente como antecedente conceptual:
+## 2. Objetivo
 
-```text
-Estado académico/institucional
-  ↓
-Reglas institucionales de acceso
-  ↓
-Permisos funcionales efectivos
-```
+Consolidar la regla institucional aplicable al objeto Cursos y habilitar la
+creación de una única Task integral que abarque:
 
-La Feature vigente no implementa todavía esa derivación. Su alcance inicial es centralizar el consumo de las autorizaciones existentes, conservando `login`, `permiso_login` y las claves de sesión. El piloto Reglamento fue validado funcionalmente con ese límite.
+~~~text
+CREATE
+→ READ
+→ UPDATE
+→ DELETE
+→ autorización
+→ ownership
+→ persistencia
+→ programa PDF
+→ contratos HTTP/JSON
+→ frontend
+→ rutas legacy
+→ VF integral
+~~~
 
-## 3. Inventario actual del módulo Cursos
+La implementación permanece sujeta a revisión técnica. No se divide el objeto
+en Tasks por operación.
 
-### 3.1 Archivos y responsabilidades identificadas
+## 3. Estado técnico confirmado
 
-| Área | Archivo | Responsabilidad actual |
+La superficie activa se compone de:
+
+| Área | Archivo | Responsabilidad |
 | --- | --- | --- |
-| Punto de entrada y pantalla | `form-doc/ver.curso.php` | Protege la entrada, presenta listado, detalle y controles de agregar, editar y eliminar. |
-| Navegación | `form-doc/header.php` | Decide si muestra el enlace Cursos dentro de Programa. |
-| Cliente | `form-doc/scripts/curso.js` | Solicita listado, detalle, altas/ediciones y eliminación al endpoint de Cursos. |
-| Endpoint | `ajax/curso.php` | Atiende operaciones de lectura, consulta por identificador, inserción/edición y eliminación. |
-| Persistencia | `src/Model/Curso.php` | Ejecuta las operaciones sobre la entidad `curso`. |
-| Sesión y permisos | `ajax/login.php`, `src/Model/Login.php` | Materializan permisos de `permiso_login` como claves de `$_SESSION`. |
-| Componente central existente | `src/Security/Authorization.php` | Ofrece `Authorization::hasAny()` sobre claves de sesión; Cursos aún no lo utiliza. |
+| Página | form-doc/ver.curso.php | Entrada, listado, detalle, formulario y controles CRUD. |
+| Navegación | form-doc/header.php | Enlace Programa → Cursos. |
+| Cliente | form-doc/scripts/curso.js | Payloads, listado, detalle, CREATE, UPDATE, DELETE y selector Profesor. |
+| Endpoint | ajax/curso.php | Operaciones create, read, read_cursos, query_id, update y delete. |
+| Modelo | src/Model/Curso.php | SQL y persistencia de curso. |
+| Selector | ajax/docente.php y src/Model/Docente.php | read_prof y selección de Profesores Aceptados. |
+| Sesión | ajax/login.php y src/Model/Login.php | Roles históricos, estado Estudiante y capacidad docente.habilitado. |
+| Archivo | files/prog_curso | Almacenamiento actual de programas. |
 
-También existe `ingr.curso.php`, con un control de sesión histórico orientado a Comité. Su relación con el flujo activo debe verificarse antes de una eventual TASK, pues la vista actual opera mediante `form-doc/ver.curso.php` y `ajax/curso.php`.
+Después del cierre integral de Profesor:
 
-### 3.2 Flujo efectivo observado
+- permiso 4 representa identidad Docente;
+- profesor.estado_profesor = 2 representa Profesor Aceptado;
+- docente.habilitado se produce sólo para Profesor Aceptado;
+- Profesor Pendiente y Rechazado no obtienen acceso académico normal;
+- read_prof devuelve únicamente Profesores con estado_profesor = 2;
+- navegación, página y endpoint de Cursos ya reconocen docente.habilitado.
 
-```text
-Usuario
-  ↓
-Inicio de sesión: login + permiso_login
-  ↓
-$_SESSION[admin|comite|aceptado|docente|estudiante]
-  ↓
-Validación directa en form-doc/ver.curso.php
-  ↓
-Módulo Cursos y solicitudes AJAX a ajax/curso.php
-```
+Ese cierre resuelve la habilitación del actor Profesor, pero el código de Cursos
+todavía aplica la misma condición histórica a todas las operaciones:
 
-El punto de entrada de Cursos admite directamente `admin`, `comite`, `aceptado` o `docente`. La vista incluye, sin una separación técnica de autorización, tanto la consulta como los controles que desencadenan escrituras. El endpoint AJAX no declara una comprobación propia de sesión o permiso; por ello, el control de la pantalla no constituye por sí solo una frontera verificable de cada operación.
+~~~text
+admin OR comite OR aceptado OR docente.habilitado
+~~~
 
-## 4. Relación con permisos actuales
+La implementación actual no expresa la matriz aprobada, no valida ownership y
+continúa utilizando aceptado como autoridad genérica para mutaciones.
 
-| Clave actual | Relación con Cursos |
+## 4. Matriz institucional aprobada
+
+| Actor | CREATE | READ | UPDATE | DELETE |
+| --- | --- | --- | --- | --- |
+| Admin | Sí, global | Sí, global | Sí, global | Sí, global |
+| Comité | Sí, global | Sí, global | Sí, global | No |
+| Profesor Aceptado | Sí, propio | Sí, global | Sí, propio | No |
+| Profesor Pendiente | No | No | No | No |
+| Profesor Rechazado | No | No | No | No |
+| Estudiante Aceptado | No | Sí | No | No |
+| Estudiante Matriculado | No | Sí | No | No |
+| Otros estados Estudiante | No | No | No | No |
+| Permiso histórico 3 | No | Sí, compatibilidad | No | No |
+| Anónimo | No | No | No | No |
+
+Las capacidades acumulativas conservan la suma de autorizaciones válidas. Una
+cuenta con más de un rol obtiene la unión de las capacidades aprobadas, sin
+convertir permiso 3, estado Estudiante o identidad Docente en autoridad
+administrativa.
+
+## 5. Ownership Profesor
+
+La regla aprobada es:
+
+~~~text
+curso.profesor
+=
+usuario.id_usuario del Profesor autenticado
+~~~
+
+### CREATE propio
+
+Cuando un Profesor Aceptado crea un Curso:
+
+- el backend obtiene su usuario desde la sesión validada;
+- ignora cualquier id_usuario, id_profesor, profesor u otro identificador
+  enviado por el cliente para determinar ownership;
+- fuerza curso.profesor al usuario del Profesor autenticado;
+- rechaza la operación si la identidad de sesión no representa exactamente un
+  Profesor con estado_profesor = 2.
+
+### UPDATE propio
+
+Cuando un Profesor Aceptado actualiza un Curso:
+
+- el backend carga el Curso por id_curso;
+- compara curso.profesor con el usuario de sesión;
+- permite la actualización sólo si coinciden;
+- no permite transferir el Curso a otro Profesor mediante un identificador
+  cliente;
+- rechaza el UPDATE de un Curso ajeno.
+
+La visibilidad o el filtrado de la UI no reemplazan esta validación.
+
+## 6. Administración y Profesor asociado
+
+Admin y Comité pueden crear y actualizar Cursos globalmente. En esas operaciones
+pueden seleccionar Profesor, pero el backend debe comprobar antes de escribir:
+
+1. que el usuario indicado existe;
+2. que representa inequívocamente una identidad Profesor;
+3. que profesor.estado_profesor = 2;
+4. que el identificador corresponde al usuario persistido en curso.profesor.
+
+El selector central:
+
+~~~text
+form-doc/scripts/curso.js
+→ ajax/docente.php, op=read_prof
+→ Docente::buscarProf()
+→ estado_profesor = 2
+~~~
+
+ya satisface el filtrado de la UI y debe conservarse. El endpoint de Cursos debe
+repetir la validación porque el payload cliente es manipulable.
+
+## 7. Capacidad de lectura
+
+La evolución mínima aprobada incorpora:
+
+~~~text
+cursos.ver
+~~~
+
+Debe representar READ de Cursos y no implica CREATE, UPDATE o DELETE.
+
+La futura revisión técnica determinará la adaptación mínima de ajax/login.php
+para derivar cursos.ver desde el estado Estudiante ya disponible:
+
+| Estado Estudiante | cursos.ver |
 | --- | --- |
-| `admin` | Accede directamente a la pantalla; el enlace de navegación también se muestra. |
-| `comite` | Accede directamente a la pantalla; el enlace de navegación también se muestra. |
-| `aceptado` | Accede directamente a la pantalla; la navegación solo lo habilita junto con `docente`. |
-| `docente` | Accede directamente a la pantalla; la navegación solo lo habilita junto con `aceptado`. |
-| `estudiante` | No habilita el acceso directo ni el enlace Cursos por sí solo. |
+| Aceptado | Sí |
+| Matriculado | Sí |
+| Otros estados | No |
 
-Cursos depende directamente de `$_SESSION`; no consume `Authorization`. Las claves son el resultado de permisos asociados al login, no una consulta directa del estado académico en cada acceso. En consecuencia, no debe asumirse que `aceptado`, `docente` o `estudiante` sean por sí mismos estados institucionales o permisos funcionales consolidados.
+docente.habilitado continúa representando Profesor Aceptado. Para CREATE y
+UPDATE propios debe combinarse con ownership backend.
 
-La divergencia confirmada es relevante: la pantalla permite una disyunción de cuatro claves, mientras la navegación ofrece Cursos a administración o Comité, o a la combinación simultánea `docente` + `aceptado`. Un usuario puede, por tanto, tener comportamiento distinto al navegar que al llegar por URL directa.
+No se redefine src/Security/Authorization.php en esta fase. La Task debe usar su
+contrato vigente y limitar cualquier cambio de producción de capacidad al
+archivo de login que la revisión técnica confirme.
 
-## 5. Relación con la resolución EPIC-003
+## 8. Permiso histórico 3
 
-El único antecedente institucional disponible indica «Cursos: solo vista» para estudiantes aceptados y matriculados. De él sólo puede concluirse que esos estudiantes no deben crear, actualizar, eliminar ni administrar profesores. Listado, detalle, descargas, históricos y el resto de los actores permanecen pendientes. Las facultades de profesores, Comité, administración y roles acumulativos no están aprobadas.
+El permiso 3 puede conservarse temporalmente como compatibilidad de READ, pero:
 
-La implementación actual no expresa esas capacidades de forma funcional: consume claves históricas de sesión y ofrece una pantalla que combina lectura y administración. Por ello, la equivalencia técnica entre la regla institucional «Cursos: solo vista» y el acceso actual con `aceptado` no está confirmada. Tampoco está validado el mapeo completo entre los estados técnicos de estudiante o profesor y las claves de sesión usadas por Cursos.
+- no es autoridad suficiente para CREATE;
+- no es autoridad suficiente para UPDATE;
+- no es autoridad suficiente para DELETE;
+- no identifica por sí solo un rol Profesor;
+- no debe reutilizarse como shortcut de CRUD global;
+- la clave de sesión aceptado, si continúa durante la transición, debe mapearse
+  exclusivamente a visualización de Cursos.
 
-Una futura centralización de consumo puede conservar inicialmente la política efectiva vigente, pero no debe afirmar que con ello implementa la matriz institucional ni automatizar estado → permiso.
+La implementación debe evitar que el fallback histórico amplíe capacidades a
+actores o estados no autorizados.
 
-## 6. Riesgos específicos de Cursos
+## 9. CREATE
 
-- **Navegación versus acceso directo:** las condiciones actuales no son equivalentes, con riesgo de experiencias contradictorias o de ampliar/restringir acceso al intentar unificarlas.
-- **Consulta versus administración:** la misma pantalla y el mismo endpoint reúnen lectura, altas, edición y eliminación. El antecedente «solo vista» para estudiantes aceptados y matriculados excluye mutaciones, pero no define el alcance de lectura ni autoriza inferir facultades administrativas.
-- **Estados académicos:** `aceptado` es una clave histórica; no confirma por sí sola si representa estudiante aceptado, matriculado, profesor aceptado o una capacidad funcional.
-- **Permisos históricos y acumulación:** una persona puede mantener `admin`, `comite`, `docente` y otras claves. Una migración que reemplace en vez de consultar acumulativamente puede alterar capacidades legítimas.
-- **Controles de endpoint:** la ausencia de una validación declarada en `ajax/curso.php` eleva el riesgo de que una migración limitada a la vista deje operaciones críticas sin una política equivalente verificable.
-- **Reversibilidad:** cambiar solamente la consulta de entrada es fácilmente reversible; separar o restringir operaciones de escritura afecta flujos académicos y requiere evidencia funcional adicional.
+CREATE debe:
 
-## 7. Factibilidad como segundo piloto
+- autorizar Admin, Comité o Profesor Aceptado;
+- para Admin/Comité, validar el Profesor Aceptado seleccionado;
+- para Profesor, derivar curso.profesor desde sesión;
+- validar campos obligatorios, tipos, rangos y relaciones;
+- validar el programa PDF en backend;
+- usar SQL parametrizado;
+- aplicar el contrato explícito de escritura;
+- informar éxito sólo después de confirmar INSERT y archivo coherentes;
+- impedir duplicación accidental por doble envío.
 
-**Cursos no es un candidato autorizado para implementación.** La evaluación técnica previa se conserva como antecedente, pero no puede reanudarse ni convertirse en piloto hasta que exista un Documento Fuente Aprobado emitido por autoridad competente.
+La ausencia de una restricción UNIQUE en schema no autoriza a inventar una regla
+institucional de unicidad. La revisión técnica debe definir validaciones
+funcionales sustentadas por el formulario y detectar únicamente conflictos que
+puedan demostrarse sin cambio de schema.
 
-| Aspecto | Reglamento validado | Cursos |
+## 10. READ
+
+READ comprende:
+
+- read: listado general;
+- query_id: detalle por id_curso;
+- read_cursos: catálogo nombre_curso para selector;
+- descarga del programa asociado.
+
+Cada operación debe:
+
+- exigir capacidad o actor con READ;
+- validar identificadores;
+- responder 404 cuando el recurso no exista;
+- devolver únicamente los campos requeridos;
+- eliminar SELECT * sobre usuario;
+- no exponer documento, fecha de nacimiento, dirección, teléfonos, contactos u
+  otros antecedentes personales del Profesor;
+- usar una estructura asociativa estable y no depender innecesariamente de
+  índices numéricos PDO;
+- proteger la entrega del PDF conforme a la solución mínima que confirme la
+  revisión técnica.
+
+Profesor Aceptado, Admin, Comité, Estudiante Aceptado y Estudiante Matriculado
+poseen READ global.
+
+## 11. UPDATE
+
+UPDATE debe:
+
+- autorizar Admin y Comité globalmente;
+- autorizar Profesor Aceptado sólo sobre Curso propio;
+- bloquear Estudiante, permiso 3 como autoridad aislada y cualquier otro actor;
+- validar existencia de id_curso;
+- validar ownership antes de mutar;
+- para Admin/Comité, validar todo nuevo Profesor asociado;
+- para Profesor, preservar su asociación y no aceptar transferencia cliente;
+- parametrizar SQL y comprobar filas afectadas;
+- coordinar reemplazo de programa sin destruir anticipadamente el archivo
+  vigente;
+- devolver un resultado inequívoco.
+
+## 12. DELETE
+
+La decisión institucional definitiva es:
+
+~~~text
+DELETE Curso = físico
+Autoridad = sólo Admin
+~~~
+
+| Actor | DELETE |
+| --- | --- |
+| Admin | Sí, global |
+| Comité | No |
+| Profesor | No |
+| Estudiante | No |
+| Permiso 3 | No |
+| Anónimo | No |
+
+No se introduce DELETE lógico, columna de estado ni migración. La implementación
+debe coordinar el registro de base de datos y el PDF mediante una estrategia
+segura y compensable. Un fallo de archivo no puede presentarse como eliminación
+íntegra, y un fallo de base de datos no puede destruir definitivamente el
+archivo vigente.
+
+## 13. Seguridad de archivos y lifecycle PDF
+
+El programa de Curso mantiene política PDF. La Task integral debe resolver:
+
+- validación MIME real mediante finfo;
+- extensión y tamaño permitidos;
+- nombre generado y controlado por servidor;
+- rechazo de path traversal;
+- ausencia de confianza en arch_actual o rutas cliente;
+- consulta del archivo vigente desde base de datos;
+- contención de unlink dentro del directorio autorizado;
+- almacenamiento o entrega que no permita ejecución arbitraria;
+- compensación ante fallos de archivo o persistencia.
+
+### CREATE
+
+Archivo válido e INSERT deben producir un único resultado coherente. Ante fallo,
+no debe quedar registro incompleto ni archivo huérfano.
+
+### UPDATE
+
+El reemplazo debe prepararse y validarse antes de alterar el registro. El archivo
+anterior no se elimina definitivamente antes de garantizar un reemplazo seguro.
+
+### DELETE
+
+Sólo Admin puede iniciar la operación. Registro y archivo deben eliminarse
+físicamente mediante una secuencia reversible o compensable durante el límite
+de la operación.
+
+La revisión técnica debe evaluar files/prog_curso. Si mover archivos fuera del
+webroot exige infraestructura no acotada, deberá registrar el bloqueo y elegir
+la mínima protección viable sin improvisar una ampliación arquitectónica.
+
+## 14. Persistencia y ADR-001
+
+src/Model/Curso.php debe dejar de concatenar parámetros y utilizar consultas
+preparadas para todas las entradas variables.
+
+CREATE, UPDATE y DELETE deben adoptar ejecutarEscritura() de manera específica:
+
+- CREATE requiere éxito, filas afectadas e idInsertado;
+- UPDATE requiere resultado explícito y filas afectadas;
+- DELETE requiere resultado explícito y filas afectadas;
+- ninguna operación considera verdadero un PDOStatement sólo por existir;
+- las excepciones deben propagarse al endpoint para producir error HTTP/JSON.
+
+La coordinación BD/archivo requiere una estrategia transaccional y de
+compensación definida durante revisión técnica. ADR-001 no se modifica ni se
+aplica mecánicamente fuera de Curso.
+
+## 15. Contrato HTTP/JSON
+
+Las escrituras deben responder con un objeto inequívoco:
+
+~~~json
+{
+  "ok": true,
+  "datos": {},
+  "mensaje": "Operación completada."
+}
+~~~
+
+Los errores deben utilizar, según corresponda:
+
+| HTTP | Uso |
+| --- | --- |
+| 400 | Payload, identificador o tipo inválido |
+| 403 | Actor sin autorización |
+| 404 | Curso o relación inexistente |
+| 409 | Conflicto de ownership, estado o resultado incompatible |
+| 422 | Validación funcional |
+| 500 | Error técnico de persistencia o coordinación de archivo |
+
+Las respuestas de error incluyen ok=false, error y mensaje. El frontend no debe
+mostrar éxito ni volver al listado cuando ok no sea true.
+
+## 16. Frontend
+
+La Task integral debe corregir dentro del mismo objeto:
+
+- manejo explícito de errores HTTP;
+- exigencia de ok=true antes del mensaje de éxito;
+- confirmación DELETE;
+- bloqueo de doble envío;
+- renderizado seguro sin concatenar datos no escapados;
+- selector incorrecto #docente;
+- apellido materno mostrado incorrectamente;
+- ID form_curso duplicado;
+- dependencia innecesaria de índices numéricos;
+- mensajes coherentes para CREATE, UPDATE, DELETE y errores.
+
+No se crea una Task UX separada.
+
+## 17. IDOR y autorización directa
+
+Los guards deben ejecutarse antes de acceder a datos o archivos. Deben
+protegerse:
+
+- query_id;
+- UPDATE;
+- DELETE;
+- selección o cambio de Profesor;
+- descarga del programa;
+- cualquier operación alternativa por id_curso.
+
+El acceso directo a ajax/curso.php debe producir la misma decisión que la UI.
+Los identificadores cliente seleccionan un recurso, pero nunca determinan el
+actor ni el ownership.
+
+## 18. Rutas legacy
+
+Se registran para revisión técnica:
+
+| Ruta | Evidencia | Decisión durante revisión |
 | --- | --- | --- |
-| Naturaleza | Solo lectura | Consulta y administración reunidas |
-| Riesgo | Bajo | Medio/alto por impacto académico potencial |
-| Regla actual | Combinación simple validada | Acceso y navegación divergentes |
-| Reversibilidad | Alta | Alta solo para consulta; menor para escritura |
+| ingr.curso.php | Sin caller; requiere functions.php y vista inexistentes | Retirar, responder 410 o conservar inactiva |
+| ajax/nombre.curso.php | Archivo vacío; sin callers | Retirar, responder 410 o conservar inactivo |
 
-Sus ventajas son que ya cuenta con un control de entrada identificable, expone una divergencia de alto valor para validar el patrón y permite comprobar compatibilidad con permisos acumulativos. Su complejidad es mayor que Reglamento: antes de migrar debe fijarse qué política histórica se preserva y qué alcance se excluye.
+No se adopta todavía una acción técnica sobre estas rutas.
 
-## 8. Alternativas técnicas a evaluar
+## 19. Archivos potenciales de implementación
 
-No se selecciona ni implementa alternativa.
+### Alcance técnico inicial
 
-### Alternativa A — Migrar solo la validación de acceso de consulta
+- ajax/curso.php
+- src/Model/Curso.php
+- form-doc/scripts/curso.js
+- form-doc/ver.curso.php
+- form-doc/header.php
 
-Sustituir de forma equivalente el control de entrada de la vista por una consulta a `Authorization`, manteniendo las claves de sesión y sin cambiar las operaciones ni su disponibilidad observable. Tiene el menor alcance y máxima reversibilidad, pero no resuelve la divergencia de navegación ni diferencia escritura de consulta.
+### Condicionado a revisión técnica
 
-### Alternativa B — Separar visualización y administración
+- ajax/login.php, exclusivamente para producir cursos.ver desde estado
+  Estudiante.
 
-Definir controles diferenciados para lectura y operaciones de alta, edición y eliminación. Se alinea mejor con la matriz de «solo vista», pero exige aclarar capacidades administrativas y controlar también los endpoints; excede un piloto de consumo equivalente.
+### Legacy sujeto a decisión técnica
 
-### Alternativa C — Esperar evolución de reglas académicas
+- ingr.curso.php
+- ajax/nombre.curso.php
 
-Posponer Cursos hasta validar el mapeo entre estados técnicos, estados institucionales y capacidades funcionales, además de la política administrativa. Reduce el riesgo de consolidar nombres históricos, aunque retrasa la evidencia de un segundo módulo.
+src/Security/Authorization.php no se redefine. Otros archivos no ingresan al
+alcance sin evidencia y revisión.
 
-## 9. Archivos potencialmente afectados en una iniciativa futura
+## 20. Schema
 
-La siguiente lista es únicamente identificatoria:
+~~~text
+Schema change requerido: No
+Migración: No
+Nuevas tablas o columnas: No
+~~~
 
-- `form-doc/ver.curso.php` y `form-doc/header.php`.
-- `form-doc/scripts/curso.js`.
-- `ajax/curso.php` y, si se confirma su vigencia funcional, `ingr.curso.php`.
-- `src/Model/Curso.php`.
-- `src/Security/Authorization.php`.
-- `ajax/login.php`, `src/Model/Login.php` e `index.php`, solo para verificación de compatibilidad de sesión y redirección.
+La implementación debe utilizar curso.profesor y las relaciones existentes.
 
-## 10. Recomendación técnica
+## 21. Task integral autorizada
 
-La recomendación técnica histórica de evaluar un segundo piloto queda suspendida. No existe autorización para elaborar un AT de materialización, diseñar una protección provisional ni crear una Task de implementación. La propuesta P-B no fue aprobada.
+Se autoriza crear:
 
-La continuación requiere primero un Documento Fuente Aprobado que identifique institución, unidad propietaria, autoridad emisora, fundamento de competencia, fecha, vigencia, matriz por operación y aprobación verificable.
+~~~text
+TASK-EPIC001-AUTORIZACION-CURSOS-INTEGRAL-001
+~~~
 
-## 11. Estado EPIC-003
+La Task constituye una única unidad bajo EPIC-001 y EPIC-009. Debe quedar lista
+para revisión técnica previa a implementación y no autoriza cambios de código
+por sí sola.
 
-```text
-Arquitectura:
-✅ Consolidada
+## 22. VF futura
 
-Matriz operativa de Cursos:
-No aprobada
+La VF será integral y ejecutada exclusivamente por el usuario después de una
+implementación autorizada. Debe cubrir:
 
-Piloto Reglamento:
-✅ Validado
+- Admin: CREATE, READ, UPDATE y DELETE físico global; lifecycle PDF;
+- Comité: CREATE, READ y UPDATE global; DELETE bloqueado;
+- Profesor Aceptado: CREATE propio, READ global, UPDATE propio, UPDATE ajeno y
+  DELETE bloqueados, imposibilidad de forzar otro Profesor;
+- Profesor Pendiente y Rechazado: sin acceso;
+- Estudiante Aceptado y Matriculado: READ solamente;
+- otros estados Estudiante: sin acceso;
+- permiso 3: READ de compatibilidad y ninguna mutación;
+- anónimo: página, endpoint y archivos bloqueados;
+- id_curso y Profesor manipulados;
+- MIME falso, archivo no PDF, tamaño inválido y ruta manipulada;
+- arch_actual manipulado;
+- doble envío y doble DELETE;
+- fallo de base de datos y fallo de archivo;
+- endpoint directo y contratos HTTP/JSON.
 
-Piloto Cursos:
-🔴 Bloqueado por falta de decisión institucional
+No se ejecuta VF durante esta consolidación documental.
 
-AT de materialización:
-No autorizado
+## 23. Riesgos y condiciones de revisión
 
-Task técnica:
-No autorizada
-```
+Riesgos principales:
 
-## 12. Hallazgos y límites de certeza
+- ampliar permiso 3 más allá de READ;
+- confiar en ownership de UI;
+- perder o dejar huérfanos programas PDF;
+- ejecutar archivos cargados desde el webroot;
+- exponer datos personales mediante SELECT *;
+- reportar éxito ante escritura parcial;
+- extender cambios de login o Authorization fuera del objeto.
 
-### Confirmados
+La revisión técnica debe detenerse si:
 
-- La fuente operativa actual de las claves de sesión es `permiso_login`, materializada en el inicio de sesión.
-- Cursos utiliza controles directos de `$_SESSION`; no utiliza el componente `Authorization`.
-- La protección directa de Cursos y su enlace de navegación no aplican la misma combinación de claves.
-- La pantalla activa concentra lectura y acciones de administración de Cursos.
-- El único antecedente disponible indica «solo vista» para estudiantes aceptados y matriculados; su alcance de lectura no está definido y no autoriza mutaciones.
+1. cursos.ver no puede derivarse sin redefinir globalmente autorización;
+2. la solución PDF exige infraestructura no acotada;
+3. la coordinación BD/archivo no dispone de estrategia compensable;
+4. aparece una relación persistente no inventariada que cambie DELETE;
+5. se requiere cambiar schema;
+6. el alcance deja de ser una única unidad funcional Curso;
+7. una implementación exige alterar la matriz institucional.
 
-### Hipótesis o validaciones pendientes
+## 24. Gobierno y cierre
 
-- La correspondencia completa entre `aceptado`, `docente`, `estudiante` y los estados institucionales de estudiante o profesor.
-- La política histórica exacta que debe conservarse cuando navegación y URL directa divergen.
-- Qué capacidad funcional habilita administrar Cursos y qué controles deben aplicarse en cada endpoint.
-- La vigencia del flujo histórico de `ingr.curso.php` frente al flujo AJAX actual.
+La decisión institucional pendiente registrada por versiones anteriores queda
+resuelta por la matriz de este documento.
 
-### Riesgos principales
+No se requiere:
 
-- Ampliar o restringir acceso por elegir una de las dos condiciones actuales sin resolución funcional.
-- Interpretar una clave histórica de sesión como estado o permiso funcional.
-- Conceder administración sin una matriz institucional aprobada.
-- Preservar una validación de pantalla sin controlar las operaciones de escritura asociadas.
+- nuevo AT;
+- addendum;
+- nueva EPIC;
+- nueva Feature;
+- Task separada de seguridad;
+- Task separada de frontend;
+- Task por operación;
+- cambio de schema.
 
-## 13. Fuentes utilizadas
+Próximo paso:
 
-- [MANUAL_MAESTRO.md](../MANUAL_MAESTRO.md)
-- [ROADMAP.md](../roadmap/ROADMAP.md)
-- [ADR-002 — Evolución del modelo de identidad y participación académica](../adr/ADR-002-evolucion-modelo-identidad-participacion-academica.md)
-- [FEATURE-EPIC003-AUTORIZACION-CENTRALIZADA-001.md](../features/FEATURE-EPIC003-AUTORIZACION-CENTRALIZADA-001.md)
-- [AT-EPIC003-AUTORIZACION-CENTRALIZACION-001.md](AT-EPIC003-AUTORIZACION-CENTRALIZACION-001.md)
-- [AT-EPIC003-IMPLEMENTACION-REGLAS-PERMISOS-001.md](AT-EPIC003-IMPLEMENTACION-REGLAS-PERMISOS-001.md)
-- [ACTA-VALIDACION-EPIC003-REGLAS-PERMISOS-RESOLUCION-001.md](../governance/ACTA-VALIDACION-EPIC003-REGLAS-PERMISOS-RESOLUCION-001.md)
+~~~text
+Revisión técnica de
+TASK-EPIC001-AUTORIZACION-CURSOS-INTEGRAL-001
+~~~
 
-La identificación del inventario se contrastó con los archivos vigentes del módulo, sin modificar ninguno.
+## 25. Fuentes
 
-- Fuente institucional posterior: `Derivación institucional formal — Matriz operativa de Cursos`.
+- ROADMAP.md.
+- ADR-001 — Contrato explícito para operaciones de escritura.
+- ADR-002 — Evolución del modelo de identidad y participación académica.
+- AT-EPIC001-AUTORIZACION-PROFESOR-INTEGRAL-001.
+- AT-EPIC003-CURSOS-SEPARACION-CAPACIDADES-001.
+- AT-EPIC003-CURSOS-SESION-ACEPTADO-001.
+- AT-EPIC003-CURSOS-VALIDACION-ACCESO-ACEPTADO-001.
+- Inspección integral del objeto Cursos sobre HEAD
+  109d6c2603176f3c0cd96e80bd3c1a2ab0dccbf5.
 
-## 14. Cierre
+## 26. Dictamen
 
-No se creó Task ni se implementaron cambios. El módulo queda bloqueado hasta que una autoridad competente emita el Documento Fuente Aprobado. Este AT no autoriza revisión para materialización ni publicación.
-
-## 15. Actualización institucional posterior
-
-Resultado aplicable:
-
-```text
-F. No se identificó autoridad competente.
-```
-
-Estado:
-
-```text
-Módulo: Cursos
-Matriz operativa: No aprobada
-Autoridad institucional: No identificada
-Documento Fuente Aprobado: No existe
-Protección provisional: No aprobada
-AT de materialización: No autorizado
-Task técnica: No autorizada
-Implementación local: Parcial, no publicable y preservada
-Eliminación física: No autorizada
-```
-
-### Hipótesis institucional
-
-La coincidencia pública plausible con el Doctorado en Antropología de la
-Pontificia Universidad Católica de Chile no vincula formalmente esta intranet
-con esa institución y no se utiliza para identificar autoridades ni adoptar
-decisiones.
+Matriz institucional aprobada e incorporada. El bloqueo documental de Cursos se
+retira. Corresponde una única Task integral, pendiente de revisión técnica antes
+de cualquier implementación.
