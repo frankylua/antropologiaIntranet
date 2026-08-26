@@ -7,8 +7,9 @@ use App\Security\Authorization;
         session_start();//Validamos si existe o no la sesión
     }
     require_once __DIR__ . '/../src/bootstrap/app.php';
-    if(!Authorization::hasAny(['admin', 'comite', 'aceptado']) ){
+    if(!Authorization::hasCapability('calendario.ver') ){
         header('Location:../index.php');
+        exit;
     }else
     {
 require('header.php')

@@ -89,6 +89,7 @@ function isValidAuthContext(
     int $loginId,
     bool $shouldGrantRegulations,
     bool $shouldGrantCourses,
+    bool $shouldGrantCalendar,
     ?int $professorState
 ): bool {
     $roleByPermission = [
@@ -153,7 +154,7 @@ function isValidAuthContext(
         return false;
     }
     foreach ($capabilities as $capability) {
-        if (!is_string($capability) || !in_array($capability, ['perfil.ver', 'reglamento.ver', 'docente.habilitado', 'cursos.ver'], true)) {
+        if (!is_string($capability) || !in_array($capability, ['perfil.ver', 'reglamento.ver', 'docente.habilitado', 'cursos.ver', 'calendario.ver'], true)) {
             return false;
         }
     }
@@ -163,6 +164,7 @@ function isValidAuthContext(
         || in_array('reglamento.ver', $capabilities, true) !== $shouldGrantRegulations
         || in_array('docente.habilitado', $capabilities, true) !== ($professorState === 2)
         || in_array('cursos.ver', $capabilities, true) !== $shouldGrantCourses
+        || in_array('calendario.ver', $capabilities, true) !== $shouldGrantCalendar
     ) {
         return false;
     }
@@ -315,6 +317,14 @@ try {
         $capabilities['cursos.ver'] = true;
     }
 
+    $shouldGrantCalendar = isset($authContext['admin'])
+        || isset($authContext['comite'])
+        || in_array($studentStatus ?? 0, [2, 3], true)
+        || $professorState === 2;
+    if ($shouldGrantCalendar) {
+        $capabilities['calendario.ver'] = true;
+    }
+
     $authContext['capacidades'] = array_values(array_keys($capabilities));
 
     if (isset($authContext['docente']) || isset($authContext['estudiante'])) {
@@ -337,6 +347,7 @@ try {
         $loginId,
         $shouldGrantRegulations,
         $shouldGrantCourses,
+        $shouldGrantCalendar,
         $professorState
     )) {
         throw new \UnexpectedValueException('AUTH_CONTEXT_VALIDATION_FAILED');

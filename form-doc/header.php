@@ -100,7 +100,7 @@ $miperfil = isset($_SESSION['docente']) ? RUTA . 'form-doc/info.docente.php' : (
                                                 Académico</a></li>
                                     <?php endif; ?>
                                     
-                                    <?php if (isset($_SESSION['admin']) || isset($_SESSION['comite']) || isset($_SESSION['aceptado'])): ?>
+                                    <?php if (Authorization::hasCapability('calendario.ver')): ?>
                                     <li><a href="<?php echo RUTA; ?>form-doc/calend.acad.php"
                                             class="dropdown-item">Calendario Académico</a></li>
                                             <?php endif; ?>
