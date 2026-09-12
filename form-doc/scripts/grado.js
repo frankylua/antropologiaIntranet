@@ -10,6 +10,44 @@ function mostrarErrorTituloContextual(xhr) {
     $('#mnsj_grad').addClass('alert-danger');
     $('#mnsj_grad').html(mensaje);
 }
+function configuracionGrado() {
+    const app = $('#grado-app');
+    return {
+        contexto: app.attr('data-contexto') || 'sin-acceso',
+        csrf: app.attr('data-csrf') || ''
+    };
+}
+function agregarUsuarioObjetivoGrado(datos, usuario) {
+    if (configuracionGrado().contexto !== 'global') {
+        return datos;
+    }
+    const valor = Number(usuario || $('#id_usuario').attr('name'));
+    if (Number.isSafeInteger(valor) && valor > 0) {
+        datos.usuario = valor;
+    }
+    return datos;
+}
+function mostrarErrorGrado(mensaje) {
+    const texto = mensaje || 'No fue posible completar la operación de Grado académico.';
+    if ($('#mnsj_grad').length) {
+        $('#mnsj_row_grad').show();
+        $('#mnsj_grad').removeClass('alert-success').addClass('alert-danger').text(texto);
+        return;
+    }
+    const esDocente = $('#ficha_acad').attr('name') == 'doc';
+    const fila = esDocente ? $('#mnsj_row_acad_doc') : $('#mnsj_row_acad_est');
+    const mensajeDestino = esDocente ? $('#mnsj_acad_doc') : $('#mnsj_acad_est');
+    fila.show();
+    mensajeDestino.removeClass('alert-success').addClass('alert-danger').text(texto);
+}
+function mensajeErrorGrado(xhr) {
+    return xhr.responseJSON && xhr.responseJSON.mensaje
+        ? xhr.responseJSON.mensaje
+        : 'No fue posible completar la operación de Grado académico.';
+}
+function headersCsrfGrado() {
+    return { 'X-CSRF-Token': configuracionGrado().csrf };
+}
 //se construye el contenedor para edit grado
 function formGrado(contenedor,valorInst = null) {
     $(contenedor).append('<div class="row " id="grad_row"><div class="col-md-6 mb-3"><label class="form-label" for="grad_acad">Tipo Grado</label><select id="grad_acad" class="form-select grado"><option selected value="0">Seleccione tipo</option><option value="1">Pregrado</option><option value="2">Postgrado</option></select></div><div class="col-md-6 mb-3" id="grado_ac"><label class="form-label" for="">Grado Académico</label><select id="grado" class="form-select tit post" name="grado"><option value="0"></option></select></div></div>');
@@ -112,16 +150,19 @@ $(document).on('click', '#borrar_grado', function () {
     //$('#grado_card'+id).fadeIn()
 });
 function cargarGrado(usuario, id) {
-
-    op = 'read'
+    const datos = agregarUsuarioObjetivoGrado({ op: 'read' }, usuario);
     $.ajax({
         async: true,
         type: 'POST',
         url: '../ajax/grado.php',
-        data: { op, usuario },
+        dataType: 'json',
+        data: datos,
         success: function (response) {
-            console.log(response)
-            let grados = JSON.parse(response);
+            if (!response || response.ok !== true || !Array.isArray(response.datos)) {
+                mostrarErrorGrado(response && response.mensaje);
+                return;
+            }
+            let grados = response.datos;
             $('#grados_card').empty();
             let conpre = 1
             let conpost = 1
@@ -151,6 +192,9 @@ function cargarGrado(usuario, id) {
                 }
 
 
+                const acciones = configuracionGrado().contexto === 'sin-acceso'
+                    ? ''
+                    : `<button type="button" class="col-auto btn btn-link link-success ps-1 editarGrado" id="${grado['id_grado']}">Editar</button><button type="button" class="col-auto btn btn-link link-danger ps-1 eliminarGrado" id="${grado['id_grado']}">Eliminar</button>`;
                 template += `
         <div class="col-12" id="cont-${grado['id_grado']}">
         <div class="card mb-3" id="grado_card${grado['id_grado']}">
@@ -159,7 +203,7 @@ function cargarGrado(usuario, id) {
                 <thead>
                 <tr >
                 <th class="col-md-4 titulo_acad"><h5 >GRADO</h5></th>
-                <th class="row justify-content-end ps-0 botones"><button type="button" class="col-auto btn btn-link link-success ps-1 editarGrado" id="${grado['id_grado']}">Editar</button><button type="button" class="col-auto btn btn-link link-danger ps-1 eliminarGrado" id="${grado['id_grado']}">Eliminar</button></th>
+                <th class="row justify-content-end ps-0 botones">${acciones}</th>
                 </tr>
                 </thead>
                     <tbody>
@@ -197,7 +241,11 @@ function cargarGrado(usuario, id) {
                 }
 
             });
-            $(id).append(template)
+            $(id).empty().append(template)
+        },
+        error: function (xhr) {
+            $(id).empty();
+            mostrarErrorGrado(mensajeErrorGrado(xhr));
         }
     })
 }
@@ -209,25 +257,31 @@ $("body").on("click", ".editarGrado", function () {
         editAcadEst()
     }
 
-    id_grado = $(this).attr("id");
-    console.log(id_grado)
+    const id_grado = $(this).attr("id");
     $('#edit_academicos').attr('name', id_grado)
     $('#campos_grado').append('<h3 class="mb-5 text-center" id="text-tit">EDITAR GRADO ACADÉMICO</h3>')
+    const datosLectura = agregarUsuarioObjetivoGrado(
+        { op: "read_grado_id", id_grado },
+        $('#id_usuario').attr('name')
+    );
     $.ajax({
-        async: false,
         url: "../ajax/grado.php",
         type: "POST",
-        data: { op: "read_grado_id", id_grado },
+        dataType: 'json',
+        data: datosLectura,
         success: function (response) {
-            let grado = JSON.parse(response);
-            console.log(grado)
-            formGrado('#campos_grado',grado[0]['inst_grado'])
+            if (!response || response.ok !== true || !response.datos) {
+                mostrarErrorGrado(response && response.mensaje);
+                return;
+            }
+            const grado = response.datos;
+            formGrado('#campos_grado',grado['inst_grado'])
             //carga gradoacademico
-            tipo = grado[0]['tipo_grado']
+            tipo = grado['tipo_grado']
             $('#grad_acad').val(tipo == 1 || tipo == 2 ? 1 : 2)
             $('#grad_acad').attr('name', tipo == 1 || tipo == 2 ? 1 : 2)
-            $('#fech_grado').val(grado[0]['fech_graduacion'])
-            $('#fech_grado').attr('name', grado[0]['fech_graduacion'])
+            $('#fech_grado').val(grado['fech_graduacion'])
+            $('#fech_grado').attr('name', grado['fech_graduacion'])
             $('#grado').html('<option selected value="0">Seleccione</option')
             tipo_tit = tipo == 1 ? 'lic' : tipo == 2 ? 'un' : tipo == 3 ? 'mag' : 'doc';
             // carga de select titulo
@@ -240,13 +294,11 @@ $("body").on("click", ".editarGrado", function () {
                         `<option value="${item.id_titulo}">${item.tit_grado}</option>`
                     );
                 });
-                $(titulo).val(grado[0]['tit_grado'])
+                $(titulo).val(grado['tit_grado'])
 
             })
 
-            // $('#inst_grado').val(grado[0]['inst_grado'])
-            // console.log(grado[0]['inst_grado'])
-            $(titulo).attr('name', grado[0]['tit_grado'])
+            $('#s_tit').attr('name', grado['tit_grado'])
             if (tipo == 1 || tipo == 2) {
                 $('#grado').append('<option value="1">Licenciatura</option><option selected value="2">Título Universitario</option>')
                 if (tipo == 1) {
@@ -262,38 +314,54 @@ $("body").on("click", ".editarGrado", function () {
             //boton volver y editar
             $('#campos_grado').append('<div class="row mt-5 justify-content-between "><div class="col-6 col-md-4 mb-3"><button type="button" class="col-12 btn btn-dark col-6" id="volverAcad">Cancelar</button></div><div class="col-6 col-md-4 mb-3 "><button type="submit" class="col-12 btn btn-dark col-6">Editar</button></div></div>');
         },
+        error: function (xhr) {
+            mostrarErrorGrado(mensajeErrorGrado(xhr));
+        }
     });
 });
 $("body").on("click", ".eliminarGrado", function () {
-    id_grado = $(this).attr("id");
-    usu = $('#info_doc').attr('name')
+    const id_grado = $(this).attr("id");
+    if (!window.confirm('¿Confirma que desea eliminar este Grado académico?')) {
+        return;
+    }
+    const usuario = $('#id_usuario').attr('name');
+    const datosDelete = agregarUsuarioObjetivoGrado({ id_grado, op: "delete" }, usuario);
     $.ajax({
         url: "../ajax/grado.php",
         type: "POST",
-        data: { id_grado, op: "delete" },
+        dataType: 'json',
+        headers: headersCsrfGrado(),
+        data: datosDelete,
         success: function (response) {
-            let mensaje = JSON.parse(response);
+            if (!response || response.ok !== true) {
+                mostrarErrorGrado(response && response.mensaje);
+                return;
+            }
+            const mensaje = response.mensaje;
             if ($('#ficha_acad').attr('name')=='doc') {
                 
                 $("#mnsj_row_acad_doc").show();
-                $("#mnsj_acad_doc").addClass("alert-success");
-                $("#mnsj_acad_doc").html(mensaje);
+                $("#mnsj_acad_doc").removeClass("alert-danger").addClass("alert-success");
+                $("#mnsj_acad_doc").text(mensaje);
                 setTimeout(function () {
                     $("#mnsj_row_acad_doc").fadeOut(1500);
                     cargarFichaDoc($("#info_doc").attr('name'))
                 }, 3000);
             }else{
                 $("#mnsj_row_acad_est").show();
-                $("#mnsj_acad_est").addClass("alert-success");
-                $("#mnsj_acad_est").html(mensaje);
+                $("#mnsj_acad_est").removeClass("alert-danger").addClass("alert-success");
+                $("#mnsj_acad_est").text(mensaje);
                 setTimeout(function () {
                     $("#mnsj_row_acad_est").fadeOut(1500);
+                    cargarFichaEst($("#info_est").attr('name'))
                 }, 3000);
-                cargarFichaEst($("#info_est").attr('name'))
             }
                 
             
         },
+        error: function (xhr) {
+            mostrarErrorGrado(mensajeErrorGrado(xhr));
+        }
     });
 
 });
@@ -370,22 +438,34 @@ $('#form_grado').submit(function (e) {
         }
         inst = $('#id_inst').attr('name') == 0 ? inst : $('#id_inst').attr('name')
         titulo = $('#titulo').attr('name') == 0 ? titulo : titulo = $('#titulo').attr('name')
-        op = 'insert-update';
-        grado_arr = { inst, titulo, fecha, usuario, op };
-        console.log(grado_arr)
-        $.post('../ajax/grado.php', grado_arr, function (response) {
-            let dato = JSON.parse(response);
-            $('#mnsj_row_grad').show();
-            $('#mnsj_grad').removeClass('alert-danger');
-            $('#mnsj_grad').addClass('alert-success');
-            $('#mnsj_grad').html(dato);
-            setTimeout(function () {
-                $('#ingresar_grado').remove();
-                $('#boton_grado').show();
-                cargarGrado(usuario, '#grados_card')
-                $('.editarGrado').hide()
-                $("#mnsj_row_grad").fadeOut(1500);
-            }, 3000);
+        const grado_arr = agregarUsuarioObjetivoGrado(
+            { inst, titulo, fecha, op: 'insert-update' },
+            usuario
+        );
+        $.ajax({
+            url: '../ajax/grado.php',
+            type: 'POST',
+            dataType: 'json',
+            headers: headersCsrfGrado(),
+            data: grado_arr,
+            success: function (response) {
+                if (!response || response.ok !== true) {
+                    mostrarErrorGrado(response && response.mensaje);
+                    return;
+                }
+                $('#mnsj_row_grad').show();
+                $('#mnsj_grad').removeClass('alert-danger').addClass('alert-success');
+                $('#mnsj_grad').text(response.mensaje);
+                setTimeout(function () {
+                    $('#ingresar_grado').remove();
+                    $('#boton_grado').show();
+                    cargarGrado(usuario, '#grados_card')
+                    $("#mnsj_row_grad").fadeOut(1500);
+                }, 3000);
+            },
+            error: function (xhr) {
+                mostrarErrorGrado(mensajeErrorGrado(xhr));
+            }
         })
 
     }
@@ -450,23 +530,36 @@ $('#form_edit_grado').submit(function (e) {
     }
     inst = $('#id_inst').attr('name') == 0 ? inst : $('#id_inst').attr('name')
     titulo = $('#titulo').attr('name') == 0 ? titulo : titulo = $('#titulo').attr('name')
-    op = 'insert-update';
-    grado_arr = { inst, titulo, fecha, op, id_grado };
-    console.log(grado_arr)
-    $.post('../ajax/grado.php', grado_arr, function (response) {
-        let dato = JSON.parse(response);
-        $('#mnsj_row_grad').show();
-        $('#mnsj_grad').removeClass('alert-danger');
-        $('#mnsj_grad').addClass('alert-success');
-        $('#mnsj_grad').html(dato);
-        setTimeout(function () {
-            if($('#ficha_acad').attr('name')=='doc'){
-                reiniciarInfoDoc()
-            }else{
-                reiniciarInfoEst()
+    const grado_arr = agregarUsuarioObjetivoGrado(
+        { inst, titulo, fecha, op: 'insert-update', id_grado },
+        usuario
+    );
+    $.ajax({
+        url: '../ajax/grado.php',
+        type: 'POST',
+        dataType: 'json',
+        headers: headersCsrfGrado(),
+        data: grado_arr,
+        success: function (response) {
+            if (!response || response.ok !== true) {
+                mostrarErrorGrado(response && response.mensaje);
+                return;
             }
-            
-            $("#mnsj_row_grad").fadeOut(1500);
-        }, 3000);
+            $('#mnsj_row_grad').show();
+            $('#mnsj_grad').removeClass('alert-danger').addClass('alert-success');
+            $('#mnsj_grad').text(response.mensaje);
+            setTimeout(function () {
+                if($('#ficha_acad').attr('name')=='doc'){
+                    reiniciarInfoDoc()
+                }else{
+                    reiniciarInfoEst()
+                }
+
+                $("#mnsj_row_grad").fadeOut(1500);
+            }, 3000);
+        },
+        error: function (xhr) {
+            mostrarErrorGrado(mensajeErrorGrado(xhr));
+        }
     })
 })
