@@ -27,7 +27,7 @@
 <script src="<?php echo RUTA;?>form-doc/scripts/agrFormDatPers.js?d=@DateTime.Now.ToString("ddMMyyddmmsss")"></script>
 <script src="<?php echo RUTA;?>form-doc/scripts/usuario.js?d=@DateTime.Now.ToString("ddMMyyddmmsss")"></script>
 <script src="<?php echo RUTA;?>form-doc/scripts/grado.js?d=@DateTime.Now.ToString("ddMMyyddmmsss")"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/postdoctorado.js?d=@DateTime.Now.ToString("ddMMyyddmmsss")"></script>
+<script src="<?php echo RUTA;?>form-doc/scripts/postdoctorado.js?v=<?php echo filemtime(__DIR__ . '/scripts/postdoctorado.js');?>"></script>
 <script src="<?php echo RUTA;?>form-doc/scripts/publicacion.js?d=@DateTime.Now.ToString("ddMMyyddmmsss")"></script>
 <script src="<?php echo RUTA;?>form-doc/scripts/congreso.js?d=@DateTime.Now.ToString("ddMMyyddmmsss")"></script>
 <script src="<?php echo RUTA;?>form-doc/scripts/proyecto.js?d=@DateTime.Now.ToString("ddMMyyddmmsss")"></script>

@@ -39,6 +39,21 @@ if (session_status() === PHP_SESSION_ACTIVE) {
   }
   $gradoTokenCsrf = $_SESSION['csrf_grado'];
 }
+
+$postdoctoradoContexto = $gradoContexto;
+$postdoctoradoPuedeOperar = $gradoPuedeOperar;
+$postdoctoradoTokenCsrf = '';
+
+if (session_status() === PHP_SESSION_ACTIVE) {
+  if (
+    !isset($_SESSION['csrf_postdoctorado'])
+    || !is_string($_SESSION['csrf_postdoctorado'])
+    || preg_match('/^[a-f0-9]{64}$/D', $_SESSION['csrf_postdoctorado']) !== 1
+  ) {
+    $_SESSION['csrf_postdoctorado'] = bin2hex(random_bytes(32));
+  }
+  $postdoctoradoTokenCsrf = $_SESSION['csrf_postdoctorado'];
+}
 ?>
             <div id="grado-app"
               data-contexto="<?= htmlspecialchars($gradoContexto, ENT_QUOTES, 'UTF-8') ?>"
@@ -63,6 +78,9 @@ if (session_status() === PHP_SESSION_ACTIVE) {
               </div>
             </div>
 
+            <div id="postdoctorado-app"
+              data-contexto="<?= htmlspecialchars($postdoctoradoContexto, ENT_QUOTES, 'UTF-8') ?>"
+              data-csrf="<?= htmlspecialchars($postdoctoradoTokenCsrf, ENT_QUOTES, 'UTF-8') ?>"></div>
             <div class='row'>
               <div class="col-12" id="postdoc_card">
 
@@ -74,7 +92,9 @@ if (session_status() === PHP_SESSION_ACTIVE) {
             </div> 
             <div class="row" id="boton_postdoc">
               <div class=" col d-grid gap-2 mb-3">
+                <?php if ($postdoctoradoPuedeOperar): ?>
                 <button class="btn btn-outline-dark" id="btn_postdoc" name="btn_postdoc" type="button" >Agregar Postdoctorado</button>
+                <?php endif; ?>
               </div>
             </div>
                   
