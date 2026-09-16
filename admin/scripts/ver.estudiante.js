@@ -170,6 +170,7 @@ cargarPub($("#info_est").attr("name"), "#publi_est");
 cargarCong($("#info_est").attr("name"), "#cong_est");
 cargarProy($("#info_est").attr("name"), "#proy_est");
 cargarPasantia($("#info_est").attr("name"), "#pasant_est");
+cargarBeca($("#info_est").attr("name"), "#beca_card");
 }
 function cargarEst(tipo,busqueda){
     op =

@@ -7,6 +7,15 @@ if (strlen(session_id()) < 1) {
 if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
     header('Location:../index.php');
 } else {
+    if (
+        !isset($_SESSION['csrf_beca'])
+        || !is_string($_SESSION['csrf_beca'])
+        || preg_match('/^[a-f0-9]{64}$/D', $_SESSION['csrf_beca']) !== 1
+    ) {
+        $_SESSION['csrf_beca'] = bin2hex(random_bytes(32));
+    }
+
+    $becaTokenCsrf = $_SESSION['csrf_beca'];
     require ('../form-doc/header.php');
     ?>
     <div class="container mt-2">
@@ -61,6 +70,7 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
                             </div>
                         </div>
                     </div>
+                    <div class="d-none" id="beca_catalogo" data-csrf="<?= htmlspecialchars($becaTokenCsrf, ENT_QUOTES, 'UTF-8') ?>" ></div>
                 </div>
             </div>
         </div>

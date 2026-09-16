@@ -34,6 +34,7 @@ function cargarDatosAcademicos(){
     cargarPasantia($('#id_usuario').attr('name'), '#pasantia_card')
     cargarProy($('#id_usuario').attr('name'), '#proyecto_card')
     cargarTesis($('#id_usuario').attr('name'), '#tesis_card')
+    cargarBeca($('#id_usuario').attr('name'), '#beca_card')
 }
 function AcadEst() {
     $('html, body').stop().animate({

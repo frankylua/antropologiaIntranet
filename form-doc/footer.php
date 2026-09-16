@@ -32,7 +32,7 @@
 <script src="<?php echo RUTA;?>form-doc/scripts/congreso.js?d=@DateTime.Now.ToString("ddMMyyddmmsss")"></script>
 <script src="<?php echo RUTA;?>form-doc/scripts/proyecto.js?d=@DateTime.Now.ToString("ddMMyyddmmsss")"></script>
 <script src="<?php echo RUTA;?>form-doc/scripts/pasantia.js?d=@DateTime.Now.ToString("ddMMyyddmmsss")"></script>
-<script src="<?php echo RUTA;?>form-doc/scripts/beca.js?d=@DateTime.Now.ToString("ddMMyyddmmsss")"></script>
+<script src="<?php echo RUTA;?>form-doc/scripts/beca.js?v=<?php echo filemtime(__DIR__ . '/scripts/beca.js');?>"></script>
 <script src="<?php echo RUTA;?>form-doc/scripts/tesis.js?d=@DateTime.Now.ToString("ddMMyyddmmsss")"></script>
 </html>
     
