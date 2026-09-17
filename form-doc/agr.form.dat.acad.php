@@ -43,6 +43,9 @@ if (session_status() === PHP_SESSION_ACTIVE) {
 $postdoctoradoContexto = $gradoContexto;
 $postdoctoradoPuedeOperar = $gradoPuedeOperar;
 $postdoctoradoTokenCsrf = '';
+$pasantiaContexto = $gradoContexto;
+$pasantiaPuedeOperar = $gradoPuedeOperar;
+$pasantiaTokenCsrf = '';
 
 if (session_status() === PHP_SESSION_ACTIVE) {
   if (
@@ -53,6 +56,14 @@ if (session_status() === PHP_SESSION_ACTIVE) {
     $_SESSION['csrf_postdoctorado'] = bin2hex(random_bytes(32));
   }
   $postdoctoradoTokenCsrf = $_SESSION['csrf_postdoctorado'];
+  if (
+    !isset($_SESSION['csrf_pasantia'])
+    || !is_string($_SESSION['csrf_pasantia'])
+    || preg_match('/^[a-f0-9]{64}$/D', $_SESSION['csrf_pasantia']) !== 1
+  ) {
+    $_SESSION['csrf_pasantia'] = bin2hex(random_bytes(32));
+  }
+  $pasantiaTokenCsrf = $_SESSION['csrf_pasantia'];
 }
 ?>
             <div id="grado-app"
@@ -151,18 +162,23 @@ if (session_status() === PHP_SESSION_ACTIVE) {
               </div>
             </div>
 
+            <div id="pasantia-app"
+              data-contexto="<?= htmlspecialchars($pasantiaContexto, ENT_QUOTES, 'UTF-8') ?>"
+              data-csrf="<?= htmlspecialchars($pasantiaTokenCsrf, ENT_QUOTES, 'UTF-8') ?>"></div>
             <div class='row' >
-              <form action="" id="form_pasantia">
+              <div id="form_pasantia">
               <div class="col-12" id="pasantia_card">
               </div>
               <div class="col" id='pasantia'>
               </div>
-              </form>
+              </div>
             </div>
 
             <div class="row" id="boton_pasantia">
               <div class=" col d-grid gap-2 mb-3">
+                <?php if ($pasantiaPuedeOperar): ?>
                 <button class="btn btn-outline-dark" type="button" id="btn_pasantia">Agregar Pasantía</button>
+                <?php endif; ?>
               </div>
             </div>
 

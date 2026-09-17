@@ -293,11 +293,11 @@
           <div class="accordion-item">
             <h2 class="accordion-header">
               <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                data-bs-target="#collapsePasant" aria-expanded="false" aria-controls="collapsePasant">
+                data-bs-target="#collapsePasantiaEst" aria-expanded="false" aria-controls="collapsePasantiaEst">
                 <H5>PASANTÍA</H5>
               </button>
             </h2>
-            <div id="collapsePasant" class="accordion-collapse collapse" data-bs-parent="#accordionEst">
+            <div id="collapsePasantiaEst" class="accordion-collapse collapse" data-bs-parent="#accordionEst">
               <div class="accordion-body">
                 <div class="col-12" id="pasant_est"></div>   
               </div>
@@ -318,4 +318,3 @@
               </div>
             </div>
           </div>
-         
