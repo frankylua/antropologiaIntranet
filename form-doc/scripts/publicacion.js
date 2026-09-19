@@ -1,827 +1,174 @@
-  //Agregar Publicación
-  $('#btn_publicacion').click(function(){
-    $('#boton_publicacion').hide();
-  $('#publicacion').append('<div class="card mb-3" id="ingresar_publicacion"><div class="card-body" id="pub_card"> </div></div>');
-  $('#pub_card').append('<div class="row justify-content-between"><div class="col-auto mb-3"><h4>Publicación</h4></div><div class="col-auto"><button type="button" name="add" id="close_pub" class="btn btn-close btn-sm borrar_publicacion"></button></div></div>');   
-  $('#pub_card').append('<div class="row "><div class="col-12 mb-3 "> <label for="pub" class="form-label">Tipo de Publicación</label><select id="pub" name="pub" class="form-select publ"><option selected value="0">Publicación</option><option value="1">Artículo</option><option value="2">Edición de Revista Temática</option><option value="3">Libro o capítulo de Libro</option><option value="4">Otra Publicación</option></select></div></div>');
-  $('#pub_card').append('<div class="col" id="id_pub"></div>');
-  $('#pub_card').append(' <div class="row justify-content-center " id="mnsj_row_pub"><div class="col-lg-8 alert  text-center alert-danger" role="alert" id="mnsj_pub"></div></div>')
-  $('#pub_card').append('<div class="row justify-content-center" id="guardar_pub" ><div class="col-md-6 mt-3 d-grid gap-2"><button type="submit" class="btn btn-dark">Guardar Publicación</button></div></div>');
-  $('#mnsj_row_pub').hide();
-  $('#guardar_pub').hide();
-  })
-  //form articulo/revista
-  function formArtRev(cont){
-    $(cont).append('<div class="row justify-content-between" id="row_pub"><div class="col" id="pub_col"></div></div></div>');    
-      $('#pub_col').append('<div class="row "> <div class="col-md-8 mb-3"><label for="titulo" class="form-label">Título</label><textarea rows="2" class="form-control " id="titulo" maxlength="300"></textarea></div><div class="col-md-4 mb-3"><label for="anio" class="form-label">Año</label><select  class="form-select anio" id="anio"><select/></div></div>');
-      $('#pub_col').append('<div class="row"><div class="col mb-3"><div class="card"><div class="card-body"><div class="row justify-content-between"><div class="col-auto mb-3"> <h6 class="card-title fs-5">Otros/as Autores/as</h6></div></div> <div class="row"><div class="col-md-12 mb-3"><label for="autores" class="form-label">(Ingresar nombres separados por una coma)</label><textarea class="form-control " id="autores" rows="3" maxlength="300"></textarea></div> </div> </div> </div></div></div>');
-      $('#pub_col').append('<div class="row"><div class="col-md-6 mb-3"> <label for="nombre" class="form-label">Nombre Revista</label><input type="text" class="form-control " id="nombre" maxlength="60"></div><div class="col-md-6 mb-3 "><label for="indizacion" class="form-label">Indización</label><select id="indizacion" class="form-select indiz"><option selected value="0">Tipo</option ><option value="2">Wos</option><option value="3">Scopus</option><option value="4">Erih Plus</option ><option value="5">Scielo</option><option value="6">Latindex</option><option value="1">No tiene</option></select></div></div>');
-      $('#pub_col').append('<div class="row"><div class="col-md-6 mb-3 "><label for="estado" class="form-label">Estado</label><select id="estado" class="form-select est"><option selected value="0">Seleccione Estado</option><option value="1">Publicada</option><option value="2">En Prensa</option><option value="3">Aceptada</option><option value="4">Enviada</option></select></div><div class="col-md-6 mb-3"><label for="issn" class="form-label">Issn</label><input type="text" class="form-control " id="issn" maxlength="9"></div>');
-      $('#pub_col').append('<div class="row"><label for="fact_imp" class="form-label">Factor de Impacto</label><div class="col-md-6 mb-3"><input type="number" step="any" class="form-control fact_imp" id="fact_imp" name="factor"></div><div class="col-md-6 mb-3 align-self-center"><div class="form-check"><input type="radio" class="form-check-input no_fac"  id="no_fac" name="no_fac"><label for="no_fac" class="form-check-label">No tiene Factor de Impacto</label></div></div>');
-      $('#pub_col').append(' <div class="row justify-content-center " id="mnsj_row_pub"><div class="col-lg-8 alert  text-center alert-danger" role="alert" id="mnsj_pub"></div></div>')
+/* global $ */
+(function () {
+  'use strict';
+  const endpoint = '../ajax/publicacion.php';
+  const context = { loaded: false, pending: null, csrfToken: null, canManageGlobal: false };
+  let usuarioContextual = null;
+  let selectorListado = '#publicacion_card';
+  let editorialesExistentes = [];
+  let editorialesNuevas = [];
 
-      anios('#anio',1960);
+  function notify(message) { const $m = $('#mnsj_pub'); if ($m.length) $m.text(message).show(); }
+  function failure(xhr) { return xhr && xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'No fue posible completar la operación.'; }
+  function request(data, write) {
+    const options = { url: endpoint, type: 'POST', dataType: 'json', data };
+    if (write) options.headers = { 'X-CSRF-Token': context.csrfToken };
+    return $.ajax(options).then(function (response) {
+      return response && response.status === 'OK' ? response : $.Deferred().reject({ responseJSON: response }).promise();
+    });
   }
-  //libro
-  function formLibro(cont){
-    $(cont).append('<div class="row justify-content-between" id="libro"><div class="col" id="libro_col"></div></div>');
-    $('#libro_col').append('<div class="row"><div class="col-md-6 mb-3"><select id="tipo_libro" class="form-select select_acad"><option selected value="0">Tipo</option><option value="1">Libro</option><option value="2">Capítulo</option></select></div><div class="col-md-6 mb-3"><select id="rol_libro" class="form-select"><option selected value="0">Rol</option><option value="1">Autor/a</option><option value="2">Editor/a</option></select></div></div>');
-    $('#libro_col').append('<div class="row"><div class="col-md-8 mb-3"><label for="nombre" class="form-label">Nombre Capítulo y/o Libro</label><input type="text" class="form-control" id="nombre" maxlength="60"></div><div class="col-md-4 mb-3"><label for="anio" class="form-label">Año</label><select  class="form-select anio" id="anio"><select/></div></div>');
-    $('#libro_col').append('<div class="row"><div class="col mb-3"><div class="card"><div class="card-body"><div class="row justify-content-between"><div class="col-auto mb-3"><h6 class="card-title fs-5">Otros/as Autores/as</h6></div></div><div class="row"><div class="col-md-12 mb-3"><label for="autores" class="form-label">(Ingresar nombres separados por una coma)</label><textarea class="form-control" id="autores" rows="3" maxlength="300"></textarea><div class="row" id="val_aut_libro"></div></div></div></div></div></div></div>');
-    $('#libro_col').append('<div class="row"><div class="col-md-6 mb-3"><label  class="form-label mb-2">Referato Externo</label><div class="row"><div class="col-auto"><div class="form-check"><input type="radio" class="form-check-input referato" name="ref_ext" id="si_ref_ext" value="1"><label for="si_ref_ext" class="form-check-label">Sí</label></div></div><div class="col-auto"><div class="form-check"><input type="radio" class="form-check-input referato" name="ref_ext" value="0" id="no_ref_ext"><label for="no_ref_ext" class="form-check-label">No</label></div></div></div></div><div class="col-md-6 mb-3"><label  class="form-label mb-2">Corresponde a traducción</label><div class="row"><div class="col-auto"><div class="form-check"><input type="radio" class="form-check-input traduccion" name="traduc" value="1" id="si_traduc"><label for="si_traduc" class="form-check-label">Sí</label></div></div><div class="col-auto"><div class="form-check"><input type="radio" class="form-check-input traduccion" name="traduc" value="0" id="no_traduc"><label for="no_traduc" class="form-check-label">No</label></div></div></div></div>')
-    $('#libro_col').append('<div class="row"><div class="col-md-6 mb-3"><label for="lugar" class="form-label">Lugar</label><input type="text" class="form-control" id="lugar" maxlength="45"><div class="row" id="val_lug_lib"></div></div><div class="col-md-6 mb-3"><label for="estado" class="form-label">Estado</label><select id="estado" class="form-select"><option selected value="0">Estado</option><option value="1">Publicada</option><option value="2">En Prensa</option><option value="3">Aceptada</option><option value="4">Enviada</option></select></div></div>');
-    $('#libro_col').append('<div class="row"><div class="col-md-6 mb-3"><label for="editorial" class="form-label">Editorial(es)</label><input type="text" class="form-control" id="editorial" placeholder="Editorial" name="0"><ul class="list-group" id="list_editorial"></ul></div></div><div class="row"><div class="col-md-6 " id="agr_editorial"></div></div>');
-    $('#libro_col').append('<div class="row"><div class="col-md-3 mb-3"><button type="button" class="btn btn-dark btn_editorial" id="btn_editorial">Agregar Editorial</button></div></div>');
-    $('#libro_col').append(' <div class="row justify-content-center " id="mnsj_row_pub"><div class="col-lg-8 alert  text-center alert-danger" role="alert" id="mnsj_pub"></div></div>')
-
-    anios('#anio',1950) 
-    $('#editorial').keyup(function(){    
-      $('#list_editorial').hide();
-      busqueda=$('#editorial').val(); 
-      if(busqueda!==''){
-        $.ajax({
-            url: '../ajax/publicacion.php',
-            type: 'POST',
-            data: {op:'read_edit',busqueda},
-            success: function(response){
-            let editoriales = JSON.parse(response);
-            let template ='';
-            console.log(editoriales)
-            //$('#prof_guia').attr('name','');
-            editoriales.forEach(list => {
-                template += `
-                <li class='list-group-item listEdit' id='${list.id_editorial}' name="${list.nombre}"> ${list.nombre}</li>`});
-                $('#list_editorial').html(template);
-                $('#list_editorial').show();           
-             }
-         })
-    
-      }    
-    })
+  function ensurePublicacionContext() {
+    if (context.loaded) return $.Deferred().resolve(context).promise();
+    if (context.pending) return context.pending;
+    context.pending = request({ op: 'context' }).then(function (response) {
+      const data = response.data || {};
+      if (typeof data.csrf_token !== 'string' || typeof data.can_manage_global !== 'boolean') return $.Deferred().reject().promise();
+      context.loaded = true; context.csrfToken = data.csrf_token; context.canManageGlobal = data.can_manage_global;
+      return context;
+    }).always(function () { context.pending = null; });
+    return context.pending;
   }
-  //form otra publicacion
-  function formOtraPub(cont){
-    $(cont).append('<div class="row justify-content-between" id="otra_pub"><div class="col" id="otra_col"></div></div>');
-    $('#otra_col').append('<div class="row"><div class="col-md-6 mb-3"><label for="tipo_otra_pub" class="form-label">Tipo</label><input type="text" class="form-control" id="tipo_otra_pub" maxlength="50"></div>');
-    $('#otra_col').append('<div class="row"><div class="col mb-3"><div class="row"><div class="col-md-12 mb-3"><label for="desc_pub" class="form-label">Descripción</label><textarea class="form-control" id="desc_pub" rows="3" maxlength="300"></textarea><div class="row" id="val_desc_pub"</div></div></div></div>');
-    $('#otra_col').append(' <div class="row justify-content-center " id="mnsj_row_pub"><div class="col-lg-8 alert  text-center alert-danger" role="alert" id="mnsj_pub"></div></div>')
-
-
+  function payloadContextual() { return context.canManageGlobal && usuarioContextual ? { usuario: usuarioContextual, subject_usuario_id: usuarioContextual } : {}; }
+  function value(value) { return value == null ? '' : String(value); }
+  function nombreNominal(entrada) { const texto = value(entrada).trim().replace(/\s+/g, ' '); return texto ? cadenaMay(texto) : ''; }
+  function otrosCoautores(entrada) { const texto = value(entrada).trim(); return texto ? nombreNominal(texto) : 'Sin coautores adicionales.'; }
+  function editorialesLibro(editoriales) { const nombres = (Array.isArray(editoriales) ? editoriales : []).map(function (editorial) { return nombreNominal(editorial && editorial.nombre); }).filter(Boolean); return nombres.length ? nombres.join(', ') : 'Sin editoriales registradas.'; }
+  function action(label, className, data) { const $button = $('<button>', { type: 'button', class: className }).text(label); if (data !== undefined) $button.data(data); return $button; }
+  function tableCard(title, fields, controls) {
+    const $table = $('<table>', { class: 'table table-striped' });
+    const $tr = $('<tr>').append($('<th>').append($('<h5>').text(title)));
+    $tr.append($('<th>', { class: 'row justify-content-end ps-0 botones' }).append(controls));
+    const $body = $('<tbody>');
+    fields.forEach(function (field) { $body.append($('<tr>').append($('<td>').text(field[0]), $('<td>').text(value(field[1])))); });
+    return $('<div>', { class: 'card mb-3 card_pub' }).append($('<div>', { class: 'card-body' }).append($table.append($('<thead>').append($tr), $body)));
   }
-  let x=0
-  let arrayx=[]
-
-    function agrEdit(){
-        x++ 
-        $('#agr_editorial').append('<div class="row" id="ed'+x+'"><div class="col mb-3"><input type="text" class="form-control" id="edit'+x+'" placeholder=" Editorial" name="0" maxlength="60"><ul class="list-group" id="list_editorial'+x+'"></ul></div><div class="col-auto mb-3"><button type="button" class="btn btn-dark elim_edit" id="'+x+'">x</button></div></div>');
-        arrayx.push(x)
-        $('#ed'+x).keyup(function(){    
-          $('#list_editorial'+x).hide();
-          busqueda=$('#edit'+x).val(); 
-          if(busqueda!==''){
-            $.ajax({
-                url: '../ajax/publicacion.php',
-                type: 'POST',
-                data: {op:'read_edit',busqueda},
-                success: function(response){
-                let editoriales = JSON.parse(response);
-                let template ='';
-                console.log(editoriales)
-                //$('#prof_guia').attr('name','');
-                editoriales.forEach(list => {
-                    template += `
-                    <li class='list-group-item listEditNew' id='${list.id_editorial}' name="${list.nombre}"> ${list.nombre}</li>`});
-                    $('#list_editorial'+x).html(template);
-                    $('#list_editorial'+x).show();           
-                 }
-             })
-        
-          }    
-        })
-      $('body').on('click','.listEditNew',function(){
-        id=$(this).attr('id');
-        nom_edit=cadenaMay($(this).attr('name'));
-        $('#edit'+x).val(nom_edit);
-        $('#edit'+x).attr('name',id);
-        $('#list_editorial'+x).hide();   
-    })
+  function controls(id, type, otra) {
+    if (!context.canManageGlobal) return [];
+    return [action('Editar', otra ? 'col-auto btn btn-link link-success ps-1 editarOtraPub' : 'col-auto btn btn-link link-success ps-1 editarPub', { id, tipo: type }), action('Eliminar', otra ? 'col-auto btn btn-link link-danger ps-1 eliminarOtraPub' : 'col-auto btn btn-link link-danger ps-1 eliminarPub', { id })];
+  }
+  function render($target, list, otras) {
+    $target.empty();
+    (list.articulos || []).forEach(function (p) { $target.append(tableCard('PUBLICACIÓN', [['Tipo', nombreNominal(Number(p.tipo) === 1 ? 'Artículo' : 'Edición de Revista Temática')], ['Título', nombreNominal(p.titulo)], ['Año', p.anio], ['Nombre Revista', nombreNominal(p.nombre_revista)], ['Indización', nombreNominal(p.indizacion)], ['Estado', nombreNominal(p.estado_publicacion)], ['Issn', p.issn], ['Factor de Impacto', Number(p.factor_impacto) ? p.factor_impacto : 'No tiene factor de impacto'], ['Autor principal', nombreNominal(p.autor_nombre)], ['Coautor principal', nombreNominal(p.coautor_nombre)], ['Otros coautores', otrosCoautores(p.otros_autores)]], controls(Number(p.id_publicacion), Number(p.tipo), false))); });
+    (list.libros || []).forEach(function (p) { $target.append(tableCard('PUBLICACIÓN', [['Tipo', nombreNominal(Number(p.tipo) === 1 ? 'Libro' : 'Capítulo de Libro')], ['Nombre', nombreNominal(p.nom_pub)], ['Rol', nombreNominal(Number(p.rol) === 1 ? 'Autor/a' : 'Editor/a')], ['Año', p.anio], ['Estado', nombreNominal(p.nom_est)], ['Lugar', nombreNominal(p.lugar)], ['Autor principal', nombreNominal(p.autor_nombre)], ['Coautor principal', nombreNominal(p.coautor_nombre)], ['Otros coautores', otrosCoautores(p.otros_autores)], ['Editoriales', editorialesLibro(p.editoriales)]], controls(Number(p.id_publicacion), 3, false))); });
+    (otras || []).forEach(function (p) { $target.append(tableCard('OTRA PUBLICACIÓN', [['Tipo', nombreNominal(p.tipo)], ['Descripción', nombreNominal(p.descripcion)]], controls(Number(p.id_otra_pub), 4, true))); });
+  }
+  window.cargarPub = function (usuario, selector) {
+    usuarioContextual = Number.parseInt(usuario, 10) || null;
+    if (selector) selectorListado = selector;
+    const $target = $(selectorListado).empty();
+    return ensurePublicacionContext().then(function () { return $.when(request(Object.assign({ op: 'list' }, payloadContextual())), request(Object.assign({ op: 'otra_list' }, payloadContextual()))); }).then(function (list, otras) { render($target, list.data || {}, otras.data || []); }).fail(function (xhr) { notify(failure(xhr)); });
+  };
+  function restaurarListadoPublicacion() {
+    $('#campos_publicacion').empty();
+    if (selectorListado === '#ficha_publicacion') {
+      $('#edit_acad_doc').stop(true, true).hide();
+      $('#info_doc').stop(true, true).show();
+    } else if (selectorListado === '#publi_est') {
+      $('#edit_acad_est').stop(true, true).hide();
+      $('#info_est').stop(true, true).show();
+    } else if ($('#ficha_acad').attr('name') === 'doc') {
+      $('#edit_acad_doc').stop(true, true).hide();
+      $('#acad_doc').stop(true, true).show();
+    } else {
+      $('#edit_acad_est').stop(true, true).hide();
+      $('#acad_est').stop(true, true).show();
     }
-  
-  //Select Publicacion
-  $(document).on('change','.publ',function(){  
-    $('#row_pub').remove();
-    $('#libro').remove();
-    $('#otra_pub').remove();
-  
-    if($('#pub').val() == '0'){
-      $('#guardar_pub').hide();
-    }else{
-      $('#guardar_pub').show();
+    return window.cargarPub(usuarioContextual, selectorListado);
+  }
+  function input(label, id, type, max) { return $('<div>', { class: 'col-md-6 mb-3' }).append($('<label>', { for: id, class: 'form-label' }).text(label), type === 'textarea' ? $('<textarea>', { id, class: 'form-control', maxlength: max }) : $('<input>', { id, type: type || 'text', class: 'form-control', maxlength: max })); }
+  function select(label, id, choices) { const $s = $('<select>', { id, class: 'form-select' }).append($('<option>', { value: '' }).text('Seleccione')); choices.forEach(function (c) { $s.append($('<option>', { value: c[0] }).text(c[1])); }); return $('<div>', { class: 'col-md-6 mb-3' }).append($('<label>', { for: id, class: 'form-label' }).text(label), $s); }
+  function editoriales($root) { $root.append($('<div>', { class: 'row' }).append(input('Editorial(es)', 'editorial', 'text', 60), $('<div>', { class: 'col-md-3 align-self-end' }).append(action('Agregar editorial', 'btn btn-dark btn_editorial'))), $('<ul>', { id: 'list_editorial', class: 'list-group' }).hide(), $('<div>', { id: 'editoriales_seleccionadas' })); renderEditoriales(); }
+  function renderEditoriales() { const $root = $('#editoriales_seleccionadas').empty(); editorialesExistentes.forEach(function (p) { $root.append(action(p.nombre + ' ×', 'btn btn-sm btn-outline-secondary me-1 quitar-editorial', { kind: 'old', id: p.id })); }); editorialesNuevas.forEach(function (p) { $root.append(action(p + ' ×', 'btn btn-sm btn-outline-secondary me-1 quitar-editorial', { kind: 'new', name: p })); }); }
+  function fields($root, type) {
+    $root.append($('<div>', { class: 'row' }).append(input(type === 3 ? 'Nombre libro' : 'Nombre Revista', 'nombre', 'text', 60), input('Año', 'anio', 'number')),$('<div>', { class: 'row' }).append(input('Otros/as Autores/as', 'autores', 'textarea', 300), select('Estado', 'estado', [[1, 'Publicada'], [2, 'En Prensa'], [3, 'Aceptada'], [4, 'Enviada']])));
+    if (type < 3) {
+      const $factor = input('Factor de Impacto', 'fac_imp', 'number');
+      const $sinFactor = $('<div>', { class: 'col-md-6 mb-3 align-self-end' }).append($('<div>', { class: 'form-check' }).append($('<input>', { id: 'no_fac', type: 'checkbox', class: 'form-check-input' }), $('<label>', { for: 'no_fac', class: 'form-check-label' }).text('No tiene Factor de Impacto')));
+      $root.append($('<div>', { class: 'row' }).append(input('Título', 'titulo', 'textarea', 300), input('Issn', 'issn', 'text', 9)),$('<div>', { class: 'row' }).append(select('Indización', 'indizacion', [[1, 'No tiene'], [2, 'Wos'], [3, 'Scopus'], [4, 'Erih Plus'], [5, 'Scielo'], [6, 'Latindex']]), $factor), $('<div>', { class: 'row' }).append($sinFactor));
     }
-    //agregar articulo o revista
-    if($('#pub').val() == '1' || $('#pub').val()== '2'){
-      formArtRev('#id_pub')
-    }
-    //Agregar Libro
-    if($('#pub').val() == '3'){
-         formLibro('#id_pub')           
-    }
-    //Agregar Editorial
-    $('#btn_editorial').click(function(){       
-        agrEdit();
-    })
-    //Eliminar Editorial
-    $(document).on('click', '.elim_edit', function(){
-        var button_id = $(this).attr("id"); 
-        arrayx = arrayx.filter(exis => exis != button_id)
-        $('#ed'+button_id).remove();
-    })
-    //Agregar Otra Publicacion
-    if($('#pub').val() =='4'){
-        formOtraPub('#id_pub')
-    }
-  })
-  //borrar formulario Publicacion
-  $(document).on('click', '.borrar_publicacion', function(){
-    $('#ingresar_publicacion').remove();
-    $('#boton_publicacion').show();
-  })
-  function cargarPub(usuario,id){
-    //cargar articulos y revistas
-    $.ajax({
-        async: false,
-        type : 'POST',
-        url : '../ajax/publicacion.php',
-        data : {op:'read_articulos',usuario},
-        success : function(response) {
-        if( response && response.trim() !== ""){
+    else $root.append($('<div>', { class: 'row' }).append(select('Tipo libro', 'tipo_lib', [[1, 'Libro'], [2, 'Capítulo']]), select('Rol bibliográfico', 'rol_libro', [[1, 'Autor/a'], [2, 'Editor/a']])),$('<div>', { class: 'row' }).append(select('Referato externo', 'ref_ext', [[1, 'Sí'], [0, 'No']]), select('Traducción', 'traduccion', [[1, 'Sí'], [0, 'No']])), $('<div>', { class: 'row' }).append(input('Lugar', 'lugar', 'text', 45)), editoriales($root));
+  }
+  function formData(type) { const data = { tipo: type, nombre: $.trim($('#nombre').val()), autores: $.trim($('#autores').val()), anio: Number($('#anio').val()), estado: Number($('#estado').val()) }; if (type < 3) Object.assign(data, { titulo: $.trim($('#titulo').val()), issn: $.trim($('#issn').val()), indizacion: Number($('#indizacion').val()), fac_imp: $('#no_fac').is(':checked') ? 0 : Number($('#fac_imp').val()) }); else Object.assign(data, { tipo_lib: Number($('#tipo_lib').val()), rol_libro: Number($('#rol_libro').val()), ref_ext: Number($('#ref_ext').val()), traduccion: Number($('#traduccion').val()), lugar: $.trim($('#lugar').val()), editoriales_existentes: editorialesExistentes.map(function (p) { return p.id; }), editoriales_nuevas: editorialesNuevas.slice() }); return data; }
+  function valid(data) { return data.nombre && data.anio && data.estado && (data.tipo === 3 ? data.tipo_lib && data.rol_libro && data.lugar : data.titulo && data.issn && data.indizacion && ($('#no_fac').is(':checked') || $.trim($('#fac_imp').val()) !== '')); }
+  function syncFactorImpacto() { const disabled = $('#no_fac').is(':checked'); $('#fac_imp').prop('disabled', disabled); if (disabled) $('#fac_imp').val(''); }
+  function participantBlock() {
+    const $box=$('<fieldset>',{class:'border rounded p-3 mb-3 participant-block'}).append($('<legend>',{class:'float-none w-auto px-2 fs-6'}).text('Autoría principal'));
+    const $role=select('Rol en la publicación','rol_propio',[['AUTOR','Autor'],['COAUTOR','Coautor']]);
+    const $input=$('<input>',{type:'text',id:'persona_contraria',class:'form-control academic-search',autocomplete:'off',maxlength:120});
+    return $box.append($('<div>',{class:'row'}).append($role),$('<label>',{for:'persona_contraria',class:'form-label'}).text('Coautor'),$input,$('<div>',{class:'small mt-1 academic-selected'}).data('id',null),$('<ul>',{class:'list-group academic-results mt-1'}).hide());
+  }
+  function participantsData() {
+    const rol=$('#rol_propio').val(), id=Number($('.academic-selected').data('id'))||null, texto=$.trim($('#persona_contraria').val());
+    let data={};
+    if(!rol)return {data:data,error:'Seleccione el rol en la publicación.'}; if(!texto)return {data:data,error:'Ingrese la persona del rol contrario.'};
+    const propio=usuarioContextual, contrarioUsuario=id||'', contrarioNombre=id?'':texto;
+    if(id&&id===propio)return {data:data,error:'Autor y Coautor principal no pueden ser el mismo usuario.'};
+    if(rol==='AUTOR'){data={autor_usuario:propio,autor_nombre_externo:'',coautor_usuario:contrarioUsuario,coautor_nombre_externo:contrarioNombre};}else{data={autor_usuario:contrarioUsuario,autor_nombre_externo:contrarioNombre,coautor_usuario:propio,coautor_nombre_externo:''};}
+    return {data:data,error:!propio?'No existe usuario contextual de ficha.':''};
+  }
+  function hydrateParticipant(autor, coautor) {
+    const propioAutor=autor && Number(autor.usuario)===usuarioContextual, propioCoautor=coautor && Number(coautor.usuario)===usuarioContextual;
+    const propio=propioAutor?'AUTOR':propioCoautor?'COAUTOR':''; const contrario=propioAutor?coautor:autor;
+    $('#rol_propio').val(propio); actualizarEtiquetaContraria();
+    if(!contrario)return; $('#persona_contraria').val(contrario.tipo==='INTERNO'?(contrario.nombre||''):(contrario.nombre_externo||'')); $('.academic-selected').text(contrario.tipo==='INTERNO'?(contrario.nombre||''):'').data('id',contrario.tipo==='INTERNO'?Number(contrario.usuario):null);
+  }
+  function actualizarEtiquetaContraria(){ $('#persona_contraria').prev('label').text($('#rol_propio').val()==='AUTOR'?'Coautor':'Autor'); }
+  function openEdit(idPublicacion, type) {
+    if (!context.canManageGlobal) return;
+    if ($('#ficha_acad').attr('name') === 'doc') editAcadDoc(); else editAcadEst();
+    request({ op: 'detail', id_publicacion: idPublicacion, tipo: type }).then(function (response) {
+      const data = response.data || {};
+      const $box = $('<div>', { class: 'publicacion-edit', 'data-id-publicacion': idPublicacion, 'data-tipo': type });
+      const $campos = $('#campos_publicacion');
+      $campos.closest('#edit_acad_doc, #edit_acad_est').stop(true, true).show();
+      const $header = $('<div>',{class:'row justify-content-between'}).append($('<div>',{class:'col-auto mb-3'}).append($('<h3>',{class:'card-title'}).text('EDITAR PUBLICACIÓN')),$('<div>',{class:'col-auto'}).append($('<button>',{type:'button',class:'btn btn-close btn-sm cancelar-publicacion','aria-label':'Cerrar'})));
+      editorialesExistentes = type === 3 ? (data.editoriales || []).map(function (p) { return { id: Number(p.id_editorial), nombre: value(p.nombre) }; }).filter(function (p) { return p.id > 0; }) : [];
+      editorialesNuevas = [];
+      fields($box, type); $box.append(participantBlock());
+      $box.append($('<div>', { class: 'row mt-5 justify-content-end' }).append($('<div>', { class: 'col-12 col-md-4 mb-3 d-grid' }).append(action('Guardar cambios', 'col-12 btn btn-dark guardar-edicion'))));
+      $campos.stop(true, true).show().empty().append($header, $box);
+      $('#nombre').val(data.nombre); $('#autores').val(data.otros_autores || ''); $('#anio').val(data.anio); $('#estado').val(data.estado);
+      hydrateParticipant(data.autor,data.coautor);
+      if (type === 3) { $('#tipo_lib').val(data.tipo); $('#rol_libro').val(data.rol); $('#ref_ext').val(data.ref_ext); $('#traduccion').val(data.traduccion); $('#lugar').val(data.lugar); renderEditoriales(); }
+      else { $('#titulo').val(data.titulo); $('#issn').val(data.issn); $('#indizacion').val(data.indizacion); $('#no_fac').prop('checked', Number(data.factor_impacto) === 0); $('#fac_imp').val(Number(data.factor_impacto) === 0 ? '' : data.factor_impacto); syncFactorImpacto(); }
+    }).fail(function (xhr) { notify(failure(xhr)); });
+  }
+  function openOtraEdit(idOtraPub) {
+    if (!context.canManageGlobal) return;
+    if ($('#ficha_acad').attr('name') === 'doc') editAcadDoc(); else editAcadEst();
+    request({ op: 'otra_detail', id_otra_pub: idOtraPub }).then(function (response) {
+      const data = response.data || {};
+      const $box = $('<div>', { class: 'otra-edit', 'data-id-otra-pub': idOtraPub });
+      const $campos = $('#campos_publicacion');
+      $campos.closest('#edit_acad_doc, #edit_acad_est').stop(true, true).show();
+      const $header = $('<div>', { class: 'row justify-content-between' }).append($('<div>', { class: 'col-auto mb-3' }).append($('<h3>', { class: 'card-title' }).text('EDITAR OTRA PUBLICACIÓN')), $('<div>', { class: 'col-auto' }).append($('<button>', { type: 'button', class: 'btn btn-close btn-sm cancelar-publicacion', 'aria-label': 'Cerrar' })));
+      $campos.empty().append($header, $box);
+      $box.append($('<div>', { class: 'row' }).append(input('Tipo', 'tipo_otra_pub', 'text', 50), input('Descripción', 'descripcion', 'textarea', 300)), action('Guardar cambios', 'btn btn-dark guardar-otra-edicion'));
+      $('#tipo_otra_pub').val(data.tipo); $('#descripcion').val(data.descripcion);
+    }).fail(function (xhr) { notify(failure(xhr)); });
+  }
 
-           
-            let publis = JSON.parse(response);
-            let template ='';
-         publis.forEach(pub => {
-        tipo=pub['tipo']==1?'Artículo':'Edición de Revista Temática'
-        fact_imp=pub['factor_impacto']==0?'No tiene factor de Impacto':pub['factor_impacto']
-        template += `
-        <div class="card mb-3 card_pub">
-            <div class="card-body">
-                <table class="table table-striped">
-                <thead>
-                <tr>
-                <th class="col-md-4 titulo_acad"><h5>PUBLICACIÓN</h5></th>
-                <th class="row justify-content-end ps-0 botones"><button type="button" class="col-auto btn btn-link link-success ps-1 editarPub" id="${pub['id_publicacion']}" name="${pub['tipo']}">Editar</button><button type="button" class="col-auto btn btn-link link-danger ps-1 eliminarPub" id="${pub['id_publicacion']}">Eliminar</button></th>
-                </tr>
-                </thead>
-                    <tbody>
-                        <tr>
-                            <td>Tipo de Publicación</td>
-                            <td>${tipo}</td>
-                        </tr>
-                        <tr>
-                            <td>Titulo</td>
-                            <td>${letraMay(pub.titulo)}</td>
-                        </tr> 
-                        <tr>
-                            <td>Año</td>
-                            <td>${pub.anio}</td>
-                        </tr>
-                        <tr>
-                            <td>Nombre Revista</td>
-                            <td>${letraMay(pub.nombre_revista)}</td>
-                        </tr>
-                        <tr>
-                            <td>Indizacion</td>
-                            <td>${letraMay(pub.indizacion)}</td>
-                        </tr>
-                        <tr>
-                            <td>Estado</td>
-                            <td>${letraMay(pub.estado_publicacion)}</td>
-                        </tr> 
-                        <tr>
-                            <td>Issn</td>
-                            <td>${pub.issn}</td>
-                        </tr> 
-                        <tr>
-                            <td>Factor de Impacto</td>
-                            <td>${fact_imp}</td>
-                        </tr>           
-                                      
-        `
-        
-        if( pub['otros_autores']!=null){
-                
-            template+=`<tr>
-            <td>Otros/as Autores/as</td>
-            <td>${mostrarAutores(pub['otros_autores'])}</td>
-            </tr> 
-            `
-        }
-        template+=` </tbody>
-                </table>    
-            </div>
-        </div>`
-    });
-    
-    
- 
-    $(id).append(template);
-    
-        }
-        }
-    })    
-    //cargar Libros
-    $.ajax({
-        async: false,
-        type : 'POST',
-        url : '../ajax/publicacion.php',
-        data : {op:'read_libros',usuario},
-        success : function(response) {
-            if( response && response.trim() !== ""){
-            let libros = JSON.parse(response);
-            let template ='';
-      libros.forEach(libro => {
-        tipo=libro['tipo']==1?'Libro':'Capítulo de Libro'
-        tipo_pub=libro['tipo']==1?3:4
-        rol=libro['rol']==1?'Autor/a':'Editor/a'
-        ref_ext=libro['ref_ext']==0?'No tiene':'Si tiene'
-        traduccion=libro['traduccion']==0?'No correspone':'Si corresponde'
-        template += `
-        <div class="card mb-3 card_pub">
-            <div class="card-body">
-                <table class="table table-striped">
-                <thead>
-                <tr>
-                <th class="col-md-4 titulo_acad"><h5>PUBLICACIÓN</h5></th>
-                <th class="row justify-content-end ps-0 botones"><button type="button" class="col-auto btn btn-link link-success ps-1 editarPub" id="${libro['id_publicacion']}" name="${tipo_pub}">Editar</button><button type="button" class="col-auto btn btn-link link-danger ps-1 eliminarPub" id="${libro['id_publicacion']}">Eliminar</button></th>
-                </tr>
-                </thead>
-                    <tbody>
-                        <tr>
-                            <td>Tipo de Publicación</td>
-                            <td>${tipo}</td>
-                        </tr>
-                        <tr>
-                            <td>Nombre Capítulo y/o Libro</td>
-                            <td>${cadenaMay(libro['nom_pub'])}</td>
-                        </tr> 
-                        <tr>
-                            <td>Rol</td>
-                            <td>${rol}</td>
-                        </tr>
-                       
-                        <tr>
-                            <td>Año</td>
-                            <td>${libro['anio']}</td>
-                        </tr>
-                        <tr>
-                            <td>Estado</td>
-                            <td>${letraMay(libro['nom_est'])}</td>
-                        </tr>
-                        <tr>
-                            <td>Referato Externo</td>
-                            <td>${ref_ext}</td>
-                        </tr> 
-                        <tr>
-                            <td>Traducción</td>
-                            <td>${traduccion}</td>
-                        </tr> 
-                        <tr>
-                            <td>Lugar</td>
-                            <td>${cadenaMay(libro['lugar'])}</td>
-                        </tr>                           
-        `
-        
-        if( libro['otros_autores']!=null){
-                
-            template+=`<tr>
-            <td>Otros/as Autores/as</td>
-            <td>${mostrarAutores(libro['otros_autores'])}</td>
-            </tr> 
-            `
-        }
-        //cargar editoriales
-        $.ajax({
-            async:false,
-            type : 'POST',
-            url : '../ajax/publicacion.php',
-            data : {op:'read_edit_libro',libro:libro['id_libro']},
-            success : function(response) {
-                if( response && response.trim() !== ""){
-                let editoriales = JSON.parse(response);
-                let editorialesProcesadas=[]
-                editoriales.forEach(ed => {
-                    let nombreEditorial='Dato inválido'
-                    if(ed !== null && typeof ed === 'object' && Object.prototype.hasOwnProperty.call(ed,'nombre')){
-                        if(ed['nombre'] === null){
-                            nombreEditorial='No informado'
-                        }else if(typeof ed['nombre'] === 'string'){
-                            let nombreNormalizado=ed['nombre'].trim().replace(/\s+/g,' ')
-                            nombreEditorial=nombreNormalizado === ''?'No informado':cadenaMay(nombreNormalizado)
-                        }
-                    }
-                    editorialesProcesadas.push(nombreEditorial)
-                })
-                let cadenaEditorial=editorialesProcesadas.join(', ')
-                template+=`<tr>
-                    <td>Editorial/es</td>
-                    <td>${cadenaEditorial}</td>
-                    </tr>`
-
-            }
-        }
-
-            })
-        template+=` </tbody>
-                </table>    
-            </div>
-        </div>`
-
-    });
-    
-    
- 
-    $(id).append(template);
-
-        }
-    }
-    })
-    //cargar otra publicacion
-    $.ajax({
-        async: false,
-        type : 'POST',
-        url : '../ajax/publicacion.php',
-        data : {op:'read_otro_art',usuario},
-        success : function(response) {
-            if( response && response.trim() !== ""){
-            let publis = JSON.parse(response);
-            let template ='';
-      publis.forEach(pub => {
-        template += `
-        <div class="card mb-3 card_pub">
-            <div class="card-body">
-                <table class="table table-striped">
-                <thead>
-                <tr>
-                <th class="col-md-4 titulo_acad"><h5>PUBLICACIÓN</h5></th>
-                <th class="row justify-content-end ps-0 botones"><button type="button" class="col-auto btn btn-link link-success ps-1 editarPub" id="${pub['id_otra_pub']}" name="5">Editar</button><button type="button" class="col-auto btn btn-link link-danger ps-1 eliminarOtraPub" id="${pub['id_otra_pub']}">Eliminar</button></th>
-                </tr>
-                </thead>
-                    <tbody>
-                        <tr>
-                            <td>Tipo de Publicación</td>
-                            <td>${cadenaMay(pub['tipo'])}</td>
-                        </tr>
-                        <tr>
-                            <td>Descripcion</td>
-                            <td>${cadenaMay(pub['descripcion'])}</td>
-                        </tr> 
-                        <tr>
-                                   
-                    </tbody>
-                </table>    
-            </div>
-        </div>                   
-        `
-    });
-    
-    $(id).append(template);
-    
-}
-
-        }
-    })
-}
-//editar publicacion
-//buscar la manera de enconta¡rar el tipo de publicacion
-$("body").on("click", ".editarPub", function () {
-    id_pub = $(this).attr("id");
-    tipo_pub = $(this).attr("name");// tipo de publicacion
-    $('#edit_academicos').attr('name',id_pub)
-    //if articulo   
-    if($('#ficha_acad').attr('name')=='doc'){
-        editAcadDoc()
-    }else{
-        editAcadEst()
-    }
-    $('#campos_publicacion').append('<h3 class="mb-5 text-center" id="tipo_pub">EDITAR PUBLICACIÓN</h3>')
-    if(tipo_pub==1||tipo_pub==2){
-        formArtRev('#campos_publicacion')
-        $.ajax({
-            async: false,
-            url: "../ajax/publicacion.php",
-            type: "POST",
-            data: { op: "read_art_rev_id", id_pub  },
-            success: function (response) {
-            let artRev = JSON.parse(response);
-            autores=artRev[0]['otros_autores']==null?'':mostrarAutores(artRev[0]['otros_autores'])
-            $('#tipo_pub').attr('name',tipo_pub)//agrego el tipo de publicacion para validar al editar
-            $('#titulo').val(cadenaMay(artRev[0]['titulo']))
-            $('#titulo').attr('name',cadenaMay(artRev[0]['titulo']))
-            $('#anio').val(artRev[0]['anio'])
-            $('#anio').attr('name',artRev[0]['anio'])
-            $('#autores').val(autores)
-            $('#nombre').val(cadenaMay(artRev[0]['nombre']))
-            $('#nombre').attr('name',cadenaMay(artRev[0]['nombre']))
-            $('#indizacion').val(artRev[0]['indizacion'])
-            $('#indizacion').attr('name',artRev[0]['indizacion'])
-            $('#estado').val(artRev[0]['estado'])
-            $('#estado').attr('name',artRev[0]['estado'])
-            $('#issn').val(artRev[0]['issn'])
-            $('#issn').attr('name',artRev[0]['issn'])
-            if(artRev[0]['factor_impacto']==0){
-                $('#no_fac').prop('checked',true)
-                $('#fact_imp').prop('disabled',true)   
-            }else{
-                $('#fact_imp').val(artRev[0]['factor_impacto'])
-            }
-
-      },
-    });
-    
-    }
-    if(tipo_pub==3||tipo_pub==4){
-        formLibro('#campos_publicacion')
-       x=1
-       arrayx=[]
-       //peticion articulo-revista
-        $('#btn_editorial').click(function(){       
-            agrEdit(x,arrayx);
-        })
-        //Eliminar Editorial
-        $(document).on('click', '.elim_edit', function(){
-            var button_id = $(this).attr("id"); 
-            arrayx = arrayx.filter(exis => exis != button_id)
-            $('#ed'+button_id).remove();
-        }) 
-        $.ajax({
-            async: false,
-            url: "../ajax/publicacion.php",
-            type: "POST",
-            data: { op: "read_libro_id", id_pub  },
-            success: function (response) {
-            let libro = JSON.parse(response);
-            autores=libro[0]['otros_autores']==null?'':mostrarAutores(libro[0]['otros_autores'])
-            $('#tipo_pub').attr('name',tipo_pub)//agrego el tipo de publicacion para validar al editar
-            $('#tipo_libro').val(libro[0]['tipo'])
-            $('#rol_libro').val(libro[0]['rol'])
-            $('#nombre').val(libro[0]['nom_pub'])
-            $('#anio').val(libro[0]['anio'])
-            $('#autores').val(autores)
-            $('#estado').val(libro[0]['estado'])
-            //check referato externo
-            libro[0]['ref_ext']==0?$('#no_ref_ext').prop('checked',true):$('#si_ref_ext').prop('checked',true)
-            //check correspode a traduccion
-            libro[0]['traduc']==0?$('#no_traduc').prop('checked',true):$('#si_traduc').prop('checked',true)
-            $('#lugar').val(libro[0]['lugar'])
-            $('#estado').val(libro[0]['estado'])
-            //mostrar/cargar editoriales
-                libro.forEach(lib=>{          
-                    if(libro.indexOf(lib) === 0){
-                        console.log('el indicee')
-                        $('#editorial').val(lib['nom_ed'])
-                        console.log(lib['nom_ed'])
-                }else{
-                    
-                    $('#agr_editorial').append('<div class="row" id="ed'+lib['id_editorial&G']+'"><div class="col mb-3"><input type="text" class="form-control" id="edit'+'" value="'+lib['nom_ed']+'" name="0" maxlength="60"><ul class="list-group" id="list_editorial'+'"></ul></div><div class="col-auto mb-3"><button type="button" class="btn btn-dark elim_edit" id="'+lib['id_editorial']+'">x</button></div></div>');
-                }
-
-            });
-
-      },
-    });
-    }
-    if(tipo_pub==5){
-        formOtraPub('#campos_publicacion')
-        //peticion otra publicacion
-        $.ajax({
-            async: false,
-            url: "../ajax/publicacion.php",
-            type: "POST",
-            data: { op: "read_otro_art_id", id_pub  },
-            success: function (response) {
-            let otraPub = JSON.parse(response);
-            $('#tipo_pub').attr('name',tipo_pub)
-            $('#tipo_otra_pub').val(otraPub[0]['tipo'])//agrego el tipo de publicacion para validar al editar
-            $('#desc_pub').val(otraPub[0]['descripcion'])
-            
-
-      },
-    });
-        
-    }
-    btn_editar_acad('#campos_publicacion',$('#info_doc').attr('name'))
-   
-
-    //formGrado('#campos_grado')
-    
-    //if libro
-    //if otra publicacion
-    // $.ajax({
-    //   async: false,
-    //   url: "../ajax/grado.php",
-    //   type: "POST",
-    //   data: { op: "read_grado_id", id_grado },
-    //   success: function (response) {
-    //     let grado = JSON.parse(response);
-    //     console.log('editar usu')
-    //     console.log(grado)
-    //     tipo=grado[0]['tipo_grado']
-    //     console.log(tipo)
-    //     $('#grad_acad').val(tipo==1||tipo==2?1:2)
-    //     $('#inst_grado').val(grado[0]['inst_grado'])
-    //     $('#fech_grado').val(grado[0]['fech_graduacion'])
-    //     $('#grado').html('<option selected value="0">Seleccione</option')
-    //     tipo_tit=tipo==1?'lic':tipo==2?'un':tipo==3?'mag':'doc'
-    //     ajaxSelect('#s_tit',ruta+'ajax/titulo.php','Seleccione','read',tipo_tit)
-    //     $('#s_tit').val(grado[0]['tit_grado'])
-    //     if(tipo==1||tipo==2){
-    //         $('#grado').append('<option value="1">Licenciatura</option><option selected value="2">Título Universitario</option>')
-    //         if(tipo==1){
-    //             $('#grado option[value="1"]').attr("selected",true)
-    //         }else{
-    //             $('#grado option[value="2"]').attr("selected",true)
-    //         }
-
-            
-    //     }else{
-    //         $('#grado').html('<option value="3">Magister</option><option selected value="4">Doctorado</option>')
-    //         tipo==3?$('#grado option[value="3"]').attr("selected",true):tipo==4?$('#grado option[value="4"]').attr("selected",true):''
-    //     }
-    //   },
-    // });
-});
-$('body').on('click','.listEdit',function(){
-    id=$(this).attr('id');
-    nom_edit=cadenaMay($(this).attr('name'));
-    $('#editorial').val(nom_edit);
-    $('#editorial').attr('name',id);
-    $('#list_editorial').hide();   
-})
-$("body").on("click", ".eliminarPub", function () {
-    id_pub = $(this).attr("id");
-    usu=$('#info_doc').attr('name')
-    $.ajax({
-        url: "../ajax/publicacion.php",
-        type: "POST",
-        data: { id_pub, op: "delete" },
-        success: function (response) {
-            const esDocente=$('#ficha_acad').attr('name')=='doc';
-            const antAcad=esDocente?'#ant_acad_doc':'#ant_acad_est';
-            const filaMensaje=esDocente?'#mnsj_row_acad_doc':'#mnsj_row_acad_est';
-            const mensajeAcad=esDocente?'#mnsj_acad_doc':'#mnsj_acad_est';
-            if(esDocente){
-                cargarFichaDoc($('#id_usuario').attr('name'))
-            }else{
-                cargarFichaEst($('#id_usuario').attr('name'))
-            }
-            let mensaje = JSON.parse(response);
-            const posicion=$(antAcad).offset();
-            if(posicion){
-                $("html, body").animate({ scrollTop: posicion.top}, 100);
-            }
-            $(filaMensaje).show();
-            $(mensajeAcad).addClass("alert-success");
-            $(mensajeAcad).html(mensaje);
-            setTimeout(function () {
-                $(filaMensaje).fadeOut(1500);
-            }, 3000);
-        },
-      });
-  
-});
-$("body").on("click", ".eliminarOtraPub", function () {
-    id_pub = $(this).attr("id");
-    usu=$('#info_doc').attr('name')
-    $.ajax({
-        url: "../ajax/publicacion.php",
-        type: "POST",
-        data: { id_pub, op: "delete_otra_pub" },
-        success: function (response) {
-            const esDocente=$('#ficha_acad').attr('name')=='doc';
-            const antAcad=esDocente?'#ant_acad_doc':'#ant_acad_est';
-            const filaMensaje=esDocente?'#mnsj_row_acad_doc':'#mnsj_row_acad_est';
-            const mensajeAcad=esDocente?'#mnsj_acad_doc':'#mnsj_acad_est';
-            $('#publicacion_card').html('');
-            cargarPub($('#id_usuario').attr('name'), '#publicacion_card');
-            let mensaje = JSON.parse(response);
-            const posicion=$(antAcad).offset();
-            if(posicion){
-                $("html, body").animate({ scrollTop: posicion.top}, 100);
-            }
-            $(filaMensaje).show();
-            $(mensajeAcad).addClass("alert-success");
-            $(mensajeAcad).html(mensaje);
-            setTimeout(function () {
-                $(filaMensaje).fadeOut(1500);
-            }, 3000);
-        },
-      });
-  
-});
-$('#form_publicacion').submit(function(e){
-    e.preventDefault();
-    //console.log('esta es la variableee.....'+arrayx)
-    $('#anio').click(function(){limpiarSelect('#anio');})
-    $('#autores').click(function(){limpiarInput('#autores');})
-    $('#nombre').click(function(){limpiarInput('#nombre');})
-    $('#estado').click(function(){limpiarSelect('#estado');})
-    $('#titulo').click(function(){limpiarInput('#titulo');})
-    $('#indizacion').click(function(){limpiarSelect('#indizacion');})
-    $('#issn').click(function(){limpiarInput('#issn');})
-    $('#tipo_libro').click(function(){limpiarSelect('#tipo_libro');})
-    $('#rol_libro').click(function(){limpiarSelect('#rol_libro');})
-    $('#lugar').click(function(){limpiarInput('#lugar');})
-    $('#fact_imp').click(function(){limpiarInput('#fact_imp');})
-    $('#tipo_pub').click(function(){limpiarSelect('#tipo_pub');})
-    $('#desc_pub').click(function(){limpiarSelect('#desc_pub');})
-    $('#editorial').click(function(){limpiarSelect('#editorial');})
-    arrayx.forEach(x => {
-        $('#edit'+x).click(function(){limpiarSelect('#edit'+x);})
-        
-    });
-    
-
-    let publicacion
-    let op='insert'
-    let usuario=$('#id_usuario').attr('name');
-    let tipo=$('#pub').val();
-    let ingrPub
-    if(tipo==1||tipo==2||tipo==3){
-        anio=$('#anio').val();
-        autores=guardarAutores($('#autores').val());
-        nombre=guardar($('#nombre').val());
-        estado=$('#estado').val();
-        publicacion={op,usuario,tipo,anio,autores,nombre,estado};   
-        if(anio==0||nombre==''||estado==0){
-            validSelect('#anio')
-            validCampoVacio('#nombre')
-            validSelect('#estado')
-            ingrPub=false;
-        }else{
-            ingrPub=true;
-        }
-
-    }
-    
-    if(tipo == '1' || tipo == '2'){
-        titulo=guardar($('#titulo').val());   
-        indizacion=$('#indizacion').val();        
-        issn=$('#issn').val();
-        fac_imp=$("#no_fac").is(':checked')?0:$('#fact_imp').val();
-        valFactor=!$("#no_fac").is(':checked')&&$('#fact_imp').val()==''?true:false
-        
-        if(titulo==''||indizacion==0||issn==0|| valFactor || !ingrPub){
-            if(!$("#no_fac").is(':checked')){
-                validCampoVacio('#fact_imp')
-            }
-            validCampoVacio('#titulo')
-            validSelect('#indizacion')
-            validCampoVacio('#issn')
-            $('#mnsj_row_pub').show();
-            $('#mnsj_pub').html('Rellene todos los campos articulo');
-            ingrPub=false;
-        }else{
-            ingrPub=true;
-        }
-        Object.assign(publicacion,{titulo,indizacion,issn,fac_imp})
-        console.log(publicacion)
-    }else if(tipo==3){
-        tipo_lib=$('#tipo_libro').val();
-        rol_libro=$('#rol_libro').val();
-        ref_ext=$('input:radio[name=ref_ext]:checked').val();
-        traduccion=$('input:radio[name=traduc]:checked').val();
-        editorial=$('#editorial').attr('name')==0?[$('#editorial').val()]:[$('#editorial').attr('name')];      
-        arrayx.forEach(x => 
-            editorial.push($('#edit'+x).attr('name')==0?$('#edit'+x).val():$('#edit'+x).attr('name'))
-            )
-        $('.btn_editorial').click(function(){  
-        })
-        lugar=guardar($('#lugar').val());
-        if(tipo_libro==0||rol_libro==0||ref_ext==null||traduccion==null || editorial==''||lugar=='' || !ingrPub){
-            validSelect('#tipo_libro')
-            validSelect('#rol_libro')
-            validCampoVacio('#editorial')
-            validCampoVacio('#lugar')
-            ingrPub=false;
-            $('#mnsj_row_pub').show();
-            $('#mnsj_pub').html('Rellene todos los campos');
-        }else{
-            if(arrayx.length > 1){
-                let contEdit=0
-                arrayx.forEach(x => {
-                    if($('#edit'+x).val()==''){
-                        validCampoVacio('#edit'+x)
-                        ingrPub=false
-                        contEdit++
-                    }
-                });
-                if(contEdit==0){
-                    ingrPub=true
-                }
-
-
-            }
-        }
-        Object.assign(publicacion,{tipo_lib,rol_libro,ref_ext,traduccion,editorial,lugar})       
-    }else{
-        tipo_pub=$('#tipo_otra_pub').val();
-        desc_pub=$('#desc_pub').val();
-        publicacion={op,tipo,tipo_pub,desc_pub,usuario};
-        ingrPub=true
-    }
-    //cargarPub(usuario)
-    if(ingrPub){
-        $.post('../ajax/publicacion.php',publicacion,function(response){
-            let dato = JSON.parse(response);
-                $('#mnsj_row_pub').show();
-                $('#mnsj_pub').removeClass('alert-danger');
-                $('#mnsj_pub').addClass('alert-success');
-                $('#mnsj_pub').html(dato);
-                setTimeout(function() {
-                    $('#ingresar_publicacion').remove();
-                    $('#boton_publicacion').show();
-                    cargarPub(usuario,'#publicacion_card');
-            $("#mnsj_row_pub").fadeOut(1500);
-        },3000);
-        })
-     }
-   
-    
-
-})
-//falta validar los campos vacios (enviar datos default)
-$('#form_edit_publicacion').submit(function(e){
-    e.preventDefault();
-    let id_pub=$('#edit_academicos').attr('name');
-    let tipo=$('#tipo_pub').attr('name'); //tipo de publicacion
-    tipo=tipo==4?3:tipo==5?4:tipo
-    let op='update'
-    let publicacion={id_pub,tipo,op}
-    if(tipo==1||tipo==2||tipo==3){
-        let anio=$('#anio').val();
-        anio=anio==''?$('#anio').attr('name'):anio;
-        let autores=guardarAutores($('#autores').val());
-        let nombre=guardar($('#nombre').val());
-        nombre=nombre==''?$('#nombre').attr('name'):nombre;
-        let estado=$('#estado').val();
-        estado=estado==0?$('#estado').attr('name'):estado;
-        Object.assign(publicacion,{anio,autores,nombre,estado}); 
-        if(tipo==1||tipo==2){
-            let titulo=guardar($('#titulo').val())
-            titulo=titulo==''?$('#titulo').attr('name'):titulo
-            let indizacion=$('#indizacion').val()
-            indizacion=indizacion==0?$('#indizacion').attr('name'):indizacion;            
-            let issn=$('#issn').val()
-            issn=issn==''?$('#issn').attr('name'):issn
-            let fac_imp=$("#no_fac").is(':checked')?0:$('#fact_imp').val();
-            Object.assign(publicacion,{titulo,indizacion,issn,fac_imp})
-        }else{
-            tipo_lib=$('#tipo_libro').val();
-            rol_libro=$('#rol_libro').val();
-            lugar=$('#lugar').val();
-            ref_ext=$('input:radio[name=ref_ext]:checked').val();
-            traduccion=$('input:radio[name=traduc]:checked').val();
-            Object.assign(publicacion,{tipo_lib,rol_libro,ref_ext,traduccion,lugar})
-    
-        }
-    
-    }else{
-        tipo_pub=$('#tipo_otra_pub').val()
-        desc_pub=$('#desc_pub').val()
-        publicacion={op,tipo_pub,tipo,desc_pub,id_pub}
-
-    }
-    ///console.log(publicacion)
-    $.post('../ajax/publicacion.php',publicacion,function(response){
-        let dato = JSON.parse(response);
-        console.log(dato);
-            $('#mnsj_row_pub').show();
-            $('#mnsj_pub').removeClass('alert-danger');
-            $('#mnsj_pub').addClass('alert-success');
-            $('#mnsj_pub').html(dato);
-            setTimeout(function() {
-                if($('#ficha_acad').attr('name')=='doc'){
-                    reiniciarInfoDoc()
-                }else{
-                    reiniciarInfoEst()
-                }
-                $('#campos_publicacion').html('')
-        $("#mnsj_row_pub").fadeOut(1500);
-    },3000);
-    })    
-})
-//validar factor de impacto
-estado=$("#no_fac").is(':checked')
-$(document).on('click',"#no_fac",function(){
-        limpiarInput('#fact_imp') 
-        if(estado){
-            $(this).prop('checked',true)
-            $('#fact_imp').prop('disabled',true)
-            $('#fact_imp').val('')
-            estado=false
-        }else{
-            $(this).prop('checked',false) 
-            $('#fact_imp').prop('disabled',false)
-            estado=true
-        }
-})
+  $(document)
+    .off('click.publicacion', '#btn_publicacion').on('click.publicacion', '#btn_publicacion', function () { $('#boton_publicacion').hide(); const $card = $('<div>', { id: 'ingresar_publicacion', class: 'card mb-3' }).append($('<div>', { class: 'card-body' }).append($('<div>',{class:'row justify-content-between'}).append($('<div>',{class:'col-auto mb-3'}).append($('<h4>',{class:'card-title'}).text('Publicación')),$('<div>',{class:'col-auto'}).append($('<button>',{type:'button',id:'borrar_publicacion',class:'btn btn-close btn-sm borrar_publicacion','aria-label':'Cerrar'}))), select('Tipo de Publicación', 'pub', [[1, 'Artículo'], [2, 'Edición de Revista Temática'], [3, 'Libro'], [4, 'Otra Publicación']]), $('<div>', { id: 'publicacion_fields' }), $('<div>', { id: 'mnsj_pub', class: 'alert alert-danger' }).hide(), $('<button>', { type: 'submit', id: 'guardar_pub', class: 'btn btn-dark' }).text('Guardar').hide())); $('#publicacion').empty().append($card); })
+    .off('change.publicacion', '#pub').on('change.publicacion', '#pub', function () { const type = Number($(this).val()); editorialesExistentes = []; editorialesNuevas = []; const $root = $('#publicacion_fields').empty(); if (type === 4) $root.append($('<div>', { class: 'row' }).append(input('Tipo', 'tipo_otra_pub', 'text', 50), input('Descripción', 'descripcion', 'textarea', 300))); else if (type) fields($root, type); $('#guardar_pub').toggle(!!type); })
+    .off('click.publicacion', '.borrar_publicacion').on('click.publicacion', '.borrar_publicacion', function () { $('#ingresar_publicacion').remove(); $('#boton_publicacion').show(); })
+    .off('click.publicacion', '.cancelar-publicacion').on('click.publicacion', '.cancelar-publicacion', function () { restaurarListadoPublicacion(); })
+    .off('input.publicacion', '#editorial').on('input.publicacion', '#editorial', function () { const q = $.trim($(this).val()); const $list = $('#list_editorial').empty().hide(); if (!q) return; request({ op: 'editorial_search', busqueda: q }).then(function (r) { (r.data || []).forEach(function (p) { $list.append($('<li>', { class: 'list-group-item listEdit' }).text(p.nombre).data({ id: Number(p.id_editorial), nombre: value(p.nombre) })); }); $list.toggle($list.children().length > 0); }); })
+    .off('click.publicacion', '.listEdit').on('click.publicacion', '.listEdit', function () { const p = $(this).data(); if (!editorialesExistentes.some(function (x) { return x.id === p.id; })) editorialesExistentes.push(p); $('#editorial').val(''); $('#list_editorial').hide(); renderEditoriales(); })
+    .off('click.publicacion', '.btn_editorial').on('click.publicacion', '.btn_editorial', function () { const p = $.trim($('#editorial').val()); if (!p || p.length > 60) return notify('Ingrese una editorial válida.'); if (!editorialesNuevas.includes(p) && !editorialesExistentes.some(function (x) { return x.nombre === p; })) editorialesNuevas.push(p); $('#editorial').val(''); renderEditoriales(); })
+    .off('click.publicacion', '.quitar-editorial').on('click.publicacion', '.quitar-editorial', function () { const p = $(this).data(); if (p.kind === 'old') editorialesExistentes = editorialesExistentes.filter(function (x) { return x.id !== p.id; }); else editorialesNuevas = editorialesNuevas.filter(function (x) { return x !== p.name; }); renderEditoriales(); })
+    .off('change.publicacion', '#no_fac').on('change.publicacion', '#no_fac', syncFactorImpacto)
+    .off('submit.publicacion', '#form_publicacion').on('submit.publicacion', '#form_publicacion', function (e) { e.preventDefault(); const type = Number($('#pub').val()); ensurePublicacionContext().then(function () { if (type === 4) { const data = Object.assign({ op: 'otra_create', tipo_otra_pub: $.trim($('#tipo_otra_pub').val()), descripcion: $.trim($('#descripcion').val()) }, payloadContextual()); if (!data.tipo_otra_pub || !data.descripcion) return notify('Complete los campos obligatorios.'); return request(data, true); } const data = Object.assign({ op: 'create', rol_participacion: $('#rol_participacion').val() }, formData(type), payloadContextual()); if (!valid(data) || !data.rol_participacion) return notify('Complete los campos obligatorios y seleccione el rol.'); return request(data, true); }).then(function (r) { if (!r) return; $('#ingresar_publicacion').remove(); $('#boton_publicacion').show(); window.cargarPub(usuarioContextual, '#publicacion_card'); }).fail(function (xhr) { notify(failure(xhr)); }); })
+    .off('click.publicacion', '.eliminarPub').on('click.publicacion', '.eliminarPub', function () { if (!context.canManageGlobal || !confirm('¿Eliminar esta publicación?')) return; request({ op: 'delete', id_publicacion: $(this).data('id') }, true).then(function () { window.cargarPub(usuarioContextual, '#publicacion_card'); }).fail(function (x) { notify(failure(x)); }); })
+    .off('click.publicacion', '.eliminarOtraPub').on('click.publicacion', '.eliminarOtraPub', function () { if (!context.canManageGlobal || !confirm('¿Eliminar esta publicación?')) return; request({ op: 'otra_delete', id_otra_pub: $(this).data('id') }, true).then(function () { window.cargarPub(usuarioContextual, '#publicacion_card'); }).fail(function (x) { notify(failure(x)); }); })
+    .off('click.publicacion', '.editarPub').on('click.publicacion', '.editarPub', function () { const data = $(this).data(); openEdit(Number(data.id), Number(data.tipo)); })
+    .off('click.publicacion', '.editarOtraPub').on('click.publicacion', '.editarOtraPub', function () { openOtraEdit(Number($(this).data('id'))); })
+    .off('click.publicacion', '.guardar-otra-edicion').on('click.publicacion', '.guardar-otra-edicion', function () { const idOtraPub = Number($(this).closest('.otra-edit').data('id-otra-pub')); const data = { op: 'otra_update', id_otra_pub: idOtraPub, tipo_otra_pub: $.trim($('#tipo_otra_pub').val()), descripcion: $.trim($('#descripcion').val()) }; if (!data.tipo_otra_pub || !data.descripcion) return notify('Complete los campos obligatorios.'); request(data, true).then(restaurarListadoPublicacion).fail(function (xhr) { notify(failure(xhr)); }); });
+  $(document)
+    .off('change.autoria', '#pub').on('change.autoria', '#pub', function(){ if(Number($(this).val())&&Number($(this).val())!==4) $('#publicacion_fields').append(participantBlock()); })
+    .off('change.autoria', '#rol_propio').on('change.autoria', '#rol_propio', actualizarEtiquetaContraria)
+    .off('input.autoria', '.academic-search').on('input.autoria', '.academic-search', function(){ const $input=$(this),q=$.trim($input.val()),$box=$input.closest('.participant-block'),$list=$box.find('.academic-results').empty().hide(); $box.find('.academic-selected').text('').data('id',null); if(q.length<2)return; request({op:'academic_user_search',q:q}).then(function(r){(r.data||[]).forEach(function(u){$list.append($('<li>',{class:'list-group-item academic-option'}).text(u.nombre).data({id:Number(u.id_usuario),nombre:u.nombre}));});$list.toggle($list.children().length>0);}); })
+    .off('click.autoria', '.academic-option').on('click.autoria', '.academic-option', function(){ const u=$(this).data(),$box=$(this).closest('.participant-block');$box.find('.academic-selected').text(u.nombre).data('id',u.id);$box.find('.academic-search').val(u.nombre);$box.find('.academic-results').empty().hide(); })
+    .off('submit.publicacion', '#form_publicacion').on('submit.publicacion', '#form_publicacion', function(e){ e.preventDefault(); const type=Number($('#pub').val()); ensurePublicacionContext().then(function(){ if(type===4){const d=Object.assign({op:'otra_create',tipo_otra_pub:$.trim($('#tipo_otra_pub').val()),descripcion:$.trim($('#descripcion').val())},payloadContextual());if(!d.tipo_otra_pub||!d.descripcion){notify('Complete los campos obligatorios.');return;}return request(d,true);}const p=participantsData();if(p.error){notify(p.error);return;}const d=Object.assign({op:'create'},formData(type),p.data,payloadContextual());if(!valid(d)){notify('Complete los campos obligatorios.');return;}return request(d,true);}).then(function(r){if(!r)return;$('#ingresar_publicacion').remove();$('#boton_publicacion').show();window.cargarPub(usuarioContextual,'#publicacion_card');}).fail(function(x){notify(failure(x));}); });
+  $(document).off('click.publicacion', '.guardar-edicion').on('click.publicacion', '.guardar-edicion', function(){ const $box=$(this).closest('.publicacion-edit'),type=Number($box.data('tipo')),p=participantsData(); if(p.error)return notify(p.error); const data=Object.assign({op:'update',id_publicacion:Number($box.data('id-publicacion')),subject_usuario_id:usuarioContextual},formData(type),p.data); if(!valid(data))return notify('Complete los campos obligatorios.'); request(data,true).then(restaurarListadoPublicacion).fail(function(x){notify(failure(x));}); });
+}());

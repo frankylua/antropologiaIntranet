@@ -5,6 +5,61 @@ namespace App\Model;
 class Usuario extends Login {
     public function __construct(){
     }
+    public function usuarioInternoExiste(int $idUsuario): bool
+    {
+        if ($idUsuario < 1) {
+            return false;
+        }
+
+        $consulta = conexion()->prepare(
+            'SELECT 1 FROM usuario WHERE id_usuario = :id_usuario LIMIT 1'
+        );
+        $consulta->execute([':id_usuario' => $idUsuario]);
+
+        return $consulta->fetchColumn() !== false;
+    }
+    public function usuarioAcademicoExiste(int $idUsuario): bool
+    {
+        if ($idUsuario < 1) return false;
+        $consulta = conexion()->prepare(
+            'SELECT 1 FROM usuario u WHERE u.id_usuario = :id_usuario
+             AND (EXISTS (SELECT 1 FROM estudiante e WHERE e.usuario = u.id_usuario)
+                  OR EXISTS (SELECT 1 FROM profesor p WHERE p.usuario = u.id_usuario)) LIMIT 1'
+        );
+        $consulta->execute([':id_usuario' => $idUsuario]);
+        return $consulta->fetchColumn() !== false;
+    }
+    public function buscarUsuariosAcademicos(string $termino, int $limite = 20): array
+    {
+        $termino = trim($termino);
+        if (mb_strlen($termino) < 2) return [];
+        $limite = max(1, min($limite, 20));
+        $patron = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $termino) . '%';
+        $sql = "SELECT DISTINCT u.id_usuario,
+                       TRIM(CONCAT_WS(' ', u.nombres, u.ap_pat, u.ap_mat)) AS nombre
+                FROM usuario u
+                WHERE (EXISTS (SELECT 1 FROM estudiante e WHERE e.usuario=u.id_usuario)
+                       OR EXISTS (SELECT 1 FROM profesor p WHERE p.usuario=u.id_usuario))
+                  AND CONCAT_WS(' ', u.nombres, u.ap_pat, u.ap_mat) LIKE :patron ESCAPE '\\\\'
+                ORDER BY u.nombres, u.ap_pat, u.ap_mat
+                LIMIT {$limite}";
+        $consulta = conexion()->prepare($sql);
+        $consulta->execute([':patron' => $patron]);
+        return $consulta->fetchAll(\PDO::FETCH_ASSOC);
+    }
+    public function obtenerUsuarioAcademicoPorId(int $idUsuario): ?array
+    {
+        if ($idUsuario < 1) return null;
+        $consulta = conexion()->prepare(
+            "SELECT u.id_usuario, TRIM(CONCAT_WS(' ', u.nombres, u.ap_pat, u.ap_mat)) AS nombre
+             FROM usuario u WHERE u.id_usuario=:id_usuario
+             AND (EXISTS (SELECT 1 FROM estudiante e WHERE e.usuario=u.id_usuario)
+                  OR EXISTS (SELECT 1 FROM profesor p WHERE p.usuario=u.id_usuario)) LIMIT 1"
+        );
+        $consulta->execute([':id_usuario'=>$idUsuario]);
+        $fila=$consulta->fetch(\PDO::FETCH_ASSOC);
+        return $fila === false ? null : $fila;
+    }
     public function insertarUsuario($pueblo,$pais_res,$pais_nac,$login,$fech_nac,$nombres,$ap_mat,$ap_pat,$tipo_doc,$nro_doc,$institucion,$genero,$region,$comuna,$telefono,$direccion,$cont_em,$tel_em){
         //ingesar permiso
         $sql_usuario="INSERT INTO usuario (id_usuario,pueblo,pais_res,pais_nac,login,fecha_nac,nombres,ap_mat,ap_pat,tipo_doc,nro_doc,inst_usuario,genero,region,comuna,telefono,direccion,cont_em,tel_em) VALUES (NULL," . (empty($pueblo)?1:"'$pueblo'"). ",'$pais_res','$pais_nac','$login','$fech_nac','$nombres','$ap_mat','$ap_pat','$tipo_doc','$nro_doc','$institucion','$genero','$region','$comuna','$telefono','$direccion','$cont_em','$tel_em')";
