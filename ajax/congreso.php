@@ -1,100 +1,35 @@
 <?php
-require_once __DIR__ . '/../src/bootstrap/app.php';
-use App\Model\Congreso;
-require 'validaciones.php';
-$usuario=isset($_POST['usuario'])?(int)$_POST['usuario']:'';
-$usu=isset($_POST['usu'])?(int)$_POST['usu']:'';
-$nombre=isset($_POST['nombre'])?$_POST['nombre']:'';
-$ciudad=isset($_POST['ciudad'])?$_POST['ciudad']:'';
-$anio=isset($_POST['anio'])?(int)$_POST['anio']:'';
-$fech_in=isset($_POST['fech_in'])?$_POST['fech_in']:'';
-$fech_ter=isset($_POST['fech_ter'])?$_POST['fech_ter']:'';
-$tipo_part=isset($_POST['tipo_part'])?(int)$_POST['tipo_part']:'';
-$rol=isset($_POST['rol'])?(int)$_POST['rol']:'';
-$tipo_cong=isset($_POST['tipo_cong'])?(int)$_POST['tipo_cong']:'';
-$autor=isset($_POST['nom_autor'])?$_POST['nom_autor']:'';
-$id_coautor=isset($_POST['coautor']) && (int)$_POST['coautor'] > 0?(int)$_POST['coautor']:null;
-$id_autor=isset($_POST['autor']) && (int)$_POST['autor'] > 0?(int)$_POST['autor']:null;
-$coautores=isset($_POST['coautores'])?$_POST['coautores']:'';
-$nom_mesa=isset($_POST['nom_mesa'])?$_POST['nom_mesa']:'';
-$comen_pon=isset($_POST['comen_pon'])?$_POST['comen_pon']:'';
-$busqueda=isset($_POST['busqueda'])?$_POST['busqueda']:'';
-$id_congreso=isset($_POST['cong'])?(int)$_POST['cong']:'';
-$id_part=isset($_POST['part'])?(int)$_POST['part']:'';
-$part=isset($_POST['part'])?(int)$_POST['part']:'';
-$id_cong=0;
-$id=isset($_POST['id'])?$_POST['id']:'';
-$op=isset($_POST['op'])?$_POST['op']:'';
-$cong= new Congreso();
-switch($op){
-    case'read_cong':
-        $resp=$cong->cargarNomCong($busqueda);
-        echo json_encode($resp, JSON_UNESCAPED_UNICODE);
-        break;
-    case'read_part':
-        $resp=$cong->cargarNomMesa($busqueda,$tipo_part,$id_congreso);
-        echo json_encode($resp, JSON_UNESCAPED_UNICODE);
-        break;
-    case'carg_cong':
-        $resp=$cong->cargarCong($id);
-        echo json_encode($resp, JSON_UNESCAPED_UNICODE);
-        break;
-    case'carg_part':
-        $resp=$cong->cargarPart($id);
-        echo json_encode($resp, JSON_UNESCAPED_UNICODE);
-        break;
-    case'carg_part_cong':
-    $resp=$cong->cargarPartCong($id,$nom_mesa);
-    echo json_encode($resp, JSON_UNESCAPED_UNICODE);
-    break; 
-    //insertar publicaciones
-    case 'insert-update':
-        if(($id_congreso == 0) ){        
-            $congreso=$cong->insertarCong($nombre,$ciudad,$fech_in,$fech_ter);
-            $respuesta=$cong->insertarPart($tipo_part,$tipo_cong,$coautores,$nom_mesa,$comen_pon,$congreso,$autor,$id_autor,$id_coautor);
-            $respuesta ? $mensaje="Congreso registrado" : $mensaje="Congreso no ha sido registrado";
-            echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);           
-        }
-        else{
-            $respuesta=$cong->editarCong($id_congreso,$nombre,$ciudad,$fech_in,$fech_ter);
-            if($id_part == 0){
-               $respuesta=$cong->insertarPart($tipo_part,$tipo_cong,$coautores,$nom_mesa,$comen_pon,$congreso,$autor,$id_autor,$id_coautor);
-            }else{
-                $respuesta=$cong->editarPart($id_part,$id_congreso,$tipo_part,$tipo_cong,$coautores,$nom_mesa,$comen_pon,$autor,$id_autor,$id_coautor,$rol);
-
-            }
-            $respuesta ? $mensaje="Congreso Editado" : $mensaje="Congreso no ha sido editado";
-             echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
-        }
-        break;
-        case 'insert-part':
-            $respuesta=$cong->insertarPart($tipo_part,$tipo_cong,$coautores,$nom_mesa,$comen_pon,$id_congreso,$autor,$id_autor,$id_coautor);            
-            $respuesta ? $mensaje="Participación registrada" : $mensaje="Participación no ha sido registrado";
-            echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);                
-            break;   
-        //mostrar publicaciones
-    case 'read':
-        $respuesta=$cong->mostrar($usuario);
-         echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
-         break;
-    case 'read-id':
-    $respuesta=$cong->mostrarById($id_cong,$usuario);
-    echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
-    break;
-    case 'read-usu':
-    $respuesta=$cong->mostrarAutor($usu);
-        echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
-        break;
-    case 'update-rol':
-        $respuesta=$rol==1?$cong->editarAutor($id_autor,$part):$cong->editarCoautor($id_coautor,$part);
-        $respuesta ? $mensaje="Congreso Actualizado" : $mensaje="Congreso no ha sido actualizado";
-        echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);        
-        break;    
-    // case'delete':
-    //     $respuesta=$institucion->eliminar($id_inst);
-    //     $respuesta ? $mensaje="Pueblo Eliminado" : $mensaje="Pueblo no ha sido eliminado";
-    //     echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
-    //     break;
-        }
-
-?>
+declare(strict_types=1);
+require_once __DIR__.'/../src/bootstrap/session.php'; if(session_status()!==PHP_SESSION_ACTIVE)session_start();
+require_once __DIR__.'/../src/bootstrap/app.php';
+use App\Model\Congreso; use App\Model\Usuario; use App\Security\Authorization;
+$respond=static function(int $code,array $data): never {http_response_code($code);header('Content-Type: application/json; charset=utf-8');echo json_encode($data,JSON_UNESCAPED_UNICODE);exit;};
+$actor=static function() use($respond):int {$id=$_SESSION['id_usuario']??null;$id=is_array($id)?($id[0]['id_usuario']??null):null;if(!is_scalar($id)||(int)$id<1)$respond(401,['status'=>'ERROR','message'=>'Autenticación requerida.']);return(int)$id;};
+$authenticated=static function() use($respond):void {if(!isset($_SESSION['login']))$respond(401,['status'=>'ERROR','message'=>'Autenticación requerida.']);};
+$global=static fn():bool=>Authorization::hasAny(['admin','comite']);
+$csrf=static function() use($respond):void {$received=$_SERVER['HTTP_X_CSRF_TOKEN']??($_POST['csrf']??null);$stored=$_SESSION['csrf_congreso']??null;if(!is_string($received)||!is_string($stored)||!hash_equals($stored,$received))$respond(403,['status'=>'ERROR','message'=>'CSRF inválido.']);};
+$id=static function(string $name):int {$v=filter_var($_POST[$name]??null,FILTER_VALIDATE_INT,['options'=>['min_range'=>1]]);if($v===false)throw new InvalidArgumentException('ID inválido.');return(int)$v;};
+$text=static function(string $name,int $max,bool $required=true):?string {$v=$_POST[$name]??null;if(!is_string($v))throw new InvalidArgumentException('Dato inválido.');$v=trim($v);if(($required&&$v==='')||strlen($v)>$max)throw new InvalidArgumentException('Dato inválido.');return $v===''?null:$v;};
+$op=$_POST['op']??''; $congreso=new Congreso(); $usuarios=new Usuario();
+$subject=static function(bool $isGlobal,int $actorId) use($id,$usuarios):int {if(!$isGlobal)return $actorId;$value=$id('subject_usuario_id');if(!$usuarios->usuarioAcademicoExiste($value))throw new InvalidArgumentException('Sujeto académico inválido.');return$value;};
+$datosCongreso=static function() use($text):array {$d=['nombre'=>$text('nombre',60),'ciudad'=>$text('ciudad',45),'fecha_inicio'=>$text('fecha_inicio',10),'fecha_termino'=>$text('fecha_termino',10)];if(!preg_match('/^\d{4}-\d{2}-\d{2}$/',$d['fecha_inicio'])||!preg_match('/^\d{4}-\d{2}-\d{2}$/',$d['fecha_termino'])||$d['fecha_termino']<$d['fecha_inicio'])throw new InvalidArgumentException('Fechas inválidas.');return$d;};
+$datosParticipacion=static function() use($text,$usuarios):array {$tipo=(int)($_POST['tipo_part']??0);$tipoCong=(int)($_POST['tipo_cong']??0);if(!in_array($tipo,[1,2,3],true)||!in_array($tipoCong,[1,2],true))throw new InvalidArgumentException('Tipo inválido.');$r1=filter_var($_POST['id_aut']??null,FILTER_VALIDATE_INT,['options'=>['min_range'=>1]]);$r2=filter_var($_POST['id_coaut']??null,FILTER_VALIDATE_INT,['options'=>['min_range'=>1]]);$n1=$text('nom_aut',60,false);$n2=$text('nom_coaut',60,false);if($r1===false)$r1=null;if($r2===false)$r2=null;if((($r1!==null)==($n1!==null))||(($r2!==null)==($n2!==null)))throw new InvalidArgumentException('Cada rol debe ser interno o externo, exclusivamente.');if($r1!==null&&!$usuarios->usuarioAcademicoExiste((int)$r1)||$r2!==null&&!$usuarios->usuarioAcademicoExiste((int)$r2))throw new InvalidArgumentException('Usuario académico inválido.');if($r1!==null&&$r1===$r2)throw new InvalidArgumentException('La misma persona no puede ocupar ambos roles.');return['tipo_part'=>$tipo,'tipo_cong'=>$tipoCong,'otros_org'=>$text('otros_org',300,false),'nombre_mesa'=>$text('nombre_mesa',45),'coment_ponenc'=>$tipo===3?null:$text('coment_ponenc',80),'nom_aut'=>$n1,'id_aut'=>$r1,'nom_coaut'=>$n2,'id_coaut'=>$r2];};
+try {
+  $authenticated(); $isGlobal=$global(); $actorId=$actor();
+  if(!$isGlobal&&!$usuarios->usuarioAcademicoExiste($actorId))$respond(403,['status'=>'ERROR','message'=>'Actor académico inválido.']);
+  if($op==='context'){if(!isset($_SESSION['csrf_congreso']))$_SESSION['csrf_congreso']=bin2hex(random_bytes(32));$respond(200,['status'=>'OK','data'=>['csrf_token'=>$_SESSION['csrf_congreso'],'can_manage_global'=>$isGlobal]]);}
+  if($op==='search'){$q=$_POST['q']??'';if(!is_string($q))throw new InvalidArgumentException('Búsqueda inválida.');$respond(200,['status'=>'OK','data'=>$congreso->buscar($q)]);}
+  if($op==='academic_user_search'){$q=$_POST['q']??'';if(!is_string($q)||mb_strlen(trim($q))<2)throw new InvalidArgumentException('Ingrese al menos 2 caracteres.');$respond(200,['status'=>'OK','data'=>$usuarios->buscarUsuariosAcademicos($q)]);}
+  if($op==='list'){$s=$subject($isGlobal,$actorId);$listadoGlobal=$isGlobal&&($_POST['scope']??'')==='global';$respond(200,['status'=>'OK','data'=>$congreso->listarContextual($s,$listadoGlobal)]);}
+  if($op==='detail'){$congresoId=$id('id_congreso');$s=$subject($isGlobal,$actorId);$data=$congreso->detalle($congresoId,$isGlobal?null:$s);if($data===null) $respond(404,['status'=>'ERROR','message'=>'Congreso no encontrado.']);if(!$isGlobal&&$data['participaciones']===[])$respond(403,['status'=>'ERROR','message'=>'Acceso denegado.']);$respond(200,['status'=>'OK','data'=>$data]);}
+  if($op==='participation_detail'){$partId=$id('id_participacion');$data=$congreso->participacion($partId,$isGlobal?null:$actorId);if($data===null)$respond(404,['status'=>'ERROR','message'=>'Participación no encontrada o sin acceso.']);$respond(200,['status'=>'OK','data'=>$data]);}
+  if(in_array($op,['create','participation_create','update','participation_update','delete','participation_delete'],true))$csrf();
+  if($op==='create'){$s=$subject($isGlobal,$actorId);$p=$datosParticipacion();if(!$isGlobal&&$p['id_aut']!==$s&&$p['id_coaut']!==$s)$respond(403,['status'=>'ERROR','message'=>'El sujeto debe ocupar un rol interno.']);$new=$congreso->crearConParticipacion($datosCongreso(),$p);$respond(201,['status'=>'OK','data'=>['id_congreso'=>$new]]);}
+  if($op==='participation_create'){$s=$subject($isGlobal,$actorId);$congresoId=$id('id_congreso');if(!$congreso->existe($congresoId))$respond(404,['status'=>'ERROR','message'=>'Congreso no encontrado.']);$p=$datosParticipacion();if(!$isGlobal&&$p['id_aut']!==$s&&$p['id_coaut']!==$s)$respond(403,['status'=>'ERROR','message'=>'El sujeto debe ocupar un rol interno.']);$new=$congreso->crearParticipacion($congresoId,$p);$respond(201,['status'=>'OK','data'=>['id_participacion'=>$new]]);}
+  if(in_array($op,['update','participation_update','delete','participation_delete'],true)&&!$isGlobal)$respond(403,['status'=>'ERROR','message'=>'Acceso denegado.']);
+  if($op==='update'){$v=$id('id_congreso');if(!$congreso->existe($v))$respond(404,['status'=>'ERROR','message'=>'Congreso no encontrado.']);$congreso->actualizarCongreso($v,$datosCongreso());$respond(200,['status'=>'OK','data'=>['id_congreso'=>$v]]);}
+  if($op==='participation_update'){$v=$id('id_participacion');if($congreso->participacion($v)===null)$respond(404,['status'=>'ERROR','message'=>'Participación no encontrada.']);$congreso->actualizarParticipacion($v,$datosParticipacion());$respond(200,['status'=>'OK','data'=>['id_participacion'=>$v]]);}
+  if($op==='delete'){$v=$id('id_congreso');if(!$congreso->eliminarCongreso($v))$respond(404,['status'=>'ERROR','message'=>'Congreso no encontrado.']);$respond(200,['status'=>'OK','data'=>['id_congreso'=>$v]]);}
+  if($op==='participation_delete'){$v=$id('id_participacion');if(!$congreso->eliminarParticipacion($v))$respond(404,['status'=>'ERROR','message'=>'Participación no encontrada.']);$respond(200,['status'=>'OK','data'=>['id_participacion'=>$v]]);}
+  $respond(400,['status'=>'ERROR','message'=>'Operación inválida.']);
+} catch(InvalidArgumentException $e) {$respond(400,['status'=>'ERROR','message'=>$e->getMessage()]);} catch(RuntimeException $e) {$respond(500,['status'=>'ERROR','message'=>'No fue posible completar la operación.']);} catch(Throwable $e) {$respond(500,['status'=>'ERROR','message'=>'No fue posible completar la operación.']);}
