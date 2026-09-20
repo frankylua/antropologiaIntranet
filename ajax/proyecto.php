@@ -1,89 +1,34 @@
 <?php
+declare(strict_types=1);
+require_once __DIR__ . '/../src/bootstrap/session.php';
+if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 require_once __DIR__ . '/../src/bootstrap/app.php';
 use App\Model\Proyecto;
-require 'validaciones.php';
-$usuario=isset($_POST['usuario'])?$_POST['usuario']:'';
-$folio=isset($_POST['folio'])?$_POST['folio']:'';
-$anio=isset($_POST['anio'])?(int)$_POST['anio']:'';
-$duracion=isset($_POST['duracion'])?(int)$_POST['duracion']:'';
-$titulo=isset($_POST['titulo'])?$_POST['titulo']:'';
-$nom_inv=isset($_POST['nom_inv'])?$_POST['nom_inv']:'';
-$nom_coinv=isset($_POST['nom_coinv'])?$_POST['nom_coinv']:'';
-$inv=isset($_POST['inv'])?(int)$_POST['inv']:'';
-$coinv=isset($_POST['coinv'])?(int)$_POST['coinv']:'';
-$inst=isset($_POST['inst'])?(int)$_POST['inst']:'';
-$financ=isset($_POST['financ'])?(int)$_POST['financ']:'';
-$busqueda=isset($_POST['busqueda'])?$_POST['busqueda']:'';
-$id_proy=isset($_POST['id_proy'])?$_POST['id_proy']:0;
-$id=isset($_POST['id'])?$_POST['id']:'';
-$id_inst=isset($_POST['id_inst'])?$_POST['id_inst']:'';
-$usu=isset($_POST['usu'])?$_POST['usu']:'';
-$proy= new Proyecto();
-$op=isset($_POST['op'])?$_POST['op']:'';
-switch($op){
-    case'read_proy':
-        $resp=$proy->cargarFolio($busqueda);
-        echo json_encode($resp, JSON_UNESCAPED_UNICODE);
-        break;
-    case'carg_proy':
-        $resp=$proy->cargarProyecto($id);
-        echo json_encode($resp, JSON_UNESCAPED_UNICODE);
-        break;   
-    //insertar publicaciones
-    case 'insert-update':
-        
-        if(($id_proy == 0) ){        
-            $respuesta=$proy->insertar($folio,$anio,$duracion,$titulo,$nom_inv,$nom_coinv,$inv,$coinv,$inst,$financ);
-            
-            $respuesta ? $mensaje="Proyecto de Investigación registrado" : $mensaje="Proyecto de Investigación no ha sido registrado";
-            echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);           
-        }
-        //else{
-        //     $respuesta=$institucion->editar($id_inst,$nombre);
-        //     $respuesta ? $mensaje="Pueblo Editado" : $mensaje="Pueblo no ha sido editado";
-        //      echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
-        // }
-        break;
-        // case 'insert-part':
-        //     $respuesta=$cong->insertarPart($tipo_part,$tipo_cong,$coautores,$nom_mesa,$comen_pon,$id_congreso,$autor,$id_autor,$id_coautor);            
-        //     $respuesta ? $mensaje="Participación registrada" : $mensaje="Participación no ha sido registrado";
-        //     echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);                
-        //     break;   
-        //mostrar publicaciones
-    case 'read':
-        $respuesta=$proy->mostrar($usuario);
-         echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
-         break;
-    case 'read-inst':
-        $respuesta=$proy->mostrarInst($id_inst);
-        echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
-        break;
-       
+use App\Model\Usuario;
+use App\Security\Authorization;
 
+final class ProyectoError extends RuntimeException { public function __construct(public int $http, public string $codigo, string $message) { parent::__construct($message); } }
+function failProyecto(int $http, string $code, string $message): never { throw new ProyectoError($http, $code, $message); }
+function outProyecto(int $http, string $code, string $message, mixed $data=null): never { http_response_code($http); header('Content-Type: application/json; charset=utf-8'); echo json_encode(['ok'=>$http<400,'codigo'=>$code,'mensaje'=>$message,'datos'=>$data], JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_SUBSTITUTE); exit; }
+function pid(mixed $value, string $name): int { if ((!is_int($value)&&!is_string($value))||preg_match('/^[1-9][0-9]*$/D',(string)$value)!==1) failProyecto(400,'VALIDACION_INVALIDA',"{$name} inválido."); $id=filter_var($value,FILTER_VALIDATE_INT,['options'=>['min_range'=>1,'max_range'=>2147483647]]); if($id===false) failProyecto(400,'VALIDACION_INVALIDA',"{$name} inválido."); return $id; }
+function ptext(mixed $value, string $name, int $max): string { if(!is_string($value)||trim($value)===''||mb_strlen(trim($value))>$max) failProyecto(400,'VALIDACION_INVALIDA',"{$name} inválido."); return trim($value); }
+function actorProyecto(Usuario $u): array { $loginRaw=$_SESSION['login']??null; if(!is_scalar($loginRaw)||preg_match('/^[1-9][0-9]*$/D',(string)$loginRaw)!==1)failProyecto(401,'NO_AUTENTICADO','Debe iniciar sesión.'); $login=filter_var($loginRaw,FILTER_VALIDATE_INT,['options'=>['min_range'=>1,'max_range'=>2147483647]]); if($login===false)failProyecto(401,'NO_AUTENTICADO','Debe iniciar sesión.'); $global=Authorization::hasAny(['admin','comite'])&&((int)($_SESSION['admin']??0)===$login||(int)($_SESSION['comite']??0)===$login); if($global)return ['global'=>true,'usuario'=>0]; $ids=$_SESSION['id_usuario']??null; $id=is_array($ids)&&count($ids)===1&&is_array($ids[0]??null)&&isset($ids[0]['id_usuario'])?pid($ids[0]['id_usuario'],'identidad'):0; $est=(int)($_SESSION['estudiante']??0)===$login&&Authorization::hasCapability('perfil.ver'); $doc=(int)($_SESSION['docente']??0)===$login; if($id<1||$est===$doc||!$u->usuarioAcademicoExiste($id))failProyecto(403,'NO_AUTORIZADO','Perfil académico inválido.'); return ['global'=>false,'usuario'=>$id]; }
+function csrfProyecto(): void { $a=$_SESSION['csrf_proyecto']??null; $b=$_SERVER['HTTP_X_CSRF_TOKEN']??null; if(!is_string($a)||!is_string($b)||preg_match('/^[a-f0-9]{64}$/D',$a)!==1||!hash_equals($a,$b))failProyecto(403,'CSRF_INVALIDO','Token CSRF inválido.'); }
+function subjectProyecto(array $actor, Usuario $u): int { $requested=array_key_exists('subject_usuario_id',$_POST)?pid($_POST['subject_usuario_id'],'subject'):null; if(!$actor['global']) { if($requested!==null&&$requested!==$actor['usuario'])failProyecto(403,'NO_AUTORIZADO','Contexto no autorizado.'); return $actor['usuario']; } if($requested===null||!$u->usuarioAcademicoExiste($requested))failProyecto(400,'VALIDACION_INVALIDA','Subject inválido.'); return $requested; }
+function roleProyecto(string $key, Usuario $u): array { $raw=$_POST[$key.'_usuario_id']??null; $id=$raw===null||$raw===''?null:pid($raw,$key); $rawName=$_POST[$key.'_nombre_externo']??null; $name=$rawName===null||$rawName===''?null:ptext($rawName,$key,60); if($id===null&&$name===null)failProyecto(400,'VALIDACION_INVALIDA',"Debe indicar un {$key}: seleccione un usuario interno o ingrese un nombre externo."); if($id!==null&&$name!==null)failProyecto(400,'VALIDACION_INVALIDA',"El {$key} no puede ser interno y externo al mismo tiempo."); if($id!==null&&!$u->usuarioAcademicoExiste($id))failProyecto(400,'VALIDACION_INVALIDA',"{$key} interno inválido."); return ['id'=>$id,'name'=>$name]; }
+function dataProyecto(Proyecto $p, Usuario $u): array { $inv=roleProyecto('investigador',$u); $coinv=roleProyecto('coinvestigador',$u); if($inv['id']!==null&&$inv['id']===$coinv['id'])failProyecto(400,'VALIDACION_INVALIDA','Los roles internos deben ser distintos.'); $instRaw=$_POST['inst_proy']??null; $inst=$instRaw===null||$instRaw===''?null:pid($instRaw,'institución'); if($inst!==null&&!$p->institucionExiste($inst))failProyecto(400,'VALIDACION_INVALIDA','Institución inexistente.'); $fin=pid($_POST['fuente_financiamiento']??null,'financiamiento'); if(!$p->financiamientoExiste($fin))failProyecto(400,'VALIDACION_INVALIDA','Financiamiento inexistente.'); return ['titulo'=>ptext($_POST['titulo']??null,'Título',300),'folio'=>ptext($_POST['folio']??null,'Folio',10),'financiamiento'=>$fin,'anio'=>pid($_POST['anio_adjud']??null,'Año'),'duracion'=>pid($_POST['duracion']??null,'Duración'),'institucion'=>$inst,'id_inv'=>$inv['id'],'id_coinv'=>$coinv['id'],'nom_inv'=>$inv['name'],'nom_coinv'=>$coinv['name']]; }
 
-    case 'read-usu':
-        $respuesta=$proy->mostrarInvCoinv($usu);
-        echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
-        break;
-        // case 'read-inst':
-        // //$respuesta=$proy->mostrarInvCoinv($usu);
-        // //echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
-        // break;
-    case 'update-inv':
-        $respuesta=$proy->editarInv($inv,$id_proy);
-        $respuesta ? $mensaje="Proyecto de Investigación Actualizado" : $mensaje="Proyecto de Investigación no ha sido actualizado";
-        echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);        
-        break;
-    case 'update-coinv':
-        $respuesta=$proy->editarCoinv($coinv,$id_proy,$inst);
-        $respuesta ? $mensaje="Proyecto de Investigación Actualizado" : $mensaje="Proyecto de Investigación no ha sido actualizado";
-        echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);        
-        break;    
-    // case'delete':
-    //     $respuesta=$institucion->eliminar($id_inst);
-    //     $respuesta ? $mensaje="Pueblo Eliminado" : $mensaje="Pueblo no ha sido eliminado";
-    //     echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
-    //     break;
-        }
-
-?>
+try {
+ if(($_SERVER['REQUEST_METHOD']??'')!=='POST'){header('Allow: POST');failProyecto(405,'METODO_NO_PERMITIDO','Utilice POST.');}
+ $p=new Proyecto();$u=new Usuario();$actor=actorProyecto($u);$op=$_POST['op']??null;
+ if(!is_string($op)||!in_array($op,['context','list','detail','create','update','delete'],true))failProyecto(400,'OPERACION_INVALIDA','Operación inválida.');
+ if($op==='context'){if(!isset($_SESSION['csrf_proyecto'])||!is_string($_SESSION['csrf_proyecto'])||preg_match('/^[a-f0-9]{64}$/D',$_SESSION['csrf_proyecto'])!==1)$_SESSION['csrf_proyecto']=bin2hex(random_bytes(32));outProyecto(200,'CONTEXTO_OBTENIDO','Contexto obtenido.',['csrf_token'=>$_SESSION['csrf_proyecto'],'can_manage_global'=>$actor['global']]);}
+ if(in_array($op,['create','update','delete'],true))csrfProyecto();
+ if($op==='list'){if(($_POST['scope']??'contextual')==='global'){if(!$actor['global'])failProyecto(403,'NO_AUTORIZADO','Lectura global no autorizada.');outProyecto(200,'LISTA_OBTENIDA','Proyectos obtenidos.',$p->listarGlobal());}outProyecto(200,'LISTA_OBTENIDA','Proyectos obtenidos.',$p->listarContextual(subjectProyecto($actor,$u)));}
+ if($op==='create'){$data=dataProyecto($p,$u);if(!$actor['global']&&$data['id_inv']!==$actor['usuario']&&$data['id_coinv']!==$actor['usuario'])failProyecto(403,'NO_AUTORIZADO','El Académico debe ocupar un rol interno.');$r=$p->insertar($data);$id=(int)($r['idInsertado']??0);if((int)($r['filasAfectadas']??0)!==1||$id<1)failProyecto(409,'CONFLICTO_PERSISTENCIA','Creación no confirmada.');outProyecto(201,'PROYECTO_CREADO','Proyecto creado.',['id_proyecto'=>$id]);}
+ $id=pid($_POST['id_proyecto']??null,'id_proyecto');$row=$p->detalle($id);if($row===null)failProyecto(404,'PROYECTO_NO_ENCONTRADO','Proyecto inexistente.');
+ if($op==='detail'){if(!$actor['global']&&(int)$row['id_inv']!==$actor['usuario']&&(int)$row['id_coinv']!==$actor['usuario'])failProyecto(403,'NO_AUTORIZADO','Proyecto no autorizado.');outProyecto(200,'PROYECTO_OBTENIDO','Proyecto obtenido.',$row);}
+ if(!$actor['global'])failProyecto(403,'NO_AUTORIZADO','Sólo Admin o Comité puede modificar Proyectos.');
+ if($op==='update'){$r=$p->actualizar($id,dataProyecto($p,$u));outProyecto(200,'PROYECTO_ACTUALIZADO','Proyecto actualizado.',['id_proyecto'=>$id,'cambios'=>(int)$r['filasAfectadas']]);}
+ $r=$p->eliminar($id);if((int)$r['filasAfectadas']!==1)failProyecto(409,'CONFLICTO_PERSISTENCIA','Eliminación no confirmada.');outProyecto(200,'PROYECTO_ELIMINADO','Proyecto eliminado.',['id_proyecto'=>$id]);
+} catch(ProyectoError $e){outProyecto($e->http,$e->codigo,$e->getMessage());}catch(PDOException $e){error_log('[PROYECTO] '.$e->getMessage());outProyecto(500,'ERROR_PERSISTENCIA','Error de persistencia.');}catch(Throwable $e){error_log('[PROYECTO] '.$e->getMessage());outProyecto(500,'ERROR_TECNICO','Error técnico.');}
