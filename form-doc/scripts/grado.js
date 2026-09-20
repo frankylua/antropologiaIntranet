@@ -86,12 +86,32 @@ function listaGrados(id_tipo, id_grado) {
 // function formEditGrado(){
 //$('#edit_academicos').append('<h3 class="mb-5 text-center" id="text-tit">EDITAR GRADO ACADÉMICO</h3><form action="" id="form_edit_grado"></form>');
 // }
+function zonaGrado() { return $('#form_grado').closest('.oa-zone'); }
+function listadoGrado() { const id = zonaGrado().find('.oa-list').first().attr('id'); return id ? '#' + id : '#grados_card'; }
+function abrirEditorGrado($editor) {
+    const $zona = zonaGrado();
+    $editor.show();
+    if (!$editor.length) return false;
+    $zona.find('.oa-list,.oa-add,.oa-editor').not($editor).hide();
+    return true;
+}
+function cerrarEditorGrado() {
+    const $zona = zonaGrado();
+    $('#ingresar_grado,#campos_grado').empty();
+    if ($zona.length) { $zona.find('.oa-editor').hide(); $zona.find('.oa-list,.oa-add').show(); }
+    else { $('#boton_grado').show(); }
+}
+
 $('#btn_grado').click(function () {
+    const $editor = $('#form_grado').show();
+    if (!$editor.length) return;
     $('#boton_grado').hide();
     $('#grado_academico').append('<div class="card mb-3" id="ingresar_grado"><div class="card-body" id="card_pre"> </div></div>');
     $('#card_pre').append('<div class="row justify-content-between"><div class="col-auto mb-3"><h4 class="card-title">Grado Académico</h4></div><div class="col-auto"><button type="button" name="add" id="borrar_grado"  class="btn btn-close btn-sm borrar_grado"></button></div></div>');
     formGrado('#card_pre');
     $('#card_pre').append('<div class="row justify-content-center" ><div class="col-md-6  d-grid gap-2"><button type="submit" class="btn btn-dark mt-3">Guardar Grado Académico</button></div></div>');
+    abrirEditorGrado($editor);
+    const editorGrado = document.getElementById('ingresar_grado'); if (editorGrado) editorGrado.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
 
 });
@@ -146,7 +166,7 @@ $(document).on('change', '.tit', function () {
 $(document).on('click', '#borrar_grado', function () {
     //id = $(this).attr("id");
     $('#ingresar_grado').remove();
-    $('#boton_grado').show();
+    cerrarEditorGrado();
     //$('#grado_card'+id).fadeIn()
 });
 function cargarGrado(usuario, id) {
@@ -163,7 +183,6 @@ function cargarGrado(usuario, id) {
                 return;
             }
             let grados = response.datos;
-            $('#grados_card').empty();
             let conpre = 1
             let conpost = 1
             let template = '';
@@ -241,6 +260,9 @@ function cargarGrado(usuario, id) {
                 }
 
             });
+            if (grados.length === 0) {
+                template = '<p class="text-muted mb-3">No hay Grados Académicos registrados.</p>';
+            }
             $(id).empty().append(template)
         },
         error: function (xhr) {
@@ -251,15 +273,11 @@ function cargarGrado(usuario, id) {
 }
 $("body").on("click", ".editarGrado", function () {
      $('#campos_grado').empty();
-    if($('#ficha_acad').attr('name')=='doc'){
-        editAcadDoc()
-    }else{
-        editAcadEst()
-    }
+    abrirEditorGrado($('#form_edit_grado'));
 
     const id_grado = $(this).attr("id");
-    $('#edit_academicos').attr('name', id_grado)
-    $('#campos_grado').append('<h3 class="mb-5 text-center" id="text-tit">EDITAR GRADO ACADÉMICO</h3>')
+    $('#form_edit_grado').attr('data-id-grado', id_grado)
+    $('#campos_grado').append('<div class="row justify-content-between"><div class="col-auto mb-3"><h3 id="text-tit">EDITAR GRADO ACADÉMICO</h3></div><div class="col-auto"><button type="button" class="btn btn-close btn-sm cerrar-editor-grado" aria-label="Cerrar"></button></div></div>')
     const datosLectura = agregarUsuarioObjetivoGrado(
         { op: "read_grado_id", id_grado },
         $('#id_usuario').attr('name')
@@ -312,13 +330,15 @@ $("body").on("click", ".editarGrado", function () {
             }
 
             //boton volver y editar
-            $('#campos_grado').append('<div class="row mt-5 justify-content-between "><div class="col-6 col-md-4 mb-3"><button type="button" class="col-12 btn btn-dark col-6" id="volverAcad">Cancelar</button></div><div class="col-6 col-md-4 mb-3 "><button type="submit" class="col-12 btn btn-dark col-6">Editar</button></div></div>');
+            $('#campos_grado').append('<div class="row mt-5 justify-content-end"><div class="col-6 col-md-4 mb-3"><button type="submit" class="col-12 btn btn-dark">Editar</button></div></div>');
+            const editorGrado = document.getElementById('form_edit_grado'); if (editorGrado) editorGrado.scrollIntoView({ behavior: 'smooth', block: 'start' });
         },
         error: function (xhr) {
             mostrarErrorGrado(mensajeErrorGrado(xhr));
         }
     });
 });
+$(document).on('click', '.cerrar-editor-grado', cerrarEditorGrado);
 $("body").on("click", ".eliminarGrado", function () {
     const id_grado = $(this).attr("id");
     if (!window.confirm('¿Confirma que desea eliminar este Grado académico?')) {
@@ -345,7 +365,7 @@ $("body").on("click", ".eliminarGrado", function () {
                 $("#mnsj_acad_doc").text(mensaje);
                 setTimeout(function () {
                     $("#mnsj_row_acad_doc").fadeOut(1500);
-                    cargarFichaDoc($("#info_doc").attr('name'))
+                    cargarGrado(usuario, listadoGrado())
                 }, 3000);
             }else{
                 $("#mnsj_row_acad_est").show();
@@ -353,7 +373,7 @@ $("body").on("click", ".eliminarGrado", function () {
                 $("#mnsj_acad_est").text(mensaje);
                 setTimeout(function () {
                     $("#mnsj_row_acad_est").fadeOut(1500);
-                    cargarFichaEst($("#info_est").attr('name'))
+                    cargarGrado(usuario, listadoGrado())
                 }, 3000);
             }
                 
@@ -458,8 +478,8 @@ $('#form_grado').submit(function (e) {
                 $('#mnsj_grad').text(response.mensaje);
                 setTimeout(function () {
                     $('#ingresar_grado').remove();
-                    $('#boton_grado').show();
-                    cargarGrado(usuario, '#grados_card')
+                    cerrarEditorGrado();
+                    cargarGrado(usuario, listadoGrado())
                     $("#mnsj_row_grad").fadeOut(1500);
                 }, 3000);
             },
@@ -472,7 +492,7 @@ $('#form_grado').submit(function (e) {
 })
 $('#form_edit_grado').submit(function (e) {
     e.preventDefault();
-    let id_grado = $('#edit_academicos').attr('name');
+    let id_grado = $('#form_edit_grado').attr('data-id-grado');
     let usuario = $('#id_usuario').attr('name');
     let tipo_grado = $('#grad_acad').val();
     let grado = $('#grado').val() == 0 ? $('#grado').attr('name') : $('#grado').val();
@@ -549,12 +569,8 @@ $('#form_edit_grado').submit(function (e) {
             $('#mnsj_grad').removeClass('alert-danger').addClass('alert-success');
             $('#mnsj_grad').text(response.mensaje);
             setTimeout(function () {
-                if($('#ficha_acad').attr('name')=='doc'){
-                    reiniciarInfoDoc()
-                }else{
-                    reiniciarInfoEst()
-                }
-
+                cerrarEditorGrado();
+                cargarGrado(usuario, listadoGrado());
                 $("#mnsj_row_grad").fadeOut(1500);
             }, 3000);
         },

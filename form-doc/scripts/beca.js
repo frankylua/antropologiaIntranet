@@ -163,8 +163,9 @@
     }
 
     function cerrarEditor(ocultarAlCerrar) {
+        const $zona = $('#beca_editor').closest('.oa-zone');
         $('#beca_editor').empty().hide();
-        $('#boton_beca').show();
+        if ($zona.length) $zona.find('.oa-list,.oa-add').show(); else $('#boton_beca').show();
 
         if (ocultarAlCerrar !== false) {
             ocultarMensaje();
@@ -178,10 +179,17 @@
         const $tarjeta = $('<div>', { class: 'card mb-3' });
         const $cuerpo = $('<div>', { class: 'card-body' }).appendTo($tarjeta);
 
+        const $encabezado = $('<div>', { class: 'd-flex justify-content-between' }).appendTo($cuerpo);
         $('<h4>', {
             class: 'card-title',
             text: edicion ? 'Editar Beca' : 'Agregar Beca'
-        }).appendTo($cuerpo);
+        }).appendTo($encabezado);
+        $('<button>', {
+            type: 'button',
+            class: 'btn-close',
+            id: 'beca_cerrar',
+            'aria-label': 'Cerrar'
+        }).appendTo($encabezado);
 
         const $formulario = $('<form>', {
             id: 'beca_formulario_editor',
@@ -339,7 +347,9 @@
         }).appendTo($acciones);
 
         $editor.append($tarjeta).show();
-        $('#boton_beca').hide();
+        const $zona = $editor.closest('.oa-zone');
+        if ($zona.length) $zona.find('.oa-list,.oa-add').hide(); else $('#boton_beca').hide();
+        const editorBeca = document.getElementById('beca_editor'); if (editorBeca) editorBeca.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         cargarInstituciones(edicion ? beca.inst_beca : null);
 
@@ -553,6 +563,9 @@
     });
 
     $(document).on('click', '#beca_cancelar', function () {
+        cerrarEditor(true);
+    });
+    $(document).on('click', '#beca_cerrar', function () {
         cerrarEditor(true);
     });
 

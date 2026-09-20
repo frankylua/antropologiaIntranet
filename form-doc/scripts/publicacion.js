@@ -48,6 +48,10 @@
   }
   function render($target, list, otras) {
     $target.empty();
+    if (!(list.articulos || []).length && !(list.libros || []).length && !(otras || []).length) {
+      $('<p>', { class: 'text-muted mb-3', text: 'No hay Publicaciones registradas.' }).appendTo($target);
+      return;
+    }
     (list.articulos || []).forEach(function (p) { $target.append(tableCard('PUBLICACIÓN', [['Tipo', nombreNominal(Number(p.tipo) === 1 ? 'Artículo' : 'Edición de Revista Temática')], ['Título', nombreNominal(p.titulo)], ['Año', p.anio], ['Nombre Revista', nombreNominal(p.nombre_revista)], ['Indización', nombreNominal(p.indizacion)], ['Estado', nombreNominal(p.estado_publicacion)], ['Issn', p.issn], ['Factor de Impacto', Number(p.factor_impacto) ? p.factor_impacto : 'No tiene factor de impacto'], ['Autor principal', nombreNominal(p.autor_nombre)], ['Coautor principal', nombreNominal(p.coautor_nombre)], ['Otros coautores', otrosCoautores(p.otros_autores)]], controls(Number(p.id_publicacion), Number(p.tipo), false))); });
     (list.libros || []).forEach(function (p) { $target.append(tableCard('PUBLICACIÓN', [['Tipo', nombreNominal(Number(p.tipo) === 1 ? 'Libro' : 'Capítulo de Libro')], ['Nombre', nombreNominal(p.nom_pub)], ['Rol', nombreNominal(Number(p.rol) === 1 ? 'Autor/a' : 'Editor/a')], ['Año', p.anio], ['Estado', nombreNominal(p.nom_est)], ['Lugar', nombreNominal(p.lugar)], ['Autor principal', nombreNominal(p.autor_nombre)], ['Coautor principal', nombreNominal(p.coautor_nombre)], ['Otros coautores', otrosCoautores(p.otros_autores)], ['Editoriales', editorialesLibro(p.editoriales)]], controls(Number(p.id_publicacion), 3, false))); });
     (otras || []).forEach(function (p) { $target.append(tableCard('OTRA PUBLICACIÓN', [['Tipo', nombreNominal(p.tipo)], ['Descripción', nombreNominal(p.descripcion)]], controls(Number(p.id_otra_pub), 4, true))); });
@@ -60,20 +64,17 @@
   };
   function restaurarListadoPublicacion() {
     $('#campos_publicacion').empty();
-    if (selectorListado === '#ficha_publicacion') {
-      $('#edit_acad_doc').stop(true, true).hide();
-      $('#info_doc').stop(true, true).show();
-    } else if (selectorListado === '#publi_est') {
-      $('#edit_acad_est').stop(true, true).hide();
-      $('#info_est').stop(true, true).show();
-    } else if ($('#ficha_acad').attr('name') === 'doc') {
-      $('#edit_acad_doc').stop(true, true).hide();
-      $('#acad_doc').stop(true, true).show();
-    } else {
-      $('#edit_acad_est').stop(true, true).hide();
-      $('#acad_est').stop(true, true).show();
-    }
+    const $zona = $('#form_publicacion').closest('.oa-zone');
+    $('#ingresar_publicacion').remove();
+    if ($zona.length) { $zona.find('.oa-editor').hide(); $zona.find('.oa-list,.oa-add').show(); }
+    else { $('#boton_publicacion').show(); }
     return window.cargarPub(usuarioContextual, selectorListado);
+  }
+  function abrirEditorPublicacion($editor) {
+    const $zona = $('#form_publicacion').closest('.oa-zone');
+    if ($zona.length) $zona.find('.oa-list,.oa-add,.oa-editor').hide();
+    else $('#boton_publicacion').hide();
+    $editor.show();
   }
   function input(label, id, type, max) { return $('<div>', { class: 'col-md-6 mb-3' }).append($('<label>', { for: id, class: 'form-label' }).text(label), type === 'textarea' ? $('<textarea>', { id, class: 'form-control', maxlength: max }) : $('<input>', { id, type: type || 'text', class: 'form-control', maxlength: max })); }
   function select(label, id, choices) { const $s = $('<select>', { id, class: 'form-select' }).append($('<option>', { value: '' }).text('Seleccione')); choices.forEach(function (c) { $s.append($('<option>', { value: c[0] }).text(c[1])); }); return $('<div>', { class: 'col-md-6 mb-3' }).append($('<label>', { for: id, class: 'form-label' }).text(label), $s); }
@@ -115,12 +116,11 @@
   function actualizarEtiquetaContraria(){ $('#persona_contraria').prev('label').text($('#rol_propio').val()==='AUTOR'?'Coautor':'Autor'); }
   function openEdit(idPublicacion, type) {
     if (!context.canManageGlobal) return;
-    if ($('#ficha_acad').attr('name') === 'doc') editAcadDoc(); else editAcadEst();
+    abrirEditorPublicacion($('#form_edit_publicacion'));
     request({ op: 'detail', id_publicacion: idPublicacion, tipo: type }).then(function (response) {
       const data = response.data || {};
       const $box = $('<div>', { class: 'publicacion-edit', 'data-id-publicacion': idPublicacion, 'data-tipo': type });
       const $campos = $('#campos_publicacion');
-      $campos.closest('#edit_acad_doc, #edit_acad_est').stop(true, true).show();
       const $header = $('<div>',{class:'row justify-content-between'}).append($('<div>',{class:'col-auto mb-3'}).append($('<h3>',{class:'card-title'}).text('EDITAR PUBLICACIÓN')),$('<div>',{class:'col-auto'}).append($('<button>',{type:'button',class:'btn btn-close btn-sm cancelar-publicacion','aria-label':'Cerrar'})));
       editorialesExistentes = type === 3 ? (data.editoriales || []).map(function (p) { return { id: Number(p.id_editorial), nombre: value(p.nombre) }; }).filter(function (p) { return p.id > 0; }) : [];
       editorialesNuevas = [];
@@ -131,36 +131,37 @@
       hydrateParticipant(data.autor,data.coautor);
       if (type === 3) { $('#tipo_lib').val(data.tipo); $('#rol_libro').val(data.rol); $('#ref_ext').val(data.ref_ext); $('#traduccion').val(data.traduccion); $('#lugar').val(data.lugar); renderEditoriales(); }
       else { $('#titulo').val(data.titulo); $('#issn').val(data.issn); $('#indizacion').val(data.indizacion); $('#no_fac').prop('checked', Number(data.factor_impacto) === 0); $('#fac_imp').val(Number(data.factor_impacto) === 0 ? '' : data.factor_impacto); syncFactorImpacto(); }
+      const editorPublicacion = document.getElementById('form_edit_publicacion'); if (editorPublicacion) editorPublicacion.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }).fail(function (xhr) { notify(failure(xhr)); });
   }
   function openOtraEdit(idOtraPub) {
     if (!context.canManageGlobal) return;
-    if ($('#ficha_acad').attr('name') === 'doc') editAcadDoc(); else editAcadEst();
+    abrirEditorPublicacion($('#form_edit_publicacion'));
     request({ op: 'otra_detail', id_otra_pub: idOtraPub }).then(function (response) {
       const data = response.data || {};
       const $box = $('<div>', { class: 'otra-edit', 'data-id-otra-pub': idOtraPub });
       const $campos = $('#campos_publicacion');
-      $campos.closest('#edit_acad_doc, #edit_acad_est').stop(true, true).show();
       const $header = $('<div>', { class: 'row justify-content-between' }).append($('<div>', { class: 'col-auto mb-3' }).append($('<h3>', { class: 'card-title' }).text('EDITAR OTRA PUBLICACIÓN')), $('<div>', { class: 'col-auto' }).append($('<button>', { type: 'button', class: 'btn btn-close btn-sm cancelar-publicacion', 'aria-label': 'Cerrar' })));
       $campos.empty().append($header, $box);
       $box.append($('<div>', { class: 'row' }).append(input('Tipo', 'tipo_otra_pub', 'text', 50), input('Descripción', 'descripcion', 'textarea', 300)), action('Guardar cambios', 'btn btn-dark guardar-otra-edicion'));
       $('#tipo_otra_pub').val(data.tipo); $('#descripcion').val(data.descripcion);
+      const editorPublicacion = document.getElementById('form_edit_publicacion'); if (editorPublicacion) editorPublicacion.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }).fail(function (xhr) { notify(failure(xhr)); });
   }
 
   $(document)
-    .off('click.publicacion', '#btn_publicacion').on('click.publicacion', '#btn_publicacion', function () { $('#boton_publicacion').hide(); const $card = $('<div>', { id: 'ingresar_publicacion', class: 'card mb-3' }).append($('<div>', { class: 'card-body' }).append($('<div>',{class:'row justify-content-between'}).append($('<div>',{class:'col-auto mb-3'}).append($('<h4>',{class:'card-title'}).text('Publicación')),$('<div>',{class:'col-auto'}).append($('<button>',{type:'button',id:'borrar_publicacion',class:'btn btn-close btn-sm borrar_publicacion','aria-label':'Cerrar'}))), select('Tipo de Publicación', 'pub', [[1, 'Artículo'], [2, 'Edición de Revista Temática'], [3, 'Libro'], [4, 'Otra Publicación']]), $('<div>', { id: 'publicacion_fields' }), $('<div>', { id: 'mnsj_pub', class: 'alert alert-danger' }).hide(), $('<button>', { type: 'submit', id: 'guardar_pub', class: 'btn btn-dark' }).text('Guardar').hide())); $('#publicacion').empty().append($card); })
+    .off('click.publicacion', '#btn_publicacion').on('click.publicacion', '#btn_publicacion', function () { abrirEditorPublicacion($('#form_publicacion')); const $card = $('<div>', { id: 'ingresar_publicacion', class: 'card mb-3' }).append($('<div>', { class: 'card-body' }).append($('<div>',{class:'row justify-content-between'}).append($('<div>',{class:'col-auto mb-3'}).append($('<h4>',{class:'card-title'}).text('Publicación')),$('<div>',{class:'col-auto'}).append($('<button>',{type:'button',id:'borrar_publicacion',class:'btn btn-close btn-sm borrar_publicacion','aria-label':'Cerrar'}))), select('Tipo de Publicación', 'pub', [[1, 'Artículo'], [2, 'Edición de Revista Temática'], [3, 'Libro'], [4, 'Otra Publicación']]), $('<div>', { id: 'publicacion_fields' }), $('<div>', { id: 'mnsj_pub', class: 'alert alert-danger' }).hide(), $('<button>', { type: 'submit', id: 'guardar_pub', class: 'btn btn-dark' }).text('Guardar').hide())); $('#publicacion').empty().append($card); const editorPublicacion = document.getElementById('ingresar_publicacion'); if (editorPublicacion) editorPublicacion.scrollIntoView({ behavior: 'smooth', block: 'start' }); })
     .off('change.publicacion', '#pub').on('change.publicacion', '#pub', function () { const type = Number($(this).val()); editorialesExistentes = []; editorialesNuevas = []; const $root = $('#publicacion_fields').empty(); if (type === 4) $root.append($('<div>', { class: 'row' }).append(input('Tipo', 'tipo_otra_pub', 'text', 50), input('Descripción', 'descripcion', 'textarea', 300))); else if (type) fields($root, type); $('#guardar_pub').toggle(!!type); })
-    .off('click.publicacion', '.borrar_publicacion').on('click.publicacion', '.borrar_publicacion', function () { $('#ingresar_publicacion').remove(); $('#boton_publicacion').show(); })
+    .off('click.publicacion', '.borrar_publicacion').on('click.publicacion', '.borrar_publicacion', restaurarListadoPublicacion)
     .off('click.publicacion', '.cancelar-publicacion').on('click.publicacion', '.cancelar-publicacion', function () { restaurarListadoPublicacion(); })
     .off('input.publicacion', '#editorial').on('input.publicacion', '#editorial', function () { const q = $.trim($(this).val()); const $list = $('#list_editorial').empty().hide(); if (!q) return; request({ op: 'editorial_search', busqueda: q }).then(function (r) { (r.data || []).forEach(function (p) { $list.append($('<li>', { class: 'list-group-item listEdit' }).text(p.nombre).data({ id: Number(p.id_editorial), nombre: value(p.nombre) })); }); $list.toggle($list.children().length > 0); }); })
     .off('click.publicacion', '.listEdit').on('click.publicacion', '.listEdit', function () { const p = $(this).data(); if (!editorialesExistentes.some(function (x) { return x.id === p.id; })) editorialesExistentes.push(p); $('#editorial').val(''); $('#list_editorial').hide(); renderEditoriales(); })
     .off('click.publicacion', '.btn_editorial').on('click.publicacion', '.btn_editorial', function () { const p = $.trim($('#editorial').val()); if (!p || p.length > 60) return notify('Ingrese una editorial válida.'); if (!editorialesNuevas.includes(p) && !editorialesExistentes.some(function (x) { return x.nombre === p; })) editorialesNuevas.push(p); $('#editorial').val(''); renderEditoriales(); })
     .off('click.publicacion', '.quitar-editorial').on('click.publicacion', '.quitar-editorial', function () { const p = $(this).data(); if (p.kind === 'old') editorialesExistentes = editorialesExistentes.filter(function (x) { return x.id !== p.id; }); else editorialesNuevas = editorialesNuevas.filter(function (x) { return x !== p.name; }); renderEditoriales(); })
     .off('change.publicacion', '#no_fac').on('change.publicacion', '#no_fac', syncFactorImpacto)
-    .off('submit.publicacion', '#form_publicacion').on('submit.publicacion', '#form_publicacion', function (e) { e.preventDefault(); const type = Number($('#pub').val()); ensurePublicacionContext().then(function () { if (type === 4) { const data = Object.assign({ op: 'otra_create', tipo_otra_pub: $.trim($('#tipo_otra_pub').val()), descripcion: $.trim($('#descripcion').val()) }, payloadContextual()); if (!data.tipo_otra_pub || !data.descripcion) return notify('Complete los campos obligatorios.'); return request(data, true); } const data = Object.assign({ op: 'create', rol_participacion: $('#rol_participacion').val() }, formData(type), payloadContextual()); if (!valid(data) || !data.rol_participacion) return notify('Complete los campos obligatorios y seleccione el rol.'); return request(data, true); }).then(function (r) { if (!r) return; $('#ingresar_publicacion').remove(); $('#boton_publicacion').show(); window.cargarPub(usuarioContextual, '#publicacion_card'); }).fail(function (xhr) { notify(failure(xhr)); }); })
-    .off('click.publicacion', '.eliminarPub').on('click.publicacion', '.eliminarPub', function () { if (!context.canManageGlobal || !confirm('¿Eliminar esta publicación?')) return; request({ op: 'delete', id_publicacion: $(this).data('id') }, true).then(function () { window.cargarPub(usuarioContextual, '#publicacion_card'); }).fail(function (x) { notify(failure(x)); }); })
-    .off('click.publicacion', '.eliminarOtraPub').on('click.publicacion', '.eliminarOtraPub', function () { if (!context.canManageGlobal || !confirm('¿Eliminar esta publicación?')) return; request({ op: 'otra_delete', id_otra_pub: $(this).data('id') }, true).then(function () { window.cargarPub(usuarioContextual, '#publicacion_card'); }).fail(function (x) { notify(failure(x)); }); })
+    .off('submit.publicacion', '#form_publicacion').on('submit.publicacion', '#form_publicacion', function (e) { e.preventDefault(); const type = Number($('#pub').val()); ensurePublicacionContext().then(function () { if (type === 4) { const data = Object.assign({ op: 'otra_create', tipo_otra_pub: $.trim($('#tipo_otra_pub').val()), descripcion: $.trim($('#descripcion').val()) }, payloadContextual()); if (!data.tipo_otra_pub || !data.descripcion) return notify('Complete los campos obligatorios.'); return request(data, true); } const data = Object.assign({ op: 'create', rol_participacion: $('#rol_participacion').val() }, formData(type), payloadContextual()); if (!valid(data) || !data.rol_participacion) return notify('Complete los campos obligatorios y seleccione el rol.'); return request(data, true); }).then(function (r) { if (!r) return; restaurarListadoPublicacion(); }).fail(function (xhr) { notify(failure(xhr)); }); })
+    .off('click.publicacion', '.eliminarPub').on('click.publicacion', '.eliminarPub', function () { if (!context.canManageGlobal || !confirm('¿Eliminar esta publicación?')) return; request({ op: 'delete', id_publicacion: $(this).data('id') }, true).then(restaurarListadoPublicacion).fail(function (x) { notify(failure(x)); }); })
+    .off('click.publicacion', '.eliminarOtraPub').on('click.publicacion', '.eliminarOtraPub', function () { if (!context.canManageGlobal || !confirm('¿Eliminar esta publicación?')) return; request({ op: 'otra_delete', id_otra_pub: $(this).data('id') }, true).then(restaurarListadoPublicacion).fail(function (x) { notify(failure(x)); }); })
     .off('click.publicacion', '.editarPub').on('click.publicacion', '.editarPub', function () { const data = $(this).data(); openEdit(Number(data.id), Number(data.tipo)); })
     .off('click.publicacion', '.editarOtraPub').on('click.publicacion', '.editarOtraPub', function () { openOtraEdit(Number($(this).data('id'))); })
     .off('click.publicacion', '.guardar-otra-edicion').on('click.publicacion', '.guardar-otra-edicion', function () { const idOtraPub = Number($(this).closest('.otra-edit').data('id-otra-pub')); const data = { op: 'otra_update', id_otra_pub: idOtraPub, tipo_otra_pub: $.trim($('#tipo_otra_pub').val()), descripcion: $.trim($('#descripcion').val()) }; if (!data.tipo_otra_pub || !data.descripcion) return notify('Complete los campos obligatorios.'); request(data, true).then(restaurarListadoPublicacion).fail(function (xhr) { notify(failure(xhr)); }); });
@@ -169,6 +170,6 @@
     .off('change.autoria', '#rol_propio').on('change.autoria', '#rol_propio', actualizarEtiquetaContraria)
     .off('input.autoria', '.academic-search').on('input.autoria', '.academic-search', function(){ const $input=$(this),q=$.trim($input.val()),$box=$input.closest('.participant-block'),$list=$box.find('.academic-results').empty().hide(); $box.find('.academic-selected').text('').data('id',null); if(q.length<2)return; request({op:'academic_user_search',q:q}).then(function(r){(r.data||[]).forEach(function(u){$list.append($('<li>',{class:'list-group-item academic-option'}).text(u.nombre).data({id:Number(u.id_usuario),nombre:u.nombre}));});$list.toggle($list.children().length>0);}); })
     .off('click.autoria', '.academic-option').on('click.autoria', '.academic-option', function(){ const u=$(this).data(),$box=$(this).closest('.participant-block');$box.find('.academic-selected').text(u.nombre).data('id',u.id);$box.find('.academic-search').val(u.nombre);$box.find('.academic-results').empty().hide(); })
-    .off('submit.publicacion', '#form_publicacion').on('submit.publicacion', '#form_publicacion', function(e){ e.preventDefault(); const type=Number($('#pub').val()); ensurePublicacionContext().then(function(){ if(type===4){const d=Object.assign({op:'otra_create',tipo_otra_pub:$.trim($('#tipo_otra_pub').val()),descripcion:$.trim($('#descripcion').val())},payloadContextual());if(!d.tipo_otra_pub||!d.descripcion){notify('Complete los campos obligatorios.');return;}return request(d,true);}const p=participantsData();if(p.error){notify(p.error);return;}const d=Object.assign({op:'create'},formData(type),p.data,payloadContextual());if(!valid(d)){notify('Complete los campos obligatorios.');return;}return request(d,true);}).then(function(r){if(!r)return;$('#ingresar_publicacion').remove();$('#boton_publicacion').show();window.cargarPub(usuarioContextual,'#publicacion_card');}).fail(function(x){notify(failure(x));}); });
+    .off('submit.publicacion', '#form_publicacion').on('submit.publicacion', '#form_publicacion', function(e){ e.preventDefault(); const type=Number($('#pub').val()); ensurePublicacionContext().then(function(){ if(type===4){const d=Object.assign({op:'otra_create',tipo_otra_pub:$.trim($('#tipo_otra_pub').val()),descripcion:$.trim($('#descripcion').val())},payloadContextual());if(!d.tipo_otra_pub||!d.descripcion){notify('Complete los campos obligatorios.');return;}return request(d,true);}const p=participantsData();if(p.error){notify(p.error);return;}const d=Object.assign({op:'create'},formData(type),p.data,payloadContextual());if(!valid(d)){notify('Complete los campos obligatorios.');return;}return request(d,true);}).then(function(r){if(!r)return;restaurarListadoPublicacion();}).fail(function(x){notify(failure(x));}); });
   $(document).off('click.publicacion', '.guardar-edicion').on('click.publicacion', '.guardar-edicion', function(){ const $box=$(this).closest('.publicacion-edit'),type=Number($box.data('tipo')),p=participantsData(); if(p.error)return notify(p.error); const data=Object.assign({op:'update',id_publicacion:Number($box.data('id-publicacion')),subject_usuario_id:usuarioContextual},formData(type),p.data); if(!valid(data))return notify('Complete los campos obligatorios.'); request(data,true).then(restaurarListadoPublicacion).fail(function(x){notify(failure(x));}); });
 }());

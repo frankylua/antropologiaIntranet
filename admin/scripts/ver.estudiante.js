@@ -155,7 +155,7 @@ function cargarFichaEst(id_usu) {
   })
   $("#ant_acad_est").html('')
   $("#ant_acad_est").append(
-    '<div class="row m-2"><div class="col-md-4 m-0 p-2 ps-0 ms-0 mt-2 "><h4 class="text-left m-0 p-0">ANTECEDENTES ACADÉMICOS</h4></div><div class="col-md-8 m-0 p-2"><h4><button type="button" class="btn btn-dark btn-sm text-center " id="agrAcadEst">Agregar Datos Académicos</button></h4></div></div>'
+    '<div class="row m-2"><div class="col m-0 p-2 ps-0 ms-0 mt-2"><h4 class="text-left m-0 p-0">ANTECEDENTES ACADÉMICOS</h4></div></div>'
 );
 $("#grado_est").html('')
 $('#postdoc_est').html('')
@@ -170,7 +170,7 @@ cargarPub($("#info_est").attr("name"), "#publi_est");
 cargarCong($("#info_est").attr("name"), "#cong_est");
 cargarProy($("#info_est").attr("name"), "#proy_est");
 cargarPasantia($("#info_est").attr("name"), "#pasant_est");
-cargarBeca($("#info_est").attr("name"), "#beca_card");
+cargarBeca($("#info_est").attr("name"), "#beca_est");
 }
 function cargarEst(tipo,busqueda){
     op =

@@ -1,3 +1,28 @@
+function consolidarAntecedentesDocente() {
+  const configuracion = [
+    ['#collapseGrado', '#ficha_grado', '#grado-app,#form_grado,#boton_grado,#form_edit_grado'],
+    ['#collapsePostdoc', '#ficha_postdoc', '#postdoctorado-app,#form_postdoc,#boton_postdoc,#form_edit_postdoc'],
+    ['#collapsePub', '#ficha_publicacion', '#form_publicacion,#boton_publicacion,#form_edit_publicacion'],
+    ['#collapseCongreso', '#ficha_congreso', '#form_congreso,#boton_congreso'],
+    ['#collapseProy', '#ficha_proyecto', '#form_proyecto,#boton_proyecto'],
+    ['#collapsePasant', '#ficha_pasantia', '#pasantia-app,#form_pasantia,#boton_pasantia'],
+    ['#collapseTesis', '#ficha_tesis', '#form_tesis,#boton_tesis']
+  ];
+  configuracion.forEach(function (item) {
+    const $zona = $(item[0]).find('.accordion-body').first().addClass('oa-zone');
+    $zona.find(item[1]).first().addClass('oa-list');
+    $(item[2]).each(function () { $(this).appendTo($zona); });
+    $zona.find('[id^="boton_"]').addClass('oa-add');
+    $zona.find('form, #pasantia').not(':has(.oa-list)').addClass('oa-editor');
+    $zona.find('.oa-add button').text('Agregar nuevo');
+    $zona.find('.oa-editor').hide();
+  });
+  $('#congreso_card,#proyecto_card,#pasantia_card,#tesis_card').remove();
+  $('#id_usuario').empty().addClass('d-none').prependTo('#ficha_ant');
+  $('#acad_doc,#edit_acad_doc').remove();
+}
+consolidarAntecedentesDocente();
+
 //cargar ficha doce //cargar formulario datos programa desde ajax
   function contextoTerceroDocente(){
     return window.contextoDocenteTercero===true
@@ -97,33 +122,6 @@
       $("#edit_pers_doc").fadeOut();
       $("#edit_acad_doc").fadeOut();
   }
-  //vista de ingreso datos académicos
-  function acadDoc() {
-    $('html, body').stop().animate({
-      scrollTop: $('#acad_doc').offset().top
-    }, 1000);
-    //codigo para llevar al usuario al inicio haciendo scroll
-    $("#lista_doc").fadeOut();
-    $("#info_doc").fadeOut();
-    $("#ficha_acad").fadeOut();
-    $("#acad_doc").fadeIn();
-    $("#edit_pers_doc").fadeOut();
-    $("#edit_acad_doc").fadeOut();
-    $('#grados_card').html('')
-    $('#postdoc_card').html('')
-    $('#publicacion_card').html('')
-    $('#congreso_card').html('')
-    $('#pasantia_card').html('')
-    $('#proyecto_card').html('')
-    $('#tesis_card').html('')
-    cargarGrado($('#id_usuario').attr('name'), '#grados_card')
-    cargarPostdoc($('#id_usuario').attr('name'), '#postdoc_card')
-    cargarPub($('#id_usuario').attr('name'), '#publicacion_card')
-    cargarCong($('#id_usuario').attr('name'), '#congreso_card')
-    cargarPasantia($('#id_usuario').attr('name'), '#pasantia_card')
-    cargarProy($('#id_usuario').attr('name'), '#proyecto_card')
-    cargarTesis($('#id_usuario').attr('name'), '#tesis_card')
-  }
   //vista de formulario editar antecedentes académicos
   function editAcadDoc() {
     $("#lista_doc").fadeOut();
@@ -132,7 +130,6 @@
     $("#acad_doc").fadeOut();
     $("#edit_pers_doc").fadeOut();
     $("#edit_acad_doc").fadeIn();
-    cargarGrado($('#id_usuario').attr('name'), '#grados_card')
   }
   function mostrarBotonPass(){
     $("#box-pass").hide();
@@ -294,7 +291,7 @@ function cargarFichaDoc(id_usu) {
   });
   $("#ant_acad_doc").html('')
   $("#ant_acad_doc").append(
-    '<div class="row m-2"><div class="col-md-4 m-0 p-2 ps-0 ms-0 mt-2 "><h4 class="text-left m-0 p-0">ANTECEDENTES ACADÉMICOS</h4></div><div class="col-md-8 m-0 p-2"><h4><button type="button" class="btn btn-dark btn-sm text-center " id="agrAcadDoc">Agregar Datos Académicos</button></h4></div></div>'
+    '<div class="row m-2"><div class="col m-0 p-2 ps-0 ms-0 mt-2"><h4 class="text-left m-0 p-0">ANTECEDENTES ACADÉMICOS</h4></div></div>'
   );
   $("#ficha_grado").html('')
   $('#ficha_postdoc').html('')
@@ -369,9 +366,6 @@ function cargarFichaDoc(id_usu) {
       });
   }
  
-  $('body').on('click','#agrAcadDoc',function(){
-    acadDoc();  
-})
 $("body").on("click", ".editarPersDoc", function () {
   $("html, body").animate({ scrollTop: 0 }, 1000);
     editPersDoc()

@@ -1,3 +1,29 @@
+function consolidarAntecedentesEstudiante() {
+    const configuracion = [
+        ['#collapseGrado', '#grado_est', '#grado-app,#form_grado,#boton_grado,#form_edit_grado'],
+        ['#collapsePostdoc', '#postdoc_est', '#postdoctorado-app,#form_postdoc,#boton_postdoc,#form_edit_postdoc'],
+        ['#collapsePub', '#publi_est', '#form_publicacion,#boton_publicacion,#form_edit_publicacion'],
+        ['#collapseCongreso', '#cong_est', '#form_congreso,#boton_congreso'],
+        ['#collapseProy', '#proy_est', '#form_proyecto,#boton_proyecto'],
+        ['#collapsePasantiaEst', '#pasant_est', '#pasantia-app,#form_pasantia,#boton_pasantia'],
+        ['#collapsePasant', '#beca_est', '#beca_app']
+    ];
+    configuracion.forEach(function (item) {
+        const $zona = $(item[0]).find('.accordion-body').first().addClass('oa-zone');
+        $zona.find(item[1]).first().addClass('oa-list');
+        $(item[2]).each(function () { $(this).appendTo($zona); });
+        $zona.find('[id^="boton_"]').addClass('oa-add');
+        $zona.find('form, #beca_editor, #pasantia').not(':has(.oa-list)').addClass('oa-editor');
+        $zona.find('.oa-add button').text('Agregar nuevo');
+        $zona.find('.oa-editor').hide();
+    });
+    $('#congreso_card,#proyecto_card,#pasantia_card,#beca_card').remove();
+    $('#id_usuario').empty().addClass('d-none').prependTo('#ficha_ant');
+    $('#acad_est,#edit_acad_est').remove();
+}
+consolidarAntecedentesEstudiante();
+$(document).trigger('antecedentesEstudianteListos');
+
 //vista de ficha estudiantes
 function fichaEst() {
     $("#info_est").fadeIn();
@@ -17,34 +43,6 @@ function editProgEst() {
     $("#edit_pers_est").fadeOut();
     $("#edit_prog_est").fadeIn();
     $("#edit_acad_est").fadeOut();
-}
-//vista de antecedentes academicos
-function cargarDatosAcademicos(){
-    $('#grados_card').html('')
-    $('#postdoc_card').html('')
-    $('#publicacion_card').html('')
-    $('#congreso_card').html('')
-    $('#pasantia_card').html('')
-    $('#proyecto_card').html('')
-    $('#tesis_card').html('')
-    cargarGrado($('#id_usuario').attr('name'), '#grados_card')
-    cargarPostdoc($('#id_usuario').attr('name'), '#postdoc_card')
-    cargarPub($('#id_usuario').attr('name'), '#publicacion_card')
-    cargarCong($('#id_usuario').attr('name'), '#congreso_card')
-    cargarPasantia($('#id_usuario').attr('name'), '#pasantia_card')
-    cargarProy($('#id_usuario').attr('name'), '#proyecto_card')
-    cargarTesis($('#id_usuario').attr('name'), '#tesis_card')
-    cargarBeca($('#id_usuario').attr('name'), '#beca_card')
-}
-function AcadEst() {
-    $('html, body').stop().animate({
-        scrollTop: $('#acad_est').offset().top
-      }, 1000);
-    $('#lista_est').fadeOut();
-    $('#acad_est').fadeIn();
-    $('#info_est').fadeOut();
-    cargarDatosAcademicos()
-    
 }
 //vista editar datos personales
 function editPersDoc() {
@@ -215,9 +213,6 @@ $('#prof_guia').keyup(function () {
         })
     }
 })
-$('body').on('click','#agrAcadEst',function(){
-    AcadEst();  
-})
 //cargar profesor desde la lista
 $('body').on('click', '.listProf', function () {
     id = $(this).attr('id');
@@ -236,10 +231,6 @@ $("body").on("click", ".editarPers", function () {
 
 
 //cargar informacion estudiante
-$('body').on('click', '.agrAcadEst', function () {
-    id_usu = $(this).attr('id');
-    AcadEst();
-})
 //eliminar estudiante
 $('body').on('click', '.eliminarEst', function () {
     id_login = $(this).attr('id');

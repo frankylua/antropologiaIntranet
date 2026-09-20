@@ -182,12 +182,14 @@ function cargarTesis(usu, id) {
       //   </div>
       //   </div>`
       // });
-      // $(id).append(tabla);
+      let tesis; try { tesis = typeof response === 'string' ? JSON.parse(response) : response; } catch (error) { return; }
+      if (Array.isArray(tesis) && tesis.length === 0) $(id).empty().append($('<p>', { class: 'text-muted mb-3', text: 'No hay Tesis registradas.' }));
     }
   })
 }
 $('#btn_tesis').click(function () {
-  $('#boton_tesis').fadeOut();
+  const $zona = $('#form_tesis').closest('.oa-zone');
+  $('#form_tesis').show();
   cotutela = false
   $('#tesis').append('<div class="card mb-3" id="ingresar_tesis"><div class="card-body" id="card_tesis"> </div></div>');
   $('#card_tesis').append('<div class="row justify-content-between"><div class="col-auto mb-3"><h4 class="card-title">Tesis</h4></div><div class="col-auto"><button type="button" name="add" id=""  class="btn btn-close btn-sm borrar_tesis"></button></div></div>');
@@ -201,6 +203,8 @@ $('#btn_tesis').click(function () {
   $('#card_tesis').append(' <div class="row justify-content-center " id="mnsj_row_tesis"><div class="col-lg-8 alert  text-center alert-danger" role="alert" id="mnsj_tesis"></div></div>')
   $('#card_tesis').append('<div class="row justify-content-center"><div class="col-md-6 mt-3 d-grid gap-2"><button type="submit" class="btn btn-dark">Guardar Tesis</button></div></div>');
   $('#mnsj_row_tesis').hide();
+  if ($zona.length) $zona.find('.oa-list,.oa-add').hide(); else $('#boton_tesis').hide();
+  const editorTesis = document.getElementById('ingresar_tesis'); if (editorTesis) editorTesis.scrollIntoView({ behavior: 'smooth', block: 'start' });
   ajaxSelect('#pais_tesis', ruta + 'ajax/pais.php', 'Seleccione', 'pais');
   ajaxSelect('#inst_tesis', ruta + 'ajax/institucion.php', 'Seleccione', 'read', undefined, 'id_inst', 'inst');
   anios('#anio_tesis', 2006)
@@ -449,7 +453,8 @@ $(document).on('click', '.borrar_cotutela', function () {
 //Eliminar Tesis
 $(document).on('click', '.borrar_tesis', function () {
   $('#ingresar_tesis').remove()
-  $('#boton_tesis').show();
+  const $zona = $('#form_tesis').closest('.oa-zone');
+  if ($zona.length) { $zona.find('.oa-editor').hide(); $zona.find('.oa-list,.oa-add').show(); } else $('#boton_tesis').show();
 });
 //agregar input opcion otro instituto tesis
 $(document).on('change', '#inst_tesis', function () {
@@ -596,8 +601,8 @@ $('#form_tesis').submit(function (e) {
         $('#mnsj_tesis').html(dato);
         setTimeout(function () {
           $('#ingresar_tesis').remove();
-          $('#boton_tesis').show();
-          cargarTesis($('#id_usuario').attr('name'), '#tesis_card')
+          const $zona = $('#form_tesis').closest('.oa-zone');
+          if ($zona.length) $zona.find('.oa-list,.oa-add').show(); else $('#boton_tesis').show();
           $("#mnsj_row_tesis").fadeOut(1500);
         }, 3000);
       })

@@ -103,13 +103,29 @@ function formPostdoc(contenedor, valorPorDefecto = null) {
     }
 }
 
+function zonaPostdoctorado() { return $('#form_postdoc').closest('.oa-zone'); }
+function listadoPostdoctorado() { const id = zonaPostdoctorado().find('.oa-list').first().attr('id'); return id ? '#' + id : '#postdoc_card'; }
+function abrirEditorPostdoctorado($editor) {
+    const $zona = zonaPostdoctorado();
+    $zona.find('.oa-list,.oa-add,.oa-editor').hide();
+    $editor.show();
+}
+function cerrarEditorPostdoctorado() {
+    const $zona = zonaPostdoctorado();
+    $('#ingresar_postdoc,#campos_postdoc').empty();
+    if ($zona.length) { $zona.find('.oa-editor').hide(); $zona.find('.oa-list,.oa-add').show(); }
+    else { $('#boton_postdoc').show(); }
+}
+
 $('#btn_postdoc').click(function () {
+    abrirEditorPostdoctorado($('#form_postdoc'));
     $('#ingresar_postdoc').remove();
     $('#boton_postdoc').hide();
     $('#postdoctorado').append('<div class="card mb-3" id="ingresar_postdoc"><div class="card-body" id="card_postdoc"> </div></div>');
     $('#card_postdoc').append('<div class="row justify-content-between"><div class="col-auto mb-3"><h4 class="card-title">Postdoctorado</h4></div><div class="col-auto"><button type="button" name="add" id="close_postdoc" class="btn btn-close btn-sm"></button></div></div>');
     formPostdoc('#card_postdoc');
     $('#card_postdoc').append('<div class="row justify-content-center"><div class="col-md-6 d-grid gap-2"><button type="submit" class="btn btn-dark mt-3">Guardar Postdoctorado</button></div></div>');
+    const editorPostdoc = document.getElementById('ingresar_postdoc'); if (editorPostdoc) editorPostdoc.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
 $(document).on('change', '#inst_postdoc', function () {
@@ -122,7 +138,7 @@ $(document).on('change', '#inst_postdoc', function () {
 
 $(document).on('click', '#close_postdoc', function () {
     $('#ingresar_postdoc').remove();
-    $('#boton_postdoc').show();
+    cerrarEditorPostdoctorado();
 });
 
 function cargarPostdoc(usuario, contenedor) {
@@ -191,6 +207,9 @@ function cargarPostdoc(usuario, contenedor) {
                     </div>
                 `;
             });
+            if (response.datos.length === 0) {
+                template = '<p class="text-muted mb-3">No hay Postdoctorados registrados.</p>';
+            }
             $(destino).empty().append(template);
         },
         error: function (xhr) {
@@ -239,17 +258,13 @@ $('body').on('click', '.editarPostdoc', function () {
     const contenedor = resolverContenedorPostdoctorado($(this).attr('data-contenedor'));
 
     $('#campos_postdoc').empty();
-    if ($('#ficha_acad').attr('name') === 'doc') {
-        editAcadDoc();
-    } else {
-        editAcadEst();
-    }
+    abrirEditorPostdoctorado($('#form_edit_postdoc'));
 
-    $('#edit_academicos')
-        .attr('name', idPostdoctorado)
+    $('#form_edit_postdoc')
+        .attr('data-id-postdoctorado', idPostdoctorado)
         .data('postdoctorado-usuario', usuario)
         .data('postdoctorado-contenedor', contenedor);
-    $('#campos_postdoc').append('<h3 class="mb-5 text-center" id="text-tit">EDITAR POSTDOCTORADO</h3>');
+    $('#campos_postdoc').append('<div class="row justify-content-between"><div class="col-auto mb-3"><h3 id="text-tit">EDITAR POSTDOCTORADO</h3></div><div class="col-auto"><button type="button" class="btn btn-close btn-sm cerrar-editor-postdoctorado" aria-label="Cerrar"></button></div></div>');
 
     const datosLectura = agregarUsuarioObjetivoPostdoctorado(
         { op: 'read_postdoc_id', id_postdoc: idPostdoctorado },
@@ -268,17 +283,19 @@ $('body').on('click', '.editarPostdoc', function () {
 
             const postdoctorado = response.datos;
             formPostdoc('#campos_postdoc', postdoctorado.id_inst);
-            $('#campos_postdoc').append('<div class="row mt-5 justify-content-between"><div class="col-6 col-md-4 mb-3"><button type="button" class="col-12 btn btn-dark col-6" id="volverAcad">Cancelar</button></div><div class="col-6 col-md-4 mb-3"><button type="submit" class="col-12 btn btn-dark col-6">Editar</button></div></div>');
+            $('#campos_postdoc').append('<div class="row mt-5 justify-content-end"><div class="col-6 col-md-4 mb-3"><button type="submit" class="col-12 btn btn-dark">Editar</button></div></div>');
             $('#inst_postdoc').val(String(postdoctorado.id_inst));
             $('#prof_postdoc').val(textoPostdoctorado(postdoctorado.prof));
             $('#fech_in_postdoc').val(postdoctorado.fecha_inicio);
             $('#fech_ter_postdoc').val(postdoctorado.fecha_termino);
+            const editorPostdoc = document.getElementById('form_edit_postdoc'); if (editorPostdoc) editorPostdoc.scrollIntoView({ behavior: 'smooth', block: 'start' });
         },
         error: function (xhr) {
             mostrarMensajePostdoctorado(mensajeErrorPostdoctorado(xhr), true);
         }
     });
 });
+$(document).on('click', '.cerrar-editor-postdoctorado', cerrarEditorPostdoctorado);
 
 $('body').on('click', '.eliminarPostdoc', function () {
     const idPostdoctorado = $(this).attr('data-id-postdoc');
@@ -354,8 +371,8 @@ $('#form_postdoc').submit(function (event) {
             mostrarMensajePostdoctorado(response.mensaje, false);
             setTimeout(function () {
                 $('#ingresar_postdoc').remove();
-                $('#boton_postdoc').show();
-                cargarPostdoc(usuario, '#postdoc_card');
+                cerrarEditorPostdoctorado();
+                cargarPostdoc(usuario, listadoPostdoctorado());
             }, 1500);
         },
         error: function (xhr) {
@@ -372,7 +389,7 @@ $('#form_edit_postdoc').submit(function (event) {
     }
 
     const usuario = usuarioContextoPostdoctorado(
-        $('#edit_academicos').data('postdoctorado-usuario')
+        $('#form_edit_postdoc').data('postdoctorado-usuario')
     );
     if ($('#inst_postdoc').val() === 'otro') {
         const altaInstitucion = crearInstitucionContextual(
@@ -392,7 +409,7 @@ $('#form_edit_postdoc').submit(function (event) {
     }
 
     datosPostdoctorado.op = 'update';
-    datosPostdoctorado.id_postdoc = $('#edit_academicos').attr('name');
+    datosPostdoctorado.id_postdoc = $('#form_edit_postdoc').attr('data-id-postdoctorado');
     agregarUsuarioObjetivoPostdoctorado(datosPostdoctorado, usuario);
     $.ajax({
         url: '../ajax/postdoctorado.php',
@@ -408,12 +425,9 @@ $('#form_edit_postdoc').submit(function (event) {
 
             mostrarMensajePostdoctorado(response.mensaje, false);
             setTimeout(function () {
-                $('#campos_postdoc').empty();
-                if ($('#ficha_acad').attr('name') === 'doc') {
-                    reiniciarInfoDoc();
-                } else {
-                    reiniciarInfoEst();
-                }
+                const contenedor = $('#form_edit_postdoc').data('postdoctorado-contenedor');
+                cerrarEditorPostdoctorado();
+                cargarPostdoc(usuario, contenedor);
             }, 1500);
         },
         error: function (xhr) {

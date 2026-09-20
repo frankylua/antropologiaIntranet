@@ -228,7 +228,6 @@
             </h2>
             <div id="collapseGrado" class="accordion-collapse collapse" data-bs-parent="#accordionEst">
               <div class="accordion-body">
-                <div class="col-12" id="grado_est"></div>
                 <div class="col-12" id="grado_est" name="0"></div>
               </div>
             </div>
@@ -311,7 +310,7 @@
                 <H5>BECA</H5>
               </button>
             </h2>
-            <div id="collapsePasant" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+            <div id="collapsePasant" class="accordion-collapse collapse" data-bs-parent="#accordionEst">
               <div class="accordion-body">
                 <div class="col-12" id="beca_est"></div>
 

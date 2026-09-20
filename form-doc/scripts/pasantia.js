@@ -20,7 +20,7 @@
     function solicitud(datos, escritura) { return $.ajax({ url: endpoint, type: 'POST', dataType: 'json', data: datos, headers: escritura ? { 'X-CSRF-Token': csrf } : {} }); }
     function dato($tabla, etiqueta, valor) { const $fila = $('<tr>').appendTo($tabla); $('<td>').text(etiqueta).appendTo($fila); $('<td>').text(valor == null ? '' : String(valor)).appendTo($fila); }
     function fecha(valor) { const texto = String(valor || ''); return /^\d{4}-\d{2}-\d{2}$/.test(texto) ? texto.split('-').reverse().join('-') : ''; }
-    function cerrarEditor() { $('#pasantia').empty(); $('#boton_pasantia').show(); idInstitucionContextual = null; }
+    function cerrarEditor() { const $zona = $('#pasantia').closest('.oa-zone'); $('#pasantia').empty(); if ($zona.length) $zona.find('.oa-list,.oa-add').show(); else $('#boton_pasantia').show(); idInstitucionContextual = null; }
     function agregarObjetivo(datos) { if (!esGlobal) return true; const id = objetivo(); if (!id) { mensaje('Seleccione primero un usuario válido.', 'danger'); return false; } datos.usuario = id; return true; }
 
     function catalogo(selector, url, id, texto, seleccionado) {
@@ -34,8 +34,8 @@
     }
 
     function editor(pasantia) {
-        const editando = Boolean(pasantia), $zona = $('#pasantia').empty(), $card = $('<div>', { class: 'card mb-3', id: 'pasantia_editor' }).appendTo($zona), $body = $('<div>', { class: 'card-body' }).appendTo($card), $form = $('<form>', { id: 'pasantia_formulario_editor', novalidate: true }).appendTo($body);
-        $('<h4>', { class: 'card-title', text: editando ? 'Editar Pasantía' : 'Agregar Pasantía' }).prependTo($body);
+        const editando = Boolean(pasantia), $zona = $('#pasantia').empty().show(), $card = $('<div>', { class: 'card mb-3', id: 'pasantia_editor' }).appendTo($zona), $body = $('<div>', { class: 'card-body' }).appendTo($card), $form = $('<form>', { id: 'pasantia_formulario_editor', novalidate: true }).appendTo($body);
+        $body.prepend($('<div>', { class: 'd-flex justify-content-between' }).append($('<h4>', { class: 'card-title', text: editando ? 'Editar Pasantía' : 'Agregar Pasantía' }), $('<button>', { type: 'button', class: 'btn-close', id: 'pasantia_cerrar', 'aria-label': 'Cerrar' })));
         $('<input>', { type: 'hidden', id: 'pasantia_id', value: editando ? pasantia.id_pasantia : '' }).appendTo($form);
         const campos = [
             ['pasantia_institucion', 'Institución', 'select', 'col-md-6 mb-3'], ['pasantia_patrocinante', 'Profesor/a Patrocinante', 'text', 'col-md-6 mb-3'],
@@ -47,7 +47,9 @@
         const $acciones = $('<div>', { class: 'd-flex justify-content-end gap-2' }).appendTo($form);
         $('<button>', { type: 'button', class: 'btn btn-outline-secondary', id: 'pasantia_cancelar', text: 'Cancelar' }).appendTo($acciones);
         $('<button>', { type: 'submit', class: 'btn btn-dark', id: 'pasantia_guardar', text: editando ? 'Guardar cambios' : 'Guardar Pasantía' }).appendTo($acciones);
-        $('#boton_pasantia').hide();
+        const $zonaOa = $('#pasantia').closest('.oa-zone');
+        if ($zonaOa.length) $zonaOa.find('.oa-list,.oa-add').hide(); else $('#boton_pasantia').hide();
+        const editorVisible = document.getElementById('pasantia_editor'); if (editorVisible) editorVisible.scrollIntoView({ behavior: 'smooth', block: 'start' });
         catalogo('#pasantia_institucion', '../ajax/institucion.php', 'id_inst', 'inst', editando ? pasantia.inst_pasant : null);
         catalogo('#pasantia_pais', '../ajax/pais.php', 'id_pais', 'pais', editando ? pasantia.pais_pasant : null);
         if (editando) { $('#pasantia_patrocinante').val(pasantia.prof_patr || ''); $('#pasantia_fondo').val(pasantia.fondo || ''); $('#pasantia_ciudad').val(pasantia.ciudad || ''); $('#pasantia_fecha_inicio').val(pasantia.fech_in || ''); $('#pasantia_fecha_termino').val(pasantia.fech_ter || ''); }
@@ -87,6 +89,7 @@
     $('#btn_pasantia').on('click', () => editor(null));
     $(document).on('change', '#pasantia_institucion', function () { idInstitucionContextual = null; $('#pasantia_nueva_institucion_col').remove(); if ($(this).val() === 'otro') { const $col = $('<div>', { class: 'col-md-6 mb-3', id: 'pasantia_nueva_institucion_col' }); $('<label>', { class: 'form-label', for: 'pasantia_nueva_institucion', text: 'Nueva Institución' }).appendTo($col); $('<input>', { class: 'form-control', type: 'text', id: 'pasantia_nueva_institucion', maxlength: 80, required: true }).appendTo($col); $col.insertAfter($(this).closest('.col-md-6')); } });
     $(document).on('click', '#pasantia_cancelar', cerrarEditor);
+    $(document).on('click', '#pasantia_cerrar', cerrarEditor);
     $(document).on('submit', '#pasantia_formulario_editor', function (evento) { evento.preventDefault(); const datos = datosFormulario(), id = String($('#pasantia_id').val() || ''); if (!datos || !agregarObjetivo(datos)) return; datos.op = id ? 'update' : 'create'; if (id) datos.id_pasantia = id; $('#pasantia_guardar').prop('disabled', true); solicitud(datos, true).done(r => { if (!r || r.ok !== true) return mensaje(r && r.mensaje, 'danger'); cerrarEditor(); mensaje(r.mensaje, 'success', true); window.cargarPasantia(usuarioActual, destinoActual); }).fail(xhr => mensaje(error(xhr), 'danger')).always(() => $('#pasantia_guardar').prop('disabled', false)); });
     $(document).on('click', '.pasantia-editar', function () { detalle(String($(this).data('id'))); });
     $(document).on('click', '.pasantia-eliminar', function () { const id = String($(this).data('id')); if (!window.confirm('¿Confirma la eliminación permanente de esta Pasantía?')) return; const datos = { op: 'delete', id_pasantia: id }; if (!agregarObjetivo(datos)) return; $('.pasantia-eliminar').prop('disabled', true); solicitud(datos, true).done(r => { if (!r || r.ok !== true) return mensaje(r && r.mensaje, 'danger'); mensaje(r.mensaje, 'success', true); window.cargarPasantia(usuarioActual, destinoActual); }).fail(xhr => mensaje(error(xhr), 'danger')).always(() => $('.pasantia-eliminar').prop('disabled', false)); });

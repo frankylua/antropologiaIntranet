@@ -141,7 +141,7 @@ function cargarFichaEst() {
             $("#ant_acad_est").html('')
         }
     })
-    $('#ant_acad_est').append('<div class="row m-2"><div class="col-md-4 m-0 p-2 ps-0 ms-0 mt-2 "><h4 class="text-left m-0 p-0">ANTECEDENTES ACADÉMICOS</h4></div><div class="col-md-8 m-0 p-2"><h4><button type="button" class="btn btn-dark btn-sm text-center agrAcadEst" id="">Agregar Datos Académicos</button></h4></div></div>')
+    $('#ant_acad_est').append('<div class="row m-2"><div class="col m-0 p-2 ps-0 ms-0 mt-2"><h4 class="text-left m-0 p-0">ANTECEDENTES ACADÉMICOS</h4></div></div>')
     $("#grado_est").html('')
     $('#postdoc_est').html('')
     $('#publi_est').html('')
@@ -181,7 +181,7 @@ function init() {
     $("#mnsj_row_prog_est").hide();
     $("mnsj_row_acad_est").hide();
     $('.loadPage').fadeOut();
-    cargarFichaEst()
+    $(document).one('antecedentesEstudianteListos', cargarFichaEst)
    
 
 
