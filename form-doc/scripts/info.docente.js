@@ -156,7 +156,8 @@ function cargarFichaDoc() {
     cargarCong($("#info_doc").attr("name"), "#ficha_congreso");
     cargarProy($("#info_doc").attr("name"), "#ficha_proyecto");
     cargarPasantia($("#info_doc").attr("name"), "#ficha_pasantia");
-    cargarTesis($("#info_doc").attr("name"), "#ficha_tesis");
+    // Tesis usa su propio contrato contextual; evita invocar el helper legacy eliminado.
+    $(document).trigger('tesis:subject-ready');
     $('.titulo_acad').html('')
 }
 $("body").on("click", ".verFicha", function () {

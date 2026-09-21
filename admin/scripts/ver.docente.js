@@ -34,6 +34,7 @@ function cargarFichaDoc(id_usu) {
       $("#info_doc").attr("name", usu[0]["id_usuario"]);
       $("#id_usuario").attr("name", usu[0]["id_usuario"]);
       $("#login").attr("name", usu[0]["id_login"]);
+      $(document).trigger("tesis:subject-ready");
       template += `
         <tr>
         <td class="col-4" ><h4 class=" mt-3">ANTECEDENTES PERSONALES</h4></td>
@@ -203,7 +204,6 @@ function cargarFichaDoc(id_usu) {
   cargarCong($("#info_doc").attr("name"), "#ficha_congreso");
   cargarProy($("#info_doc").attr("name"), "#ficha_proyecto");
   cargarPasantia($("#info_doc").attr("name"), "#ficha_pasantia");
-  cargarTesis($("#info_doc").attr("name"), "#ficha_tesis");
   $('.titulo_acad').html('')
 }
 function cargarDocentes(tipo, busqueda, estado) {

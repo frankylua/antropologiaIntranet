@@ -138,6 +138,9 @@ function cargarFichaEst() {
             });
             template += `</ul></td></tr>`
             $('#datos_fichaest').html(template);
+            // El perfil propio ya tiene el usuario.id_usuario autoritativo en #info_est.
+            // Notifica a los OA contextuales sin depender de una selección desde Admin.
+            $(document).trigger('tesis:subject-ready');
             $("#ant_acad_est").html('')
         }
     })

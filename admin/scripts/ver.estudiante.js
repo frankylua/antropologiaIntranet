@@ -151,6 +151,9 @@ function cargarFichaEst(id_usu) {
     });
     template += `</ul></td></tr>`
     $('#datos_fichaest').html(template);
+    // La ficha ya está disponible y el subject corresponde a usuario.id_usuario.
+    // Tesis se carga de forma contextual, sin intervenir en la ficha histórica.
+    $(document).trigger('tesis:subject-ready');
       }
   })
   $("#ant_acad_est").html('')

@@ -13,11 +13,12 @@ function consolidarAntecedentesDocente() {
     $zona.find(item[1]).first().addClass('oa-list');
     $(item[2]).each(function () { $(this).appendTo($zona); });
     $zona.find('[id^="boton_"]').addClass('oa-add');
-    $zona.find('form, #pasantia').not(':has(.oa-list)').addClass('oa-editor');
+    $zona.find('form, #pasantia').not('#form_tesis').not(':has(.oa-list)').addClass('oa-editor');
     $zona.find('.oa-add button').text('Agregar nuevo');
     $zona.find('.oa-editor').hide();
   });
-  $('#congreso_card,#proyecto_card,#pasantia_card,#tesis_card').remove();
+  $('#congreso_card,#proyecto_card,#pasantia_card').remove();
+  $('#mnsj_row_acad_doc').hide();
   $('#id_usuario').empty().addClass('d-none').prependTo('#ficha_ant');
   $('#acad_doc,#edit_acad_doc').remove();
 }
@@ -306,7 +307,8 @@ function cargarFichaDoc(id_usu) {
   cargarCong($("#info_doc").attr("name"), "#ficha_congreso");
   cargarProy($("#info_doc").attr("name"), "#ficha_proyecto");
   cargarPasantia($("#info_doc").attr("name"), "#ficha_pasantia");
-  cargarTesis($("#info_doc").attr("name"), "#ficha_tesis");
+  // Tesis se recarga mediante su módulo contextual, no mediante cargarTesis legacy.
+  $(document).trigger('tesis:subject-ready');
   $('.titulo_acad').html('')
 }
   

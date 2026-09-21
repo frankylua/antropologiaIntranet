@@ -1,10 +1,10 @@
 <div class='row'>
-    <form action="" id="form_tesis">
+    <div id="form_tesis">
         <div class="col-12" id="tesis_card">
         </div>
         <div class="col" id='tesis'>
         </div>
-    </form>
+    </div>
 </div>
 <div class="row" id="boton_tesis">
     <div class=" col d-grid gap-2 mb-3">

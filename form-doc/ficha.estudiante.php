@@ -317,3 +317,14 @@
               </div>
             </div>
           </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseTesisEst" aria-expanded="false" aria-controls="collapseTesisEst">
+                <H5>TESIS</H5>
+              </button>
+            </h2>
+            <div id="collapseTesisEst" class="accordion-collapse collapse" data-bs-parent="#accordionEst">
+              <div class="accordion-body"><div class="col-12 oa-zone" id="ficha_tesis_est"><div class="oa-list"></div></div></div>
+            </div>
+          </div>
