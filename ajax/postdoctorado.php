@@ -8,6 +8,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 require_once __DIR__ . '/../src/bootstrap/app.php';
 
 use App\Model\Postdoctorado;
+use App\Model\Institucion;
 use App\Security\Authorization;
 
 final class PostdoctoradoHttpError extends RuntimeException
@@ -283,11 +284,33 @@ function profesorPatrocinantePostdoctorado(mixed $value): string
     return $profesor;
 }
 
-/** @return array{profesor:string,institucion:int,fechaInicio:string,fechaTermino:string} */
+/** @return array{id:int,nueva:?string} */
+function institucionPostdoctorado(): array
+{
+    $nuevaPresente = array_key_exists('institucion_nueva', $_POST);
+    $nueva = $nuevaPresente && is_string($_POST['institucion_nueva'])
+        ? trim($_POST['institucion_nueva'])
+        : null;
+    $idRaw = $_POST['inst'] ?? null;
+
+    if ($idRaw === '0' || $idRaw === 0) {
+        if (!$nuevaPresente || $nueva === null || $nueva === '') {
+            fallarPostdoctorado(400, 'CAMPO_INVALIDO', 'Debe indicar una Institución nueva válida.');
+        }
+        return ['id' => 0, 'nueva' => $nueva];
+    }
+
+    if ($nuevaPresente) {
+        fallarPostdoctorado(400, 'CAMPO_INVALIDO', 'No puede indicar una Institución existente y una nueva simultáneamente.');
+    }
+    return ['id' => enteroPositivoPostdoctorado($idRaw, 'inst'), 'nueva' => null];
+}
+
+/** @return array{profesor:string,institucion:int,institucionNueva:?string,fechaInicio:string,fechaTermino:string} */
 function datosPostdoctorado(Postdoctorado $postdoctorado): array
 {
     $profesor = profesorPatrocinantePostdoctorado($_POST['prof'] ?? null);
-    $institucion = enteroPositivoPostdoctorado($_POST['inst'] ?? null, 'inst');
+    $institucion = institucionPostdoctorado();
     $fechaInicio = fechaPostdoctorado($_POST['fech_in'] ?? null, 'fecha_inicio');
     $fechaTermino = fechaPostdoctorado($_POST['fech_ter'] ?? null, 'fecha_termino');
 
@@ -298,17 +321,10 @@ function datosPostdoctorado(Postdoctorado $postdoctorado): array
             'La fecha de inicio no puede ser posterior a la fecha de término.'
         );
     }
-    if (!$postdoctorado->institucionExiste($institucion)) {
-        fallarPostdoctorado(
-            404,
-            'INSTITUCION_NO_ENCONTRADA',
-            'La Institución indicada no existe.'
-        );
-    }
-
     return [
         'profesor' => $profesor,
-        'institucion' => $institucion,
+        'institucion' => $institucion['id'],
+        'institucionNueva' => $institucion['nueva'],
         'fechaInicio' => $fechaInicio,
         'fechaTermino' => $fechaTermino,
     ];
@@ -324,6 +340,7 @@ function postdoctoradoPublico(array $fila): array
 }
 
 $postdoctorado = new Postdoctorado();
+$pdo = null;
 
 try {
     $op = isset($_POST['op']) && is_string($_POST['op']) ? $_POST['op'] : '';
@@ -372,10 +389,17 @@ try {
     if ($op === 'insert') {
         $usuario = usuarioObjetivoPostdoctorado($actor, $postdoctorado);
         $datos = datosPostdoctorado($postdoctorado);
+        $pdo = conexion();
+        $pdo->beginTransaction();
+        $institucion = new Institucion();
+        $idInstitucion = $institucion->resolverId(
+            $datos['institucion'],
+            $datos['institucionNueva']
+        );
         $resultado = $postdoctorado->insertar(
             $usuario,
             $datos['profesor'],
-            $datos['institucion'],
+            $idInstitucion,
             $datos['fechaInicio'],
             $datos['fechaTermino']
         );
@@ -383,6 +407,7 @@ try {
         if ((int) $resultado['filasAfectadas'] !== 1 || $idInsertado <= 0) {
             throw new RuntimeException('La creación no afectó exactamente un Postdoctorado.');
         }
+        $pdo->commit();
         responderPostdoctorado(201, [
             'ok' => true,
             'codigo' => 'POSTDOCTORADO_CREADO',
@@ -406,11 +431,19 @@ try {
         }
         $propietario = autorizarFilaPostdoctorado($actor, $fila, $postdoctorado);
         $datos = datosPostdoctorado($postdoctorado);
-        $sinCambios = (int) $fila['inst_postdoc'] === $datos['institucion']
+        $pdo = conexion();
+        $pdo->beginTransaction();
+        $institucion = new Institucion();
+        $idInstitucion = $institucion->resolverId(
+            $datos['institucion'],
+            $datos['institucionNueva']
+        );
+        $sinCambios = (int) $fila['inst_postdoc'] === $idInstitucion
             && (string) $fila['prof'] === $datos['profesor']
             && (string) $fila['fecha_inicio'] === $datos['fechaInicio']
             && (string) $fila['fecha_termino'] === $datos['fechaTermino'];
         if ($sinCambios) {
+            $pdo->commit();
             responderPostdoctorado(200, [
                 'ok' => true,
                 'codigo' => 'POSTDOCTORADO_SIN_CAMBIOS',
@@ -423,7 +456,7 @@ try {
             $idPostdoctorado,
             $propietario,
             $datos['profesor'],
-            $datos['institucion'],
+            $idInstitucion,
             $datos['fechaInicio'],
             $datos['fechaTermino']
         );
@@ -434,6 +467,7 @@ try {
                 'No fue posible confirmar la actualización del Postdoctorado.'
             );
         }
+        $pdo->commit();
         responderPostdoctorado(200, [
             'ok' => true,
             'codigo' => 'POSTDOCTORADO_ACTUALIZADO',
@@ -470,12 +504,27 @@ try {
         'mensaje' => 'Postdoctorado eliminado correctamente.',
     ]);
 } catch (PostdoctoradoHttpError $error) {
+    if ($pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     responderPostdoctorado($error->statusCode, [
         'ok' => false,
         'error' => $error->errorCode,
         'mensaje' => $error->getMessage(),
     ]);
+} catch (DomainException $error) {
+    if ($pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    responderPostdoctorado(404, [
+        'ok' => false,
+        'error' => 'INSTITUCION_NO_ENCONTRADA',
+        'mensaje' => 'La Institución indicada no existe.',
+    ]);
 } catch (PDOException $error) {
+    if ($pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     error_log('[POSTDOCTORADO_PERSISTENCIA] ' . $error->getMessage());
     if ((string) $error->getCode() === '23000') {
         responderPostdoctorado(409, [
@@ -490,6 +539,9 @@ try {
         'mensaje' => 'No fue posible completar la operación de Postdoctorado.',
     ]);
 } catch (Throwable $error) {
+    if ($pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     error_log('[POSTDOCTORADO_ENDPOINT] ' . $error->getMessage());
     responderPostdoctorado(500, [
         'ok' => false,

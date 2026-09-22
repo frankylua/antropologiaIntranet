@@ -67,6 +67,7 @@ function formGrado(contenedor,valorInst = null) {
         listas.forEach((p) => {
             template += `<option value="${p.id_inst}"> ${cadenaMay(p.inst)}</option>`;
         });
+        template += '<option value="otro">Otra institución</option>';
         $('#inst_grado').html(template);
         if(valorInst){
                 $('#inst_grado').val(valorInst);
@@ -413,14 +414,6 @@ $('#form_grado').submit(function (e) {
         nuevo_tit = $('#s_tit').val() == 'otro' ? true : false;//agregar nuevo titulo
         let titulo_contextual_valido = true;
         // en caso de ser "true" ingresar en tabla titulo y/o instituto y devolver id para guardar grado academico
-        if (nuevo_inst) {
-            const altaInstitucion = crearInstitucionContextual(inst, usuario, 'grado');
-            if (!altaInstitucion.ok) {
-                mostrarErrorInstitucionContextual('#mnsj_row_grad', '#mnsj_grad', altaInstitucion);
-                return;
-            }
-            $('#id_inst').attr('name', altaInstitucion.id);
-        }
         if (nuevo_tit) {
             op = 'insert';
             $.ajax({
@@ -456,10 +449,13 @@ $('#form_grado').submit(function (e) {
         if (!titulo_contextual_valido) {
             return;
         }
-        inst = $('#id_inst').attr('name') == 0 ? inst : $('#id_inst').attr('name')
+        const institucion_nueva = nuevo_inst ? inst : null;
+        inst = nuevo_inst ? 0 : ($('#id_inst').attr('name') == 0 ? inst : $('#id_inst').attr('name'));
         titulo = $('#titulo').attr('name') == 0 ? titulo : titulo = $('#titulo').attr('name')
+        const payloadGrado = { inst, titulo, fecha, op: 'insert-update' };
+        if (institucion_nueva !== null) payloadGrado.institucion_nueva = institucion_nueva;
         const grado_arr = agregarUsuarioObjetivoGrado(
-            { inst, titulo, fecha, op: 'insert-update' },
+            payloadGrado,
             usuario
         );
         $.ajax({
@@ -505,14 +501,6 @@ $('#form_edit_grado').submit(function (e) {
     nuevo_tit = $('#s_tit').val() == 'otro' ? true : false;//agregar nuevo titulo
     let titulo_contextual_valido = true;
     // en caso de ser "true" ingresar en tabla titulo y/o instituto y devolver id para guardar grado academico
-    if (nuevo_inst) {
-        const altaInstitucion = crearInstitucionContextual(inst, usuario, 'grado');
-        if (!altaInstitucion.ok) {
-            mostrarErrorInstitucionContextual('#mnsj_row_grad', '#mnsj_grad', altaInstitucion);
-            return;
-        }
-        $('#id_inst').attr('name', altaInstitucion.id);
-    }
     if (nuevo_tit) {
         op = 'insert';
         $.ajax({
@@ -548,10 +536,13 @@ $('#form_edit_grado').submit(function (e) {
     if (!titulo_contextual_valido) {
         return;
     }
-    inst = $('#id_inst').attr('name') == 0 ? inst : $('#id_inst').attr('name')
+    const institucion_nueva = nuevo_inst ? inst : null;
+    inst = nuevo_inst ? 0 : ($('#id_inst').attr('name') == 0 ? inst : $('#id_inst').attr('name'));
     titulo = $('#titulo').attr('name') == 0 ? titulo : titulo = $('#titulo').attr('name')
+    const payloadGrado = { inst, titulo, fecha, op: 'insert-update', id_grado };
+    if (institucion_nueva !== null) payloadGrado.institucion_nueva = institucion_nueva;
     const grado_arr = agregarUsuarioObjetivoGrado(
-        { inst, titulo, fecha, op: 'insert-update', id_grado },
+        payloadGrado,
         usuario
     );
     $.ajax({

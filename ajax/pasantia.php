@@ -8,6 +8,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 require_once __DIR__ . '/../src/bootstrap/app.php';
 
 use App\Model\Pasantia;
+use App\Model\Institucion;
 use App\Security\Authorization;
 
 final class PasantiaHttpError extends RuntimeException
@@ -159,10 +160,34 @@ function fechaPasantia(mixed $valor, string $campo): string
     return $valor;
 }
 
+/** @return array{id:int,nueva:?string} */
+function institucionPasantia(): array
+{
+    $nuevaPresente = array_key_exists('institucion_nueva', $_POST);
+    $nueva = $nuevaPresente && is_string($_POST['institucion_nueva'])
+        ? trim($_POST['institucion_nueva'])
+        : null;
+    $idRaw = $_POST['inst_pasant'] ?? null;
+
+    if ($idRaw === '0' || $idRaw === 0) {
+        if (!$nuevaPresente || $nueva === null || $nueva === '') {
+            fallarPasantia(400, 'VALIDACION_INVALIDA', 'Debe indicar una Institución nueva válida.');
+        }
+        return ['id' => 0, 'nueva' => $nueva];
+    }
+
+    if ($nuevaPresente) {
+        fallarPasantia(400, 'VALIDACION_INVALIDA', 'No puede indicar una Institución existente y una nueva simultáneamente.');
+    }
+    return ['id' => enteroPasantia($idRaw, 'institución'), 'nueva' => null];
+}
+
 function datosPasantia(Pasantia $modelo): array
 {
+    $institucion = institucionPasantia();
     $datos = [
-        'inst_pasant' => enteroPasantia($_POST['inst_pasant'] ?? null, 'institución'),
+        'inst_pasant' => $institucion['id'],
+        'institucion_nueva' => $institucion['nueva'],
         'pais_pasant' => enteroPasantia($_POST['pais_pasant'] ?? null, 'país'),
         'prof_patr' => textoPasantia($_POST['prof_patr'] ?? null, 'patrocinante'),
         'fondo' => textoPasantia($_POST['fondo'] ?? null, 'fondo'),
@@ -173,8 +198,8 @@ function datosPasantia(Pasantia $modelo): array
     if ($datos['fech_in'] > $datos['fech_ter']) {
         fallarPasantia(400, 'VALIDACION_INVALIDA', 'La fecha de inicio no puede ser posterior al término.');
     }
-    if (!$modelo->institucionExiste($datos['inst_pasant']) || !$modelo->paisExiste($datos['pais_pasant'])) {
-        fallarPasantia(400, 'VALIDACION_INVALIDA', 'La institución y el país deben existir.');
+    if (!$modelo->paisExiste($datos['pais_pasant'])) {
+        fallarPasantia(400, 'VALIDACION_INVALIDA', 'El país indicado debe existir.');
     }
     return $datos;
 }
@@ -185,6 +210,7 @@ function pasantiaPublica(array $fila): array
     return $fila;
 }
 
+$pdo = null;
 try {
     $modelo = new Pasantia();
     $actor = actorPasantia($modelo);
@@ -205,11 +231,21 @@ try {
     }
     if ($op === 'create') {
         $usuario = usuarioObjetivoPasantia($actor, $modelo);
-        $resultado = $modelo->insertar($usuario, datosPasantia($modelo));
+        $datos = datosPasantia($modelo);
+        $pdo = conexion();
+        $pdo->beginTransaction();
+        $institucion = new Institucion();
+        $datos['inst_pasant'] = $institucion->resolverId(
+            $datos['inst_pasant'],
+            $datos['institucion_nueva']
+        );
+        unset($datos['institucion_nueva']);
+        $resultado = $modelo->insertar($usuario, $datos);
         $id = idValidoPasantia($resultado['idInsertado'] ?? null);
         if ((int) $resultado['filasAfectadas'] !== 1 || $id === null) {
             fallarPasantia(409, 'CONFLICTO_PERSISTENCIA', 'No fue posible confirmar la creación de la Pasantía.');
         }
+        $pdo->commit();
         responderPasantia(201, 'PASANTIA_CREADA', 'Pasantía registrada correctamente.', ['id_pasantia' => $id]);
     }
     $id = enteroPasantia($_POST['id_pasantia'] ?? null, 'id_pasantia');
@@ -219,6 +255,14 @@ try {
     }
     if ($op === 'update') {
         $datos = datosPasantia($modelo);
+        $pdo = conexion();
+        $pdo->beginTransaction();
+        $institucion = new Institucion();
+        $datos['inst_pasant'] = $institucion->resolverId(
+            $datos['inst_pasant'],
+            $datos['institucion_nueva']
+        );
+        unset($datos['institucion_nueva']);
         $sinCambios = true;
         foreach ($datos as $campo => $valor) {
             if ((string) $fila[$campo] !== (string) $valor) {
@@ -227,12 +271,14 @@ try {
             }
         }
         if ($sinCambios) {
+            $pdo->commit();
             responderPasantia(200, 'PASANTIA_SIN_CAMBIOS', 'La Pasantía ya contiene esos datos.', ['id_pasantia' => $id, 'cambios' => false]);
         }
         $resultado = $modelo->editar($id, (int) $fila['usuario'], $datos);
         if ((int) $resultado['filasAfectadas'] !== 1) {
             fallarPasantia(409, 'CONFLICTO_PERSISTENCIA', 'No fue posible confirmar la actualización de la Pasantía.');
         }
+        $pdo->commit();
         responderPasantia(200, 'PASANTIA_ACTUALIZADA', 'Pasantía actualizada correctamente.', ['id_pasantia' => $id, 'cambios' => true]);
     }
     $resultado = $modelo->eliminar($id, (int) $fila['usuario']);
@@ -241,14 +287,28 @@ try {
     }
     responderPasantia(200, 'PASANTIA_ELIMINADA', 'Pasantía eliminada correctamente.', ['id_pasantia' => $id]);
 } catch (PasantiaHttpError $error) {
+    if ($pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     responderPasantia($error->status, $error->codigo, $error->getMessage());
+} catch (DomainException $error) {
+    if ($pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    responderPasantia(400, 'VALIDACION_INVALIDA', 'La institución indicada debe existir.');
 } catch (PDOException $error) {
+    if ($pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     error_log('[PASANTIA_PERSISTENCIA] ' . $error->getMessage());
     if ((string) $error->getCode() === '23000') {
         responderPasantia(409, 'CONFLICTO_PERSISTENCIA', 'La operación no cumple las restricciones de integridad vigentes.');
     }
     responderPasantia(500, 'ERROR_PERSISTENCIA', 'No fue posible completar la operación de Pasantía.');
 } catch (Throwable $error) {
+    if ($pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     error_log('[PASANTIA_ENDPOINT] ' . $error->getMessage());
     responderPasantia(500, 'ERROR_TECNICO', 'No fue posible completar la operación de Pasantía.');
 }

@@ -338,20 +338,8 @@ $('#form_postdoc').submit(function (event) {
 
     const usuario = usuarioContextoPostdoctorado();
     if ($('#inst_postdoc').val() === 'otro') {
-        const altaInstitucion = crearInstitucionContextual(
-            datosPostdoctorado.inst,
-            usuario,
-            'postdoctorado'
-        );
-        if (!altaInstitucion.ok) {
-            mostrarErrorInstitucionContextual(
-                '#mnsj_row_postdoc',
-                '#mnsj_postdoc',
-                altaInstitucion
-            );
-            return;
-        }
-        datosPostdoctorado.inst = altaInstitucion.id;
+        datosPostdoctorado.institucion_nueva = datosPostdoctorado.inst;
+        datosPostdoctorado.inst = 0;
     }
 
     datosPostdoctorado.op = 'insert';
@@ -392,20 +380,8 @@ $('#form_edit_postdoc').submit(function (event) {
         $('#form_edit_postdoc').data('postdoctorado-usuario')
     );
     if ($('#inst_postdoc').val() === 'otro') {
-        const altaInstitucion = crearInstitucionContextual(
-            datosPostdoctorado.inst,
-            usuario,
-            'postdoctorado'
-        );
-        if (!altaInstitucion.ok) {
-            mostrarErrorInstitucionContextual(
-                '#mnsj_row_postdoc',
-                '#mnsj_postdoc',
-                altaInstitucion
-            );
-            return;
-        }
-        datosPostdoctorado.inst = altaInstitucion.id;
+        datosPostdoctorado.institucion_nueva = datosPostdoctorado.inst;
+        datosPostdoctorado.inst = 0;
     }
 
     datosPostdoctorado.op = 'update';

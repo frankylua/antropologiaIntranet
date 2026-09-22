@@ -13,6 +13,50 @@ class Institucion {
         $sql="INSERT INTO institucion (id_inst,inst) VALUES (NULL,'$nombre')";
         return obtenerIdConsulta($sql);
     }
+    public function resolverId(
+        int $idInstitucion,
+        ?string $institucionNueva
+    ): int {
+        $pdo = conexion();
+        if ($pdo->inTransaction() !== true) {
+            throw new \RuntimeException('Se requiere una transacción activa para resolver la institución.');
+        }
+
+        $esExistente = $idInstitucion > 0 && $institucionNueva === null;
+        $esNueva = $idInstitucion === 0 && $institucionNueva !== null;
+        if (!$esExistente && !$esNueva) {
+            throw new \InvalidArgumentException('Debe indicar una institución existente o una institución nueva.');
+        }
+
+        if ($esExistente) {
+            $consulta = $pdo->prepare(
+                'SELECT id_inst FROM institucion WHERE id_inst = :id_institucion LIMIT 1'
+            );
+            $consulta->execute(['id_institucion' => $idInstitucion]);
+            if ($consulta->fetchColumn() === false) {
+                throw new \DomainException('La institución indicada no existe.');
+            }
+
+            return $idInstitucion;
+        }
+
+        $nombre = trim($institucionNueva);
+        if ($nombre === '') {
+            throw new \InvalidArgumentException('El nombre de la institución nueva no puede estar vacío.');
+        }
+
+        $resultado = ejecutarEscritura(
+            'INSERT INTO institucion (inst) VALUES (:institucion)',
+            ['institucion' => $nombre],
+            true
+        );
+        $idInsertado = isset($resultado['idInsertado']) ? (int) $resultado['idInsertado'] : 0;
+        if ((int) $resultado['filasAfectadas'] !== 1 || $idInsertado <= 0) {
+            throw new \RuntimeException('No fue posible confirmar la creación de la institución.');
+        }
+
+        return $idInsertado;
+    }
     public function editar($id,$nombre){
         $sql="UPDATE institucion SET inst='$nombre' where id_inst='$id'";
         return ejecutarEscritura($sql);

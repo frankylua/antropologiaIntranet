@@ -8,6 +8,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 require_once __DIR__ . '/../src/bootstrap/app.php';
 
 use App\Model\Grado;
+use App\Model\Institucion;
 use App\Security\Authorization;
 
 final class GradoHttpError extends RuntimeException
@@ -174,10 +175,32 @@ function exigirCsrfGrado(): void
     }
 }
 
-/** @return array{instituto:int,titulo:int,fecha:string} */
+/** @return array{id:int,nueva:?string} */
+function institucionGrado(): array
+{
+    $nuevaPresente = array_key_exists('institucion_nueva', $_POST);
+    $nueva = $nuevaPresente && is_string($_POST['institucion_nueva'])
+        ? trim($_POST['institucion_nueva'])
+        : null;
+    $idRaw = $_POST['inst'] ?? null;
+
+    if ($idRaw === '0' || $idRaw === 0) {
+        if (!$nuevaPresente || $nueva === null || $nueva === '') {
+            fallarGrado(400, 'CAMPO_INVALIDO', 'Debe indicar una Institución nueva válida.');
+        }
+        return ['id' => 0, 'nueva' => $nueva];
+    }
+
+    if ($nuevaPresente) {
+        fallarGrado(400, 'CAMPO_INVALIDO', 'No puede indicar una Institución existente y una nueva simultáneamente.');
+    }
+    return ['id' => enteroPositivoGrado($idRaw, 'inst'), 'nueva' => null];
+}
+
+/** @return array{instituto:int,institucionNueva:?string,titulo:int,fecha:string} */
 function datosGrado(Grado $grado): array
 {
-    $instituto = enteroPositivoGrado($_POST['inst'] ?? null, 'inst');
+    $institucion = institucionGrado();
     $titulo = enteroPositivoGrado($_POST['titulo'] ?? null, 'titulo');
     $fecha = isset($_POST['fecha']) && is_string($_POST['fecha']) ? $_POST['fecha'] : '';
     $fechaValida = DateTimeImmutable::createFromFormat('!Y-m-d', $fecha);
@@ -189,13 +212,15 @@ function datosGrado(Grado $grado): array
     ) {
         fallarGrado(422, 'FECHA_INVALIDA', 'La fecha de graduación no es válida.');
     }
-    if (!$grado->institucionExiste($instituto)) {
-        fallarGrado(404, 'INSTITUCION_NO_ENCONTRADA', 'La Institución indicada no existe.');
-    }
     if (!$grado->tituloExiste($titulo)) {
         fallarGrado(404, 'TITULO_NO_ENCONTRADO', 'El Título indicado no existe.');
     }
-    return ['instituto' => $instituto, 'titulo' => $titulo, 'fecha' => $fecha];
+    return [
+        'instituto' => $institucion['id'],
+        'institucionNueva' => $institucion['nueva'],
+        'titulo' => $titulo,
+        'fecha' => $fecha,
+    ];
 }
 
 /** @param array<string, mixed> $fila
@@ -208,6 +233,7 @@ function gradoPublico(array $fila): array
 }
 
 $grado = new Grado();
+$pdo = null;
 
 try {
     $op = isset($_POST['op']) && is_string($_POST['op']) ? $_POST['op'] : '';
@@ -248,11 +274,19 @@ try {
         if ($idGrado === 0) {
             $usuario = usuarioObjetivoGrado($actor, $grado);
             $datos = datosGrado($grado);
-            $resultado = $grado->insertar($usuario, $datos['instituto'], $datos['titulo'], $datos['fecha']);
+            $pdo = conexion();
+            $pdo->beginTransaction();
+            $institucion = new Institucion();
+            $idInstitucion = $institucion->resolverId(
+                $datos['instituto'],
+                $datos['institucionNueva']
+            );
+            $resultado = $grado->insertar($usuario, $idInstitucion, $datos['titulo'], $datos['fecha']);
             $idInsertado = isset($resultado['idInsertado']) ? (int) $resultado['idInsertado'] : 0;
             if ((int) $resultado['filasAfectadas'] !== 1 || $idInsertado <= 0) {
                 throw new RuntimeException('La creación no afectó exactamente un Grado.');
             }
+            $pdo->commit();
             responderGrado(201, [
                 'ok' => true,
                 'codigo' => 'GRADO_CREADO',
@@ -267,10 +301,18 @@ try {
         }
         $propietario = autorizarFilaGrado($actor, $fila, $grado);
         $datos = datosGrado($grado);
-        $sinCambios = (int) $fila['inst_grado'] === $datos['instituto']
+        $pdo = conexion();
+        $pdo->beginTransaction();
+        $institucion = new Institucion();
+        $idInstitucion = $institucion->resolverId(
+            $datos['instituto'],
+            $datos['institucionNueva']
+        );
+        $sinCambios = (int) $fila['inst_grado'] === $idInstitucion
             && (int) $fila['tit_grado'] === $datos['titulo']
             && (string) $fila['fech_graduacion'] === $datos['fecha'];
         if ($sinCambios) {
+            $pdo->commit();
             responderGrado(200, [
                 'ok' => true,
                 'codigo' => 'GRADO_SIN_CAMBIOS',
@@ -281,13 +323,14 @@ try {
         $resultado = $grado->editar(
             $idGrado,
             $propietario,
-            $datos['instituto'],
+            $idInstitucion,
             $datos['titulo'],
             $datos['fecha']
         );
         if ((int) $resultado['filasAfectadas'] !== 1) {
             fallarGrado(409, 'GRADO_NO_ACTUALIZADO', 'No fue posible confirmar la actualización del Grado.');
         }
+        $pdo->commit();
         responderGrado(200, [
             'ok' => true,
             'codigo' => 'GRADO_ACTUALIZADO',
@@ -313,12 +356,27 @@ try {
         'mensaje' => 'Grado académico eliminado correctamente.',
     ]);
 } catch (GradoHttpError $error) {
+    if ($pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     responderGrado($error->statusCode, [
         'ok' => false,
         'error' => $error->errorCode,
         'mensaje' => $error->getMessage(),
     ]);
+} catch (DomainException $error) {
+    if ($pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    responderGrado(404, [
+        'ok' => false,
+        'error' => 'INSTITUCION_NO_ENCONTRADA',
+        'mensaje' => 'La Institución indicada no existe.',
+    ]);
 } catch (PDOException $error) {
+    if ($pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     error_log('[GRADO_PERSISTENCIA] ' . $error->getMessage());
     if ((string) $error->getCode() === '23000') {
         responderGrado(409, [
@@ -333,6 +391,9 @@ try {
         'mensaje' => 'No fue posible completar la operación de Grado académico.',
     ]);
 } catch (Throwable $error) {
+    if ($pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     error_log('[GRADO_ENDPOINT] ' . $error->getMessage());
     responderGrado(500, [
         'ok' => false,
