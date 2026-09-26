@@ -47,7 +47,7 @@ function ajaxSelect(
     type: "POST",
     data: { op, tipo },
     success: function (response) {
-      let listas = JSON.parse(response);
+      let listas = typeof response === "string" ? JSON.parse(response) : response;
       let template = "";
       template = `<option value="0">${titulo}</option>`;
       listas.forEach((p) => {
@@ -55,7 +55,8 @@ function ajaxSelect(
         let etiquetaOpcion = propiedadEtiqueta ? p[propiedadEtiqueta] : p[1];
         template += `<option value="${idOpcion}"> ${cadenaMay(etiquetaOpcion)}</option>`;
       });
-      if (op !== "pais" && op !== "read_cursos") {
+      const esCatalogoPais = /(?:^|\/)pais\.php(?:[?#]|$)/.test(url);
+      if (!esCatalogoPais && op !== "read_cursos") {
         template += '<option value="otro">Otro</option>';
       }
       $(id).html(template);
@@ -143,18 +144,6 @@ function eliminarLista(id, n_input, descripcion) {
         },
       });
     },
-  });
-}
-function mostrarPais(id) {
-  $.get("../ajax/pais.php", function (response) {
-    let listas = JSON.parse(response);
-    let template = "";
-    template = `<option value="0">Seleccione País</option>`;
-    listas.forEach((p) => {
-      template += `<option value="${p[0]}"> ${p[1]}</option>`;
-    });
-    template += '<option value="otro">Otro</option>';
-    $(id).html(template);
   });
 }
 function mostrarTabla(id, url, tipo) {

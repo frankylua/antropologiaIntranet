@@ -90,8 +90,8 @@
     $('[name="inst_tesis"],[name="inst_cot"]').each(function () {
       $(this).append('<option value="nueva">Otra institución</option>');
     });
-    ajaxSelect('[name=pais_tesis]', '../ajax/pais.php', 'Seleccione', 'pais', undefined, 'id_pais', 'pais');
-    ajaxSelect('[name=pais_cot]', '../ajax/pais.php', 'Seleccione', 'pais', undefined, 'id_pais', 'pais');
+    ajaxSelect('[name=pais_tesis]', '../ajax/pais.php', 'Seleccione', 'read', undefined, 'id_pais', 'pais');
+    ajaxSelect('[name=pais_cot]', '../ajax/pais.php', 'Seleccione', 'read', undefined, 'id_pais', 'pais');
   }
   function syncDirectionLabel() {
     const role = $('[name=rol_docente]').val(), wrap = $('.tesis-opponent-wrap');
