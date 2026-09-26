@@ -13,6 +13,10 @@ function cargarListaAdministrativa(tipo) {
     ajaxListas('#listas', '../ajax/institucion.php', 'read', undefined, 'id_inst', 'inst', true);
     return;
   }
+  if (tipo == 'financ') {
+    ajaxListas('#listas', '../ajax/financiamiento.php', 'read-admin', undefined, 'id_financ', 'financiamiento', true);
+    return;
+  }
   cargarListas(tipo);
 }
 
@@ -417,31 +421,100 @@ function abrirCatalogoBeca(tipo) {
 }
 
 function insertUpdate(url, dato_lista) {// funcion para llamar ajax;
-  $.post(url, dato_lista, function (response) {
-    console.log(response)
-    cargarListaAdministrativa(dato_lista.tipo);
-    if ($('#agregar_lista').val() == 'Editar') {
-      $('#agregar_lista').val('Agregar');
+  const esFinanciamiento = dato_lista.tipo == 'financ';
+  $.ajax({
+    url: url,
+    type: 'POST',
+    data: dato_lista,
+    dataType: esFinanciamiento ? 'json' : undefined,
+    headers: esFinanciamiento ? {
+      'X-CSRF-Token': $('#financiamiento_catalogo').attr('data-csrf') || ''
+    } : {},
+    success: function (response) {
+      if (esFinanciamiento && (!response || response.ok !== true)) {
+        mostrarMensajeCRUD({
+          contenedor: '#mnsj_row_listas',
+          mensaje: response && response.mensaje ? response.mensaje : 'No fue posible guardar el Financiamiento.',
+          tipo: 'danger'
+        });
+        return;
+      }
+      console.log(response)
+      cargarListaAdministrativa(dato_lista.tipo);
+      if (esFinanciamiento) {
+        mostrarMensajeCRUD({
+          contenedor: '#mnsj_row_listas',
+          mensaje: response.mensaje,
+          tipo: 'success'
+        });
+      }
+      if ($('#agregar_lista').val() == 'Editar') {
+        $('#agregar_lista').val('Agregar');
+      }
+      click();
+    },
+    error: function (xhr) {
+      const esTitulo = ['lic', 'un', 'mag', 'doc'].includes(dato_lista.tipo);
+      const esInstitucion = dato_lista.tipo == 'inst';
+      if (esFinanciamiento) {
+        const response = xhr.responseJSON;
+        mostrarMensajeCRUD({
+          contenedor: '#mnsj_row_listas',
+          mensaje: response && response.mensaje ? response.mensaje : 'No fue posible guardar el Financiamiento.',
+          tipo: 'danger'
+        });
+      } else if ((dato_lista.tipo == 'pueb' || esTitulo || esInstitucion) && xhr.status == 403) {
+        const mensaje = xhr.responseJSON && xhr.responseJSON.mensaje
+          ? xhr.responseJSON.mensaje
+          : esTitulo
+            ? 'Usuario sin permisos para crear o editar titulos academicos'
+            : esInstitucion
+              ? 'Usuario sin permisos para crear o editar instituciones'
+              : 'Usuario sin permisos para crear o editar';
+        mostrarMensajeCRUD({
+          contenedor: '#mnsj_row_listas',
+          mensaje: mensaje,
+          tipo: 'danger'
+        });
+      }
     }
-    click();
-  }).fail(function (xhr) {
-    const esTitulo = ['lic', 'un', 'mag', 'doc'].includes(dato_lista.tipo);
-    const esInstitucion = dato_lista.tipo == 'inst';
-    if ((dato_lista.tipo == 'pueb' || esTitulo || esInstitucion) && xhr.status == 403) {
-      const mensaje = xhr.responseJSON && xhr.responseJSON.mensaje
-        ? xhr.responseJSON.mensaje
-        : esTitulo
-          ? 'Usuario sin permisos para crear o editar titulos academicos'
-          : esInstitucion
-            ? 'Usuario sin permisos para crear o editar instituciones'
-            : 'Usuario sin permisos para crear o editar';
-      mostrarMensajeCRUD({
-        contenedor: '#mnsj_row_listas',
-        mensaje: mensaje,
-        tipo: 'danger'
+  });
+}
+
+function eliminarFinanciamiento(id, descripcion) {
+  confirmarEliminacion({
+    tipo: 'Financiamiento',
+    nombre: typeof descripcion == 'string' ? descripcion.trim() : '',
+    onConfirm: function () {
+      $.ajax({
+        url: '../ajax/financiamiento.php',
+        type: 'POST',
+        dataType: 'json',
+        headers: {
+          'X-CSRF-Token': $('#financiamiento_catalogo').attr('data-csrf') || ''
+        },
+        data: { op: 'delete', id: id },
+        success: function (response) {
+          mostrarMensajeCRUD({
+            contenedor: '#mnsj_row_listas',
+            mensaje: response.mensaje,
+            tipo: response.ok ? 'success' : 'danger'
+          });
+          if (response.ok) cargarListaAdministrativa('financ');
+        },
+        error: function (xhr) {
+          const response = xhr.responseJSON;
+          mostrarMensajeCRUD({
+            contenedor: '#mnsj_row_listas',
+            mensaje: response && response.mensaje
+              ? response.mensaje
+              : 'No fue posible eliminar el Financiamiento.',
+            tipo: 'danger'
+          });
+        }
       });
     }
-  })
+  });
 }
 function clickListas(nom) {
   $('#agregar_lista').prop('value', 'Agregar');
@@ -476,7 +549,7 @@ function clickListas(nom) {
     cargarListaAdministrativa('inst');
   }
   if (nom == 'financ') {
-    cargarListas('financ');
+    cargarListaAdministrativa('financ');
   }
 }
 
@@ -616,6 +689,10 @@ $(document).ready(function () {
     console.log('id eliminar' + n_lista)
     if (n_lista == 'inst') {
       eliminarInstitucion(id_elim, descripcion_elim);
+      return;
+    }
+    if (n_lista == 'financ') {
+      eliminarFinanciamiento(id_elim, descripcion_elim);
       return;
     }
     eliminarLista(id_elim, n_lista, descripcion_elim);

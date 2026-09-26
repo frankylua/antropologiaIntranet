@@ -16,6 +16,14 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
     }
 
     $becaTokenCsrf = $_SESSION['csrf_beca'];
+    if (
+        !isset($_SESSION['csrf_financiamiento'])
+        || !is_string($_SESSION['csrf_financiamiento'])
+        || preg_match('/^[a-f0-9]{64}$/D', $_SESSION['csrf_financiamiento']) !== 1
+    ) {
+        $_SESSION['csrf_financiamiento'] = bin2hex(random_bytes(32));
+    }
+    $financiamientoTokenCsrf = $_SESSION['csrf_financiamiento'];
     require ('../form-doc/header.php');
     ?>
     <div class="container mt-2">
@@ -71,6 +79,7 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
                         </div>
                     </div>
                     <div class="d-none" id="beca_catalogo" data-csrf="<?= htmlspecialchars($becaTokenCsrf, ENT_QUOTES, 'UTF-8') ?>" ></div>
+                    <div class="d-none" id="financiamiento_catalogo" data-csrf="<?= htmlspecialchars($financiamientoTokenCsrf, ENT_QUOTES, 'UTF-8') ?>"></div>
                 </div>
             </div>
         </div>
