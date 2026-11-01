@@ -1,3 +1,10 @@
+function inicializarAnioIngresoDocente(){
+    const select=$('#anio_ing');
+    if(select.length && select.find('option').length===0){
+        anios('#anio_ing',2006);
+    }
+}
+inicializarAnioIngresoDocente();
 
 ajaxSelect('#inst_unid','../ajax/institucion.php','Seleccione','read','inst', 'id_inst', 'inst');
 ajaxSelect('#inst_unid_trabajo','../ajax/institucion.php','Seleccione','read','inst', 'id_inst', 'inst');
@@ -181,27 +188,24 @@ function leerDatProgDoc(){
 
 }
 
-function valMail(){
-    let correo=$('#correo').val();
+function valMail(correo=$('#correo').val()){
     const lista={correo,op:'val-mail'};
-    let respuesta=false;
+    let resultado='ERROR';
     $.ajax({
         url: '../ajax/estudiante.php',
         type: 'POST',
         data: lista,
         async: false,
+        dataType: 'json',
         success: function(response){
-        respuesta=JSON.parse(response);
-        if(respuesta.length>0){
-            respuesta= true;
-            console.log('respuesta de ajax')
-        }else{
-            respuesta=false;
+            if(Array.isArray(response) && response.length===0){
+                resultado='DISPONIBLE';
+            }else if(Array.isArray(response) && response.length===1 && response[0]===true){
+                resultado='OCUPADO';
+            }
         }
-        }
-          
-    })
-    return respuesta;
+    });
+    return resultado;
 
 }
 
@@ -256,13 +260,19 @@ function validarDatosPers(){//campos variable para dar accion de cambiar clases 
         mensaje ='Las contraseñas no coinciden';
         $('#mnsj_per').html(mensaje);
         return false;
-    }else if(!esTransicion && valMail()){
-        mensaje='El correo electrónico ya se encuentra registrado';
-        $('#correo').addClass('is-invalid');
-        $('#mnsj_row_per').show();
-        $('#mnsj_per').addClass('alert-danger');
-        $('#mnsj_per').html(mensaje);
-        return false;
+    }else if(!esTransicion){
+        const estadoCorreo=valMail();
+        if(estadoCorreo!=='DISPONIBLE'){
+            mensaje=estadoCorreo==='OCUPADO'
+                ? 'El correo electrónico ya se encuentra registrado'
+                : 'No fue posible validar el correo electrónico. Inténtelo nuevamente.';
+            $('#correo').addClass('is-invalid');
+            $('#mnsj_row_per').show();
+            $('#mnsj_per').addClass('alert-danger');
+            $('#mnsj_per').text(mensaje);
+            return false;
+        }
+        return true;
     }else{
         return true;
     }

@@ -43,6 +43,15 @@ function enviarAltaProfesor(usuario,esTransicion,contexto){
     if(contexto.autoalta===true){
         usuario.token_autoalta=contexto.token;
     }
+    if(!esTransicion){
+        const estadoCorreo=valMail(usuario.correo);
+        if(estadoCorreo!=='DISPONIBLE'){
+            mostrarErrorAltaProfesor(estadoCorreo==='OCUPADO'
+                ? 'El correo electrónico ya se encuentra registrado'
+                : 'No fue posible validar el correo electrónico. Inténtelo nuevamente.');
+            return;
+        }
+    }
     $.ajax({
         url:'../ajax/docente.php',
         type:'POST',

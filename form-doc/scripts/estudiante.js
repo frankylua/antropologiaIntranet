@@ -140,7 +140,7 @@ function valDatAcad(linea){
 $('#form_usuario').submit(function(e){
     e.preventDefault();
     //AntecAcad();
-    let usuario=leerDatPers();
+    let usuario=window.usuario && window.usuario.correo ? {...window.usuario} : leerDatPers();
     let promedio=$('#promedio').val();
     let inst=$('#inst_unid').val();
     let trabaja=$('input:radio[name=trab]:checked').attr("value");
@@ -164,6 +164,13 @@ $('#form_usuario').submit(function(e){
     let id_login=$('#id_login').val()==''?0:$('#id_login').val();
     //ingresar grado academico
     if(valDatAcad(lineaInv)){
+        const estadoCorreo=valMail(usuario.correo);
+        if(estadoCorreo!=='DISPONIBLE'){
+            mostrarErrorCreateEstudiante(estadoCorreo==='OCUPADO'
+                ? 'El correo electrónico ya se encuentra registrado'
+                : 'No fue posible validar el correo electrónico. Inténtelo nuevamente.');
+            return;
+        }
         nuevo_inst=$('#inst_unid').val()=='otro'?true:false;
         if(nuevo_inst){
             const altaInstitucion = crearInstitucionContextual(inst, 0, 'registro');
@@ -238,14 +245,6 @@ $('#form_usuario').submit(function(e){
     //         }
     //         })
     //}else{
-        if(validarDatosPers()){
-            let editado=id_login==0?false:true;
-            console.log('campos llenos!!!!!ehehehehe')
-            // $.post('../ajax/estudiante.php', usuario, function(response){
-            //     let dato = JSON.parse(response);
-            //     console.log(dato);
-            // })
-        }
     //}
     
     //valDatAcad();

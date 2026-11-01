@@ -22,6 +22,34 @@ function sesionAutenticadaEstudiante(): bool
         || Authorization::hasAny(['admin', 'comite', 'docente', 'estudiante', 'aceptado']);
 }
 
+function contextoTemporalValMailVigente($contexto): bool
+{
+    if (!is_array($contexto) || !isset($contexto['token'], $contexto['emitido'])
+        || !is_string($contexto['token']) || trim($contexto['token']) === '') {
+        return false;
+    }
+    $emitido = $contexto['emitido'];
+    if (!is_int($emitido) && (!is_string($emitido) || !ctype_digit($emitido))) {
+        return false;
+    }
+    $emitido = filter_var($emitido, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    $ahora = time();
+    return $emitido !== false && $emitido <= $ahora && ($ahora - $emitido) <= 1800;
+}
+
+function autorizadoValMail(): bool
+{
+    $login = $_SESSION['login'] ?? null;
+    $loginValido = (is_int($login) || (is_string($login) && ctype_digit($login)))
+        && filter_var($login, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) !== false;
+    if ($loginValido && Authorization::hasAny(['admin', 'comite'])) {
+        return true;
+    }
+    return !sesionAutenticadaEstudiante()
+        && (contextoTemporalValMailVigente($_SESSION['autoalta_profesor'] ?? null)
+            || contextoTemporalValMailVigente($_SESSION['autoalta_estudiante'] ?? null));
+}
+
 function contextoAutoaltaEstudianteVigente(): ?array
 {
     $contexto = $_SESSION['autoalta_estudiante'] ?? null;
@@ -84,6 +112,24 @@ function rollbackCreateEstudiante(?\PDO $conexion): void
         $conexion->rollBack();
     } catch (\Throwable $errorRollback) {
         error_log('[ESTUDIANTE_CREATE_ROLLBACK] ' . $errorRollback->getMessage());
+    }
+}
+
+if (($_POST['op'] ?? null) === 'val-mail') {
+    if (!isset($_POST['correo']) || !is_scalar($_POST['correo']) || is_bool($_POST['correo'])
+        || trim((string) $_POST['correo']) === '') {
+        responderEstudiante(400, ['ok' => false, 'error' => 'SOLICITUD_INVALIDA']);
+    }
+    if (!autorizadoValMail()) {
+        responderEstudiante(403, ['ok' => false, 'error' => 'NO_AUTORIZADO']);
+    }
+    $correoValMail = strtolower(htmlspecialchars(stripslashes(trim((string) $_POST['correo']))));
+    try {
+        $ocupado = (new Estudiante())->validarCorreo($correoValMail);
+        responderEstudiante(200, $ocupado ? [true] : []);
+    } catch (\Throwable $error) {
+        error_log('[ESTUDIANTE_VAL_MAIL] ' . $error->getMessage());
+        responderEstudiante(500, ['ok' => false, 'error' => 'ERROR_INTERNO']);
     }
 }
 
@@ -362,10 +408,6 @@ switch ($op) {
         $resp_inst = $est->editarInstDoc($id_usu, $inst);
         $mensaje = $resp_est && $resp_inst ? 'Los Datos han sido Editados' : 'Los Datos no han sido Editados';
         echo json_encode($mensaje, JSON_UNESCAPED_UNICODE);
-        break;
-    case 'val-mail':
-        $resp = $est->validarCorreo($correo);
-        echo json_encode($resp, JSON_UNESCAPED_UNICODE);
         break;
     case 'delete':
         $respuesta = $est->eliminar($id_login);

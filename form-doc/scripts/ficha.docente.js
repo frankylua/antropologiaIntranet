@@ -74,7 +74,18 @@ consolidarAntecedentesDocente();
           $('#login').attr('name',usu[0]['id_login'])
           $('#inst_unid_trabajo').val(usu[0]['inst_usuario']);
           $('#cat_acad').val(usu[0]['cat_academica']);
-          $('#anio_ing').val(usu[0]['anio_ingreso']);
+          const anioIngreso=String(usu[0]['anio_ingreso'] || '').trim();
+          const selectAnio=$('#anio_ing');
+          if(/^[1-9]\d*$/.test(anioIngreso)){
+            if(selectAnio.find('option').filter(function(){
+              return this.value===anioIngreso;
+            }).length===0){
+              selectAnio.append($('<option>',{value:anioIngreso,text:anioIngreso}));
+            }
+            selectAnio.val(anioIngreso);
+          }else{
+            selectAnio.val('0');
+          }
           $('#vinculo').val(usu[0]['vinculo']);
   
           usu.forEach(u => {
@@ -487,7 +498,9 @@ $('#form_edit_prog').submit(function(e){
     success:function(usu){
       datProg['instTrab']=datProg['instTrab']==0?usu[0]['inst_usuario']:datProg['instTrab']
       datProg['catAcad']=datProg['catAcad']==0?usu[0]['cat_academica']:datProg['catAcad']
-      datProg['anio_ing']=datProg['anio_ing']==0?usu[0]['anio_ingreso']:datProg['anio_ing']
+      if(!/^[1-9]\d*$/.test(String(datProg['anio_ing'] || '').trim())){
+        datProg['anio_ing']=usu[0]['anio_ingreso'];
+      }
       datProg['vinculo']=datProg['vinculo']==0?usu[0]['vinculo']:datProg['vinculo']
     },
     error:function(xhr){
@@ -496,6 +509,10 @@ $('#form_edit_prog').submit(function(e){
     }
   })
   if(!datosProgramaCargados){
+    return;
+  }
+  if(!/^[1-9]\d*$/.test(String(datProg['anio_ing'] || '').trim())){
+    mostrarErrorPrograma('Debe seleccionar un año de ingreso válido.');
     return;
   }
 

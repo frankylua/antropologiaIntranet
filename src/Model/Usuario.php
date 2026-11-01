@@ -94,10 +94,12 @@ class Usuario extends Login {
         return ejecutarConsulta($sql);
     }
 
-    public function validarCorreo($correo){
-        $sql="SELECT * FROM login WHERE correo='$correo'";
-        return ejecutarConsultaResultados($sql);
-
+    public function validarCorreo($correo): bool{
+        $consulta = \App\Config\ConnectionAuthority::connection(app_config())->prepare(
+            'SELECT 1 FROM login WHERE correo = :correo LIMIT 1'
+        );
+        $consulta->execute(['correo' => $correo]);
+        return $consulta->fetchColumn() !== false;
     }
     public function mostrarAutor($usuario){
         $sql="SELECT nombres,ap_pat,ap_mat FROM usuario WHERE id_usuario='$usuario'";
