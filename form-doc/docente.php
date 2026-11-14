@@ -30,6 +30,9 @@ require ('datos.pers.php');
       <h3 class=" mb-5 text-center ">INFORMACIÓN ACADÉMICA</h3>
       <?php
       require ('../form-doc/agr.form.dat.prog.doc.php');
+      if (!$altaAdministrativa) {
+          require __DIR__ . '/acuerdos.autoalta.php';
+      }
       ?>
       <div class="row mt-5 justify-content-between ">
         <div class="col-6 col-md-4 mb-3">

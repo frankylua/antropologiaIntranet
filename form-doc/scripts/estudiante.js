@@ -156,7 +156,7 @@ $('#form_usuario').submit(function(e){
     }
     let lineaInv=[]
     
-    $("input:checkbox:checked").each(function() {
+    $("input:checkbox[name='linea']:checked").each(function() {
         lineaInv.push($(this).val())
     });
     console.log(lineaInv)

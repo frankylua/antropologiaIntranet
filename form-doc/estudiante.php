@@ -138,6 +138,11 @@ require('datos.pers.php')
         <div class="col-lg-8 alert  mt-3 text-center alert-danger" role="alert" id="mnsj_acad_est">
         </div>
       </div>
+            <?php
+            if (!$esAltaAdministrativa) {
+                require __DIR__ . '/acuerdos.autoalta.php';
+            }
+            ?>
             <div class="row mt-5 justify-content-between ">
               <div class="col-md-4 mb-3">
                 <button type="button" class="col-12 btn btn-dark col-6" id="volver_acad" >Volver</button>
