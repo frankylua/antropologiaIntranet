@@ -163,6 +163,67 @@ class Docente extends Usuario{
         return ejecutarConsulta($sql);
     }
 
+    /** Confirma persona y credenciales juntas; no modifica estados, roles ni programa. */
+    public function editarPersonalAtomico(int $actor, array $rolesSesion, ?int $usuarioObjetivo, ?int $loginObjetivo, array $datos): void
+    {
+        $pdo = conexion();
+        if ($pdo->inTransaction()) throw new \LogicException('TRANSACCION_YA_ABIERTA');
+        $iniciada = false;
+        try {
+            if (!$pdo->beginTransaction()) throw new \RuntimeException('TRANSACCION_NO_INICIADA');
+            $iniciada = true;
+            $q = $pdo->prepare('SELECT id_login FROM login WHERE id_login=:login FOR UPDATE');
+            $q->execute(['login'=>$actor]);
+            if ($q->fetchColumn() === false) throw new \DomainException('NO_AUTENTICADO',401);
+            $q = $pdo->prepare('SELECT id_permiso FROM permiso_login WHERE id_login=:login FOR UPDATE');
+            $q->execute(['login'=>$actor]);
+            $permisos = array_map('intval',$q->fetchAll(\PDO::FETCH_COLUMN));
+            $propio = $usuarioObjetivo === null && $loginObjetivo === null;
+            $gestor = (($rolesSesion['admin'] ?? false) && in_array(1,$permisos,true))
+                || (($rolesSesion['comite'] ?? false) && in_array(2,$permisos,true));
+            if (($propio && (!($rolesSesion['docente'] ?? false) || !in_array(4,$permisos,true)))
+                || (!$propio && !$gestor)) throw new \DomainException('NO_AUTORIZADO',403);
+            $login = $propio ? $actor : $loginObjetivo;
+            $q = $pdo->prepare('SELECT id_login FROM login WHERE id_login=:login FOR UPDATE');
+            $q->execute(['login'=>$login]);
+            if ($q->fetchColumn() === false) throw new \DomainException('IDENTIDAD_DOCENTE_INCOMPATIBLE',409);
+            $q = $pdo->prepare('SELECT id_usuario FROM usuario WHERE login=:login FOR UPDATE');
+            $q->execute(['login'=>$login]);
+            $usuarios = $q->fetchAll(\PDO::FETCH_COLUMN);
+            if (count($usuarios) !== 1 || (!$propio && (int)$usuarios[0] !== $usuarioObjetivo)) {
+                throw new \DomainException('IDENTIDAD_DOCENTE_INCOMPATIBLE',409);
+            }
+            $usuario = (int)$usuarios[0];
+            $q = $pdo->prepare('SELECT id_profesor,estado_profesor FROM profesor WHERE usuario=:usuario FOR UPDATE');
+            $q->execute(['usuario'=>$usuario]);
+            $profesores = $q->fetchAll(\PDO::FETCH_ASSOC);
+            if (count($profesores) !== 1 || !in_array((int)$profesores[0]['estado_profesor'],[1,2,3,4],true)) {
+                throw new \DomainException('IDENTIDAD_DOCENTE_INCOMPATIBLE',409);
+            }
+            if ($propio && (int)$profesores[0]['estado_profesor'] === 4) throw new \DomainException('NO_AUTORIZADO',403);
+
+            $personal = $this->editarInfPers($datos['nombres'],$datos['ap_mat'],$datos['ap_pat'],$datos['fech_nac'],
+                $datos['documento'],$datos['nro_doc'],$datos['pais_nac'],$datos['genero'],$datos['pais_res'],
+                $datos['region'],$datos['comuna'],$datos['telefono'],$datos['direccion'],$datos['cont_em'],
+                $datos['tel_em'],$datos['correo'],$datos['pass'],$datos['pueblo'],$usuario,(int)$login);
+            if (!($personal instanceof \PDOStatement)) throw new \RuntimeException('PERSONA_NO_CONFIRMADA');
+            try {
+                $credenciales = $this->editarCredencialesDocente($usuario,(int)$login,$datos['correo'],$datos['pass']);
+            } catch (\PDOException $error) {
+                // Solo esta escritura de login puede generar el conflicto de correo único.
+                if ((string)$error->getCode() === '23000' && (int)($error->errorInfo[1] ?? 0) === 1062) {
+                    throw new \DomainException('CORREO_EN_USO',409,$error);
+                }
+                throw $error;
+            }
+            if (!$credenciales) throw new \DomainException('IDENTIDAD_DOCENTE_INCOMPATIBLE',409);
+            if (!$pdo->commit()) throw new \RuntimeException('COMMIT_NO_CONFIRMADO');
+        } catch (\Throwable $error) {
+            if ($iniciada && $pdo->inTransaction()) $pdo->rollBack();
+            throw $error;
+        }
+    }
+
     public function editarCredencialesDocente(int $idUsuario, int $idLogin, string $correo, string $pass = ''): bool{
         $conexion = conexion();
         $consultaIdentidad = $conexion->prepare(

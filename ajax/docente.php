@@ -192,7 +192,75 @@ function resolverObjetivoEdicionDocente(
     return ['id_usuario' => $idUsuario, 'id_login' => $idLogin];
 }
 
+/** Handler personal separado de la normalización heredada de los demás recorridos. */
+function atenderEdicionPersonalDocente(string $operacion): never
+{
+    try {
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            throw new \DomainException('SOLICITUD_INVALIDA',405);
+        }
+        $actor = identificadorDocente($_SESSION['login'] ?? null);
+        if ($actor === false) throw new \DomainException('NO_AUTENTICADO',401);
+        if (loginActorDocente() !== $actor) throw new \DomainException('NO_AUTORIZADO',403);
+        $roles = [];
+        foreach (['admin','comite','docente'] as $rol) {
+            $valor = $_SESSION[$rol] ?? null;
+            $roles[$rol] = (is_int($valor) || is_string($valor)) && (string)$valor === (string)$actor;
+        }
+        $propio = $operacion === 'update-inf-pers-perfil';
+        $usuario = $propio ? null : identificadorDocente($_POST['id_usu'] ?? null);
+        $login = $propio ? null : identificadorDocente($_POST['id_login'] ?? null);
+        if ($usuario === false || $login === false) throw new \DomainException('IDENTIFICADOR_INVALIDO',400);
+
+        require_once __DIR__ . '/validaciones.php';
+        $datos = [];
+        foreach (['nombres','ap_mat','ap_pat','nro_doc','region','comuna','telefono','direccion',
+            'cont_em','tel_em','correo','pass'] as $campo) {
+            $valor = $_POST[$campo] ?? '';
+            if (!is_string($valor)) throw new \DomainException('SOLICITUD_INVALIDA',400);
+            // Mantener la normalización y el tratamiento de credenciales vigentes.
+            $datos[$campo] = limpiar_datos($valor);
+        }
+        $datos['fech_nac'] = $_POST['fech_nac'] ?? '';
+        if (!is_string($datos['fech_nac'])) throw new \DomainException('SOLICITUD_INVALIDA',400);
+        foreach (['documento','pais_nac','genero','pais_res','pueblo'] as $campo) {
+            $datos[$campo] = identificadorDocente($_POST[$campo] ?? null);
+            if ($datos[$campo] === false) throw new \DomainException('DATOS_INVALIDOS',422);
+        }
+        if (filter_var($datos['correo'],FILTER_VALIDATE_EMAIL) === false) {
+            throw new \DomainException('DATOS_INVALIDOS',422);
+        }
+        (new Docente())->editarPersonalAtomico($actor,$roles,$usuario,$login,$datos);
+        responderDocente(200,[
+            'ok'=>true,'codigo'=>'DOCENTE_ACTUALIZADO','mensaje'=>'Datos editados correctamente.',
+        ]);
+    } catch (\DomainException $error) {
+        $codigo = $error->getMessage();
+        $mensajes = [
+            'CORREO_EN_USO'=>'Ese correo ya está registrado. Use otro correo; no se guardó ningún cambio.',
+            'NO_AUTENTICADO'=>'Debe iniciar sesión.',
+            'NO_AUTORIZADO'=>'No tiene autorización para editar estos datos del Docente.',
+            'IDENTIFICADOR_INVALIDO'=>'El identificador indicado no es válido.',
+            'IDENTIDAD_DOCENTE_INCOMPATIBLE'=>'No fue posible validar la identidad del Docente; no se guardó ningún cambio.',
+            'DATOS_INVALIDOS'=>'Revise los datos y el correo antes de guardar.',
+            'SOLICITUD_INVALIDA'=>'La solicitud no es válida.',
+        ];
+        responderDocente((int)$error->getCode(),[
+            'ok'=>false,'error'=>$codigo,'mensaje'=>$mensajes[$codigo] ?? 'No fue posible guardar los datos del Docente.',
+        ]);
+    } catch (\Throwable $error) {
+        error_log('[DOCENTE_UPDATE_PERSONAL] ' . get_class($error));
+        responderDocente(500,[
+            'ok'=>false,'error'=>'ERROR_TECNICO',
+            'mensaje'=>'No fue posible guardar los datos del Docente; no se guardó ningún cambio. Intente nuevamente.',
+        ]);
+    }
+}
+
 $operacionSolicitada = isset($_POST['op']) && is_string($_POST['op']) ? $_POST['op'] : '';
+if (in_array($operacionSolicitada,['update-inf-pers','update-inf-pers-perfil'],true)) {
+    atenderEdicionPersonalDocente($operacionSolicitada);
+}
 $idLoginEliminar = null;
 if ($operacionSolicitada === 'delete') {
     if (!Authorization::hasAny(['admin'])) {
@@ -657,46 +725,6 @@ switch ($op) {
             ]);
         }
         break;
-    case 'update-inf-pers':
-    case 'update-inf-pers-perfil':
-        try {
-            $objetivoEdicion = resolverObjetivoEdicionDocente(
-                $doc,
-                $actorLogin,
-                (int) $id_usu,
-                (int) $id_login,
-                $op === 'update-inf-pers-perfil'
-            );
-            $id_usu = $objetivoEdicion['id_usuario'];
-            $id_login = $objetivoEdicion['id_login'];
-
-            $resp_pers = $doc->editarInfPers($nombres, $ap_mat, $ap_pat, $fech_nac, $documento, $nro_doc, $pais_nac, $genero, $pais_res, $region, $comuna, $telefono, $direccion, $cont_em, $tel_em, $correo, $pass, $pueblo, $id_usu, $id_login);
-            if (!($resp_pers instanceof \PDOStatement)) {
-                throw new \RuntimeException('No fue posible actualizar los datos personales del Profesor.');
-            }
-
-            $resp_log = $doc->editarCredencialesDocente((int) $id_usu, (int) $id_login, (string) $correo, (string) $pass);
-            if (!$resp_log) {
-                responderDocente(409, [
-                    'ok' => false,
-                    'error' => 'IDENTIDAD_DOCENTE_INCOMPATIBLE',
-                    'mensaje' => 'No fue posible validar la identidad del Profesor para editar sus credenciales.',
-                ]);
-            }
-
-            responderDocente(200, [
-                'ok' => true,
-                'codigo' => 'DOCENTE_ACTUALIZADO',
-                'mensaje' => 'Datos editados correctamente.',
-            ]);
-        } catch (\Throwable $error) {
-            error_log('[DOCENTE_UPDATE_PERSONAL] ' . $error->getMessage());
-            responderDocente(500, [
-                'ok' => false,
-                'error' => 'ERROR_TECNICO',
-                'mensaje' => 'No fue posible editar los datos personales del Profesor.',
-            ]);
-        }
     case 'update-inf-prog':
     case 'update-inf-prog-perfil':
         $conexionPrograma=null;
