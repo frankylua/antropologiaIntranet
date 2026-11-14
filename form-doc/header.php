@@ -10,6 +10,7 @@ if (!defined('RUTA')) {
 if (strlen(session_id()) < 1) {
     session_start();//Validamos si existe o no la sesión
 }
+\App\Security\AcademicSession::enforce();
 // $id = $_SESSION['admin'];
 // $user = mostrar_perfil_admin($conexion,$id); 
 $miperfil = isset($_SESSION['docente']) ? RUTA . 'form-doc/info.docente.php' : (Authorization::hasCapability('perfil.ver') ? RUTA . 'form-doc/info.estudiante.php' : RUTA . 'admin/perfil.php');

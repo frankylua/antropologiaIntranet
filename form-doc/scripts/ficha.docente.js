@@ -61,7 +61,7 @@ consolidarAntecedentesDocente();
     $('#mnsj_row_prog_doc').show();
     $('#mnsj_prog_doc').removeClass('alert-success');
     $('#mnsj_prog_doc').addClass('alert-danger');
-    $('#mnsj_prog_doc').html(mensaje);
+    $('#mnsj_prog_doc').text(mensaje);
   }
   function llenarFormProgDoc(id_usu){
     $.ajax({
@@ -87,9 +87,11 @@ consolidarAntecedentesDocente();
             selectAnio.val('0');
           }
           $('#vinculo').val(usu[0]['vinculo']);
+          $('#estado_docente_programa').val(usu[0]['estado_profesor']);
+          $("input[type='checkbox'][name='linea']").prop('checked',false);
   
           usu.forEach(u => {
-            $("input[type='checkbox'][name='linea'][id='"+u['linea_inv']+"']").attr('checked',true);
+            $("input[type='checkbox'][name='linea'][id='"+u['linea_inv']+"']").prop('checked',true);
           });
         }
        });
@@ -487,6 +489,7 @@ $('#form_edit_prog').submit(function(e){
   datProg=leerDatProgDoc()
   datProg.id_usu=$('#info_doc').attr('name')
   datProg.id_login=$('#login').attr('name')
+  if ($('#estado_docente_programa').length) datProg.estado_profesor=$('#estado_docente_programa').val();
   datProg.op=contextoTerceroDocente()?'update-inf-prog':'update-inf-prog-perfil'
   let datosProgramaCargados=true;
   $.ajax({
@@ -532,7 +535,9 @@ $('#form_edit_prog').submit(function(e){
       $('#mnsj_prog_doc').text(dato.mensaje);
       setTimeout(function() {
         $("#mnsj_row_prog_doc").fadeOut(1500);
-        reiniciarInfoDoc()
+        if (String(datProg.estado_profesor)==='4' && typeof listaDoc==='function') {
+          listaDoc(); $('#mensaje_estado_docente').removeClass('d-none alert-danger').addClass('alert-success').text(dato.mensaje);
+        } else reiniciarInfoDoc();
         if(typeof cargarDocentes==='function'){
           cargarDocentes()
         }

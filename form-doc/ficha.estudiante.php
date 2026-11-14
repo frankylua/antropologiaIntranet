@@ -1,3 +1,14 @@
+<?php
+$gestionaProgramaEstudiante = isset($_SESSION['login']) && (
+    (isset($_SESSION['admin']) && (string)$_SESSION['admin'] === (string)$_SESSION['login']) ||
+    (isset($_SESSION['comite']) && (string)$_SESSION['comite'] === (string)$_SESSION['login'])
+);
+$eliminaEstudiante = isset($_SESSION['admin'],$_SESSION['login']) && (string)$_SESSION['admin'] === (string)$_SESSION['login'];
+?>
+<div id="reglas_estudiante" hidden data-gestiona="<?= $gestionaProgramaEstudiante ? '1' : '0' ?>" data-elimina="<?= $eliminaEstudiante ? '1' : '0' ?>"></div>
+<?php if (!$gestionaProgramaEstudiante): ?>
+<style>#info_est .editarProgEst, #edit_prog_est { display: none !important; }</style>
+<?php endif; ?>
 
 <div class="row" id="acad_est">
   <div class="col-12" id="antAcadEst">
@@ -41,6 +52,19 @@
   <div class="col" id="login_est" name="0">
     <h3 class="mb-5 text-center" id="text-tit">EDITAR INFORMACIÓN PROGRAMA</h3>
     <form class="form" id="form_edit_prog">
+      <?php if ($gestionaProgramaEstudiante): ?>
+      <div class="row mb-3"><div class="col-md-6">
+        <label for="estado_estudiante_programa" class="form-label">Estado del Estudiante</label>
+        <select id="estado_estudiante_programa" class="form-select">
+          <option value="1">Postulante</option><option value="2">Aceptado(a)</option>
+          <option value="3">Matriculado(a)</option><option value="4">Graduado(a)</option>
+          <option value="5">Retirado(a)</option><option value="7">Reprobado(a)</option>
+          <option value="6" <?= \App\Security\AcademicSession::migrationReady(conexion()) ? '' : 'disabled' ?>>Inactivo(a)</option>
+        </select>
+        <div class="form-text">Los inactivos se consultan desde el filtro Inactivos de la grilla.</div>
+      </div></div>
+      <?php endif; ?>
+
       <div class="row justify-content-between mt-5">
         <div class="col-md-3 mb-3">
           <label for="promedio" class="form-label">Promedio de notas Pregrado</label>

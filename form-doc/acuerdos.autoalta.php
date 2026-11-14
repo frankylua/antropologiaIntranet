@@ -5,9 +5,10 @@ $escaparAcuerdosMuestra = static fn(string $texto): string => htmlspecialchars($
 <div class="row mt-3 mb-3">
   <div class="col-12">
     <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="acuerdos-autoalta-check" name="acuerdos_muestra" value="1"
+      <input class="form-check-input" type="checkbox" id="acuerdos-autoalta-check" name="acuerdos_muestra" value="1" required
         aria-describedby="acuerdos-autoalta-nota">
       <label class="form-check-label" for="acuerdos-autoalta-check">
+        He leído y acepto los
         <a class="link-dark" id="abrir-acuerdos-autoalta" href="#acuerdos-autoalta-modal"
           data-bs-toggle="modal" data-bs-target="#acuerdos-autoalta-modal" aria-haspopup="dialog">
           <?php echo $escaparAcuerdosMuestra($acuerdosMuestra['titulo']); ?>

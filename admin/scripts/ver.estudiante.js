@@ -129,7 +129,6 @@ function cargarFichaEst(id_usu) {
                       return;
                   }
                   let prof = response.datos;
-                  console.log(prof)
                   nombre = cadenaMay(prof[0]['nombres']) + ' ' + cadenaMay(prof[0]['ap_pat']) + ' ' + cadenaMay(prof[0]['ap_mat'])
                   docente = nombre
 
@@ -183,46 +182,43 @@ cargarProy($("#info_est").attr("name"), "#proy_est");
 cargarPasantia($("#info_est").attr("name"), "#pasant_est");
 cargarBeca($("#info_est").attr("name"), "#beca_est");
 }
+function escaparListaEst(valor) {
+    return String(valor == null ? '' : valor).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 function cargarEst(tipo,busqueda){
-    op =
-    tipo == 0
-      ? "read-est"
-      : tipo == 1 || tipo == 2 || tipo == 3
-      ? "read-filtrada"
-      : "read-est-filtro";
-      console.log(op)
+    tipo = tipo == null ? ($('#tipo_est').val() || 0) : tipo;
+    busqueda = busqueda == null ? ($('#buscar_est').val() || '') : busqueda;
+    const op = 'read-est';
+    const elimina = $('#reglas_estudiante').attr('data-elimina') === '1';
     $.ajax({
         async: false,
         url: '../ajax/estudiante.php',
         type: 'POST',
+        dataType: 'json',
         data: {op,tipo,busqueda},
         success: function (response) {
-            console.log(response)
-        let estudiantes = JSON.parse(response);
-        let template
+            let estudiantes = Array.isArray(response) ? response : [];
+        let template = ''
         estudiantes.forEach(est => {
-            nombre=cadenaMay(est['nombres'])+' '+letraMay(est['ap_pat'])+' '+letraMay(est['ap_mat'])
-            estado=est['id_tipo']
+            const nombre=escaparListaEst(cadenaMayFichaEstudiante(est.nombres)+' '+cadenaMayFichaEstudiante(est.ap_pat)+' '+cadenaMayFichaEstudiante(est.ap_mat));
             template += `<tr>
                 <td >${nombre}</td>
-                <td class="text-center">${letraMay(est['tipo'])}</td>
+                <td class="text-center">${escaparListaEst(est['tipo'])}</td>
                 <td class="d-flex justify-content-center">
               
                <!-- desde aca es el modal cambiat tipo estudiante -->
               <input type="hidden" class="login_modal" name=${est['id_login']} value=${est['id_usuario']}></input> 
-               <button typr="button"  class="btn btn-outline-primary btn-sm text-center cambiarTipoEst" data-bs-toggle="modal" data-bs-target="#estado-est-${est['id_usuario']}"><i class="fa-solid fa-rotate-right"></i></button>
+               <button type="button"  class="btn btn-outline-primary btn-sm text-center cambiarTipoEst" data-bs-toggle="modal" data-bs-target="#estado-est-${est['id_usuario']}"><i class="fa-solid fa-rotate-right"></i></button>
                <div class="modal fade" id="estado-est-${est['id_usuario']}" tabindex="-1" aria-labelledby="modal-estado-est-${est['id_usuario']}" aria-hidden="true">
 
                    <div class="modal-dialog">
                      <div class="modal-content">
                        <div class="modal-header">
-                         <h5 class="modal-title" id="modal-estado-est-${est['id_usuario']}">Seleccione tipo de
-                           Estudiante/Acceso</h5>
+                         <h5 class="modal-title" id="modal-estado-est-${est['id_usuario']}">Cambiar estado del Estudiante</h5>
                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                        </div>
                        <div class="modal-body row mx-3">
-                        
-                      .
+
                        <select id="tipo-e${est['id_usuario']}" class="form-select tipo-estudiante" name="tipo-estudiante">
                           <option value="0"selected>Seleccione</option>
                           <option value="1">Postulante</option>
@@ -230,7 +226,7 @@ function cargarEst(tipo,busqueda){
                           <option value="3">Matriculado(a)</option>
                           <option value="4">Graduado(a)</option>
                           <option value="5">Retirado(a)</option>
-                          <option value="6">Eliminado(a)</option>
+                          <option value="6">Inactivo(a)</option>
                           <option value="7">Reprobado(a)</option>
                         </select>
                     
@@ -249,7 +245,7 @@ function cargarEst(tipo,busqueda){
       
                 </td>
                 <td class="text-center"><button type="button" class="btn btn-outline-success btn-sm verEst text-center" id="${est['id_usuario']}"><i class="fa-solid fa-eye"></i></button></td>
-                <td class="text-center"><button type="button" class="btn btn-outline-danger  btn-sm " data-bs-toggle="modal" data-bs-target="#eliminar-est-${est['id_login']}" id="${est['id_login']}" ><i class="fa-solid fa-trash-can"></i></button>
+                ${elimina && Number(est.id_tipo) !== 6 ? `<td class="text-center"><button type="button" class="btn btn-outline-danger  btn-sm " data-bs-toggle="modal" data-bs-target="#eliminar-est-${est['id_login']}" id="${est['id_login']}" ><i class="fa-solid fa-trash-can"></i></button>
                 
                 <!-- desde aca es el modal eliminar estudiante-->
                  <div class="modal fade" id="eliminar-est-${est['id_login']}" tabindex="-1" aria-labelledby="modal-eliminar-est-${est['id_login']}" aria-hidden="true">
@@ -257,19 +253,18 @@ function cargarEst(tipo,busqueda){
                      <div class="modal-dialog">
                        <div class="modal-content">
                          <div class="modal-header">
-                           <h5 class="modal-title" id="modal-eliminar-est-${est['id_login']}">Seleccione tipo de
-                             Estudiante/Acceso</h5>
+                           <h5 class="modal-title" id="modal-eliminar-est-${est['id_login']}">Inactivar Estudiante</h5>
                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                          </div>
                          <div class="modal-body row mx-3">
                           
-                      <p> Esta seguro que quiere eliminar del programa a ${nombre}</p>
+                      <p>¿Desea inactivar a ${nombre}? Se ocultará de la grilla habitual y se conservarán su cuenta, antecedentes y relaciones. Podrá reactivarlo desde Inactivos y Datos del programa.</p>
                       
                          </div>
          
                          <div class="modal-footer">
                            <!-- evento ajax en js/buttons -->
-                           <button type="button" class="btn btn-dark eliminarEst " id="${est['id_login']}" data-bs-dismiss="modal" aria-label="Close" ">Eliminar</button>
+                           <button type="button" class="btn btn-dark eliminarEst " id="${est['id_login']}" data-bs-dismiss="modal" aria-label="Close">Inactivar</button>
                          </div>
          
                        </div>
@@ -277,25 +272,15 @@ function cargarEst(tipo,busqueda){
          
                   
                  </div>
-                </td>
+                </td>` : '<td></td>'}
                 </tr>
                 `
-                $('#table_est').html(template)
-                $('#permisos').val(estado)
-                // ajaxSelect(`tipo-estudiante${est['id_usuario']}`,'../ajax/estudiante.php', 'Seleccione', 'read_tipo')
-                $.post('../ajax/estudiante.php', {op:'read_tipo'}, function (response) {
-                      data = JSON.parse(response);
-                      // templateSelect(data,`tipo-estudiante${est['id_usuario']}`)
-                      let est = $('#tipo_est');
-                      est.empty();
-                      data.forEach(function(item){
-                          est.append(
-                              `<option value="${item.id_tipo_est}">${item.tipo}</option>`
-                          );
-                      });
-        })
-            
+
         });
+        $('#table_est').html(template || '<tr><td colspan="5" class="text-center">No se encontraron estudiantes.</td></tr>');
+        },
+        error: function(xhr) {
+            $('#table_est').empty().append($('<tr>').append($('<td>').attr('colspan',5).text(mensajeErrorFichaEstudiante(xhr))));
         }
     })
     
@@ -306,60 +291,39 @@ $('body').on('click','.verEst',function(){
     cargarFichaEst(id_usu)  
     $("#mnsj_row_acad_est").hide(); 
 })
-$('body').on('click','.cambiarTipoEst',function(){
-  id_login = $('#login_modal').attr('name');
- 
-         
-        
-        
-    })
-// cambiar lista de estudiantes con la opcion select
-
   $('body').on('click','.permiso',function(){
-    op="update-permiso-tipo-est"
-    id_usu=$(this).attr('id');
-    tipo_est=$('#tipo-e'+id_usu).val()
-    id_login = $(this).attr('name');
-    console.log(tipo_est)
-    $('#estado-est-'+id_usu).modal('hide');
+    const id_usu=$(this).attr('id');
+    const tipo_est=$('#tipo-e'+id_usu).val();
+    const id_login=$(this).attr('name');
     $.ajax({
-      async: false,
-      url: '../ajax/estudiante.php',
-      type: 'POST',
-      data: {op,tipo_est,id_login, id_usu},
-      success: function (response) {
-        let dato = JSON.parse(response);
-        console.log(dato)
+      url: '../ajax/estudiante.php', type: 'POST', dataType: 'json',
+      data: {op:'update-permiso-tipo-est',tipo_est,id_login,id_usu},
+      success: function(mensaje) {
         $('#mnsj_row_encabezado').show();
-        $('#mnsj_encabezado').removeClass('alert-danger');
-        $('#mnsj_encabezado').addClass('alert-success');
-        $('#mnsj_encabezado').html(dato);
-        setTimeout(function () {
-            $("#mnsj_row_encabezado").fadeOut(1500);
-            cargarEst()
-        }, 3000);
-    
+        $('#mnsj_encabezado').removeClass('alert-danger').addClass('alert-success').text(mensaje);
+        cargarEst();
+      },
+      error: function(xhr) {
+        $('#mnsj_row_encabezado').show();
+        $('#mnsj_encabezado').removeClass('alert-success').addClass('alert-danger').text(mensajeErrorFichaEstudiante(xhr));
       }
-  })
-})
-  // buscar docentes con el nombre
-$("#buscar_est").keyup(function () {
-    busqueda = $("#buscar_est").val();
-    if (busqueda !== "") {
-      cargarEst(4, busqueda);
-      $("#tipo_est").val(0);
-    } else {
-      cargarEst($("#tipo_est").val());
-    }
-  });
+    });
+});
+$('#buscar_est').keyup(function(){ cargarEst(); });
+$('#tipo_est').change(function(){ cargarEst(); });
 
 function init(){
   listaEst()
-    ajaxSelect('#tipo_est_edit','../ajax/estudiante.php','Seleccione','read_tipo')
 
-     $('#tipo_est').append('<option value="0" selected>Todos(as)</option>')
-     cargarEst()
-     cargarEst($('#tipo_est').val())
+     $.ajax({url:'../ajax/estudiante.php',type:'POST',dataType:'json',data:{op:'read_tipo'},
+       success:function(tipos){
+         const select=$('#tipo_est').empty().append($('<option>').val(0).text('Todos(as) activos(as)'));
+         tipos.forEach(t => select.append($('<option>').val(t.id_tipo_est).text(cadenaMayFichaEstudiante(t.tipo))));
+         select.val(0);
+         cargarEst(0);
+       },
+       error:function(xhr){ mostrarErrorFichaEstudiante(xhr); }
+     });
     $("#box-pass").hide();
     $("#mnsj_row_est").hide();
     $("#mnsj_row_per_est").hide();

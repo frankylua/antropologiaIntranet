@@ -17,6 +17,7 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
     <div class="row" id="lista_est">
       <div class="col">
         <h3 class=" text-center"> ESTUDIANTES</h3>
+        <p>Para recuperar un registro, filtre por Inactivo(a), abra Información → Editar Datos Programa, elija un estado vigente y guarde. La cuenta deberá volver a iniciar sesión para recuperar el perfil.</p>
         
         <div class="row justify-content-center " id="mnsj_row_encabezado">
           <div class="col-lg-8 alert  mt-3 text-center alert-danger" role="alert" id="mnsj_encabezado"></div>
@@ -24,7 +25,7 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
        
         <div class="row mt-3 g-3 m-5">
           <div class="col-md-6 mb-3">
-            <select id="tipo_est" class="form-select">
+            <select id="tipo_est" class="form-select" aria-label="Estado del Estudiante">
             </select>
           </div>
           <div class="col-md-6 mb-3">
@@ -88,8 +89,8 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
     require '../form-doc/ficha.estudiante.php';
     require ('../form-doc/footer.php');
     ?>
-    <script src="../form-doc/scripts/ficha.estudiante.js"></script>
-    <script src="scripts/ver.estudiante.js"></script>
+    <script src="../form-doc/scripts/ficha.estudiante.js?v=<?= filemtime(__DIR__ . '/../form-doc/scripts/ficha.estudiante.js') ?>"></script>
+    <script src="scripts/ver.estudiante.js?v=<?= filemtime(__DIR__ . '/scripts/ver.estudiante.js') ?>"></script>
     <?php
 }
 ob_end_flush();

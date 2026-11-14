@@ -38,10 +38,21 @@ function mostrarErrorAltaProfesor(mensaje){
     $('#mnsj_prog_doc').removeClass('alert-success').addClass('alert-danger');
     $('#mnsj_prog_doc').text(mensaje);
 }
+$('#acuerdos-autoalta-check').on('change',function(){
+    if($(this).prop('checked') && $('#mnsj_prog_doc').text()==='Debe aceptar los acuerdos y condiciones para completar el registro.'){
+        $('#mnsj_row_prog_doc').hide();
+        $('#mnsj_prog_doc').text('');
+    }
+});
 function enviarAltaProfesor(usuario,esTransicion,contexto){
     usuario.op=esTransicion?'agregar-docencia':'insert-update';
     if(contexto.autoalta===true){
+        if(!$('#acuerdos-autoalta-check').prop('checked')){
+            mostrarErrorAltaProfesor('Debe aceptar los acuerdos y condiciones para completar el registro.');
+            return;
+        }
         usuario.token_autoalta=contexto.token;
+        usuario.acuerdos_muestra='1';
     }
     if(!esTransicion){
         const estadoCorreo=valMail(usuario.correo);
@@ -115,6 +126,11 @@ $(document).on('change','#inst_unid_trabajo',function(){
 
 $('#form_usuario').submit(function(e){
     e.preventDefault();
+    const acuerdos=$('#acuerdos-autoalta-check');
+    if(acuerdos.length && !acuerdos.prop('checked')){
+        mostrarErrorAltaProfesor('Debe aceptar los acuerdos y condiciones para completar el registro.');
+        return;
+    }
     const usuario=leerDatPers();
     const profProg=leerDatProgDoc();
     const esTransicion=window.contextoAgregarDocencia&&window.contextoAgregarDocencia.listo;

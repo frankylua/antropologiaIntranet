@@ -78,4 +78,4 @@ require ('datos.pers.php');
 <?php
 require ('footer.php');
 ?>
-<script src="scripts/docente.js"></script>
+<script src="scripts/docente.js?v=<?php echo filemtime(__DIR__ . '/scripts/docente.js'); ?>"></script>

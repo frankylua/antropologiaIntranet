@@ -66,6 +66,15 @@ function mensajeErrorFichaEstudiante(xhr) {
         CREDENCIALES_AJENAS_NO_AUTORIZADAS: 'No puede cambiar el correo de acceso de otra persona.',
         DATOS_INVALIDOS: 'Revise los datos y las opciones seleccionadas.',
         DATOS_INCOMPATIBLES: 'Los datos son incompatibles con un registro existente.',
+        INACTIVACION_NO_DISPONIBLE: 'La inactivación aún no está habilitada. Solicite a administración que complete la actualización.',
+        PERFIL_INACTIVO: 'El perfil está inactivo. Solicite su reactivación a Admin o Comité.',
+        LINEAS_INVALIDAS: 'Seleccione al menos una línea de investigación válida.',
+        GUIA_NO_ELEGIBLE: 'Seleccione un Profesor aceptado para una nueva asignación.',
+        ESTUDIANTE_CON_DEPENDENCIAS: 'El Estudiante tiene antecedentes o relaciones que deben conservarse.',
+        CUENTA_CON_OTROS_ROLES: 'La cuenta tiene otros roles y no puede eliminarse desde Estudiantes.',
+        ESQUEMA_DELETE_INCOMPATIBLE: 'La eliminación requiere revisar las relaciones de la base de datos.',
+        ELIMINACION_PROPIA_NO_AUTORIZADA: 'No puede eliminar su propia cuenta.',
+        CONFIRMACION_REQUERIDA: 'Debe confirmar la eliminación.',
         ESTUDIANTE_NO_ENCONTRADO: 'No se encontró la ficha del Estudiante.'
     };
     return mensajes[codigo] || 'No fue posible completar la operación. Revise los datos e intente nuevamente.';
@@ -141,69 +150,55 @@ function llenarFormPersEst(id_usu) {
     });
 }
 //cargar formulario datos programa desde ajax
+function gestionaProgramaEstudiante() {
+    return $('#reglas_estudiante').attr('data-gestiona') === '1';
+}
 function llenarFormProgEst(id_usu) {
+    if (!gestionaProgramaEstudiante()) return;
+    $('#form_edit_prog :submit').prop('disabled',true);
+    $('#prof_guia').val('').attr('name','');
     $.ajax({
-        async: false,
-        url: "../ajax/estudiante.php",
-        type: "POST",
-        data: { op: "read_est_prog", id_usu },
-        success: function (response) {
-            let usu = JSON.parse(response);
-            console.log(usu)
-            $.ajax({
-                url: "../ajax/estudiante.php",
-                type: "POST",
-                dataType: "json",
-                data: { op: "read_nom_prof", id_estudiante: usu[0]['id_usuario'] },
-                success: function (response) {
-                    if (!response.ok || !response.datos || response.datos.length !== 1) {
-                        return;
-                    }
-                    let prof = response.datos;
-                    let nombre = prof[0]['nombres'] + ' ' + prof[0]['ap_pat'] + ' ' + prof[0]['ap_mat']
-                    $('#prof_guia').val(cadenaMay(nombre));
-                    $('#prof_guia').attr('name', prof[0]['id_usuario']);
+        async:false, url:'../ajax/estudiante.php',type:'POST',dataType:'json',
+        data:{op:'read_est_prog',id_usu},
+        success:function(usu){
+            if (!Array.isArray(usu) || !usu.length) { fichaEst(); return; }
+            const u=usu[0];
+            $('#login_est').attr('name',u.id_login);
+            $('#inst_unid').val(u.inst_usuario).trigger('change');
+            $('#estado_estudiante_programa').val(u.tipo_est);
+            $('#promedio').val(u.prom_notas);
+            $('input[name="trab"]').prop('checked',false);
+            $('input[name="trab"][value="'+u.trabaja+'"]').prop('checked',true);
+            $('#orient').val(u.orient_disc);
+            $('#sit_ocup').val(u.sit_previa);
+            $('#fech_ing').val(u.fech_ingr);
+            $('#fech_grad').val(u.fecha_egr || '');
+            $("input[type='checkbox'][name='linea']").prop('checked',false);
+            usu.forEach(linea => {
+                if (linea.linea_inv != null) $("input[type='checkbox'][name='linea'][value='"+Number(linea.linea_inv)+"']").prop('checked',true);
+            });
+            $.ajax({url:'../ajax/estudiante.php',type:'POST',dataType:'json',
+                data:{op:'read_nom_prof',id_estudiante:u.id_usuario},
+                success:function(respuesta){
+                    if (String($('#info_est').attr('name'))!==String(u.id_usuario) || !respuesta.ok || !respuesta.datos || respuesta.datos.length!==1) return;
+                    const guia=respuesta.datos[0];
+                    $('#prof_guia').val(cadenaMayFichaEstudiante([guia.nombres,guia.ap_pat,guia.ap_mat].join(' '))).attr('name',guia.id_usuario);
                 },
-                error: function () {
-                    console.error('No fue posible cargar el profesor guía del Estudiante.');
-                }
+                error:function(xhr){ errorProgramaEstudiante(xhr); },
+                complete:function(){ $('#form_edit_prog :submit').prop('disabled',false); }
             });
-
-            $('#login_est').attr('name', usu[0]['id_login'])
-            $('#inst_unid').val(usu[0]['inst_usuario']);
-            $('#promedio').val(usu[0]['prom_notas']);
-            $('input[name="trab"]').prop("checked", true).val(usu[0]['trabaja']);
-            $('#orient').val(usu[0]['orient_disc']);
-            $('#sit_ocup').val(usu[0]['sit_previa']);
-            $('#fech_ing').val(usu[0]['fech_ingr']);
-            $('#fech_grad').val(usu[0]['fecha_egr']);
-            $('#tipo_est_edit').val(usu[0]['tipo_est']);
-            usu.forEach(u => {
-                $("input[type='checkbox'][name='linea'][id='" + u['linea_inv'] + "']").attr('checked', true);
-            });
-        }
+        },
+        error:function(xhr){ errorProgramaEstudiante(xhr); }
     });
 }
-//leer los datos de programa de los estudiantes
-function leerDatProgEst() {
-    let inst_unid = $('#inst_unid').val() == 'otro' ? espacios($('#otro_inst_doc').val()) : $('#inst_unid').val();
-    let promedio = $('#promedio').val();
-    let trabaja = $("input[type=checkbox][name=trab]:checked").val()
-    let orient = $('#orient').val();
-    let lineaInv = []
-    let profesor = $('#prof_guia').attr('name')
-    let sit_ocup = $('#sit_ocup').val()
-    let fecha_ingreso = $('#fecha_ing').val()
-    let fecha_grad = $('#fecha_grad').val()
-    let tipo_est = $('#tipo_est').val()
-    // let id_login=$('#id_login').val()==''?0:$('#id_login').val();
-    $("input[type=checkbox][name=linea]:checked").each(function () {
-        lineaInv.push($(this).val())
-    });
-    datProg = { inst_unid, lineaInv, promedio, trabaja, orient, profesor, sit_ocup, fecha_ingreso, fecha_grad, tipo_est }
-    return datProg
-
+function errorProgramaEstudiante(xhr) {
+    $('#mnsj_row_acad_est').show();
+    $('#mnsj_acad_est').removeClass('alert-success').addClass('alert-danger').text(mensajeErrorFichaEstudiante(xhr));
 }
+$(document).on('change','#inst_unid',function(){
+    $('#inst_unid_col').remove();
+    if ($(this).val()==='otro') $('#row_otro_inst').append('<div class="col-md-6 mb-3" id="inst_unid_col"><label for="otro_inst_est" class="form-label">Nombre Institución</label><input id="otro_inst_est" class="form-control" maxlength="80" required></div>');
+});
   function editAcadEst() {
     $("#lista_est").fadeOut();
     $("#info_est").fadeOut();
@@ -226,36 +221,26 @@ $('.volverInfoEst').click(function () {
     reiniciarInfoEst()
 })
 
+let consultaGuiaEstudiante=0;
 $('#prof_guia').keyup(function () {
-    $('#list_prof').hide();
-    busqueda = $('#prof_guia').val();
-    if (busqueda !== '') {
-        console.log(busqueda);
-        $.ajax({
-            url: '../ajax/docente.php',
-            type: 'POST',
-            data: { op: 'read_prof', busqueda },
-            success: function (response) {
-                let profes = JSON.parse(response);
-                let template = '';
-                console.log(profes)
-                if (profes == '' && $('#prof_guia').attr('name') == '') {
-                    template = '<li class="list-group-item text-rosado">Ingrese un nombre válido</li>';
-                } else {
-                    $('#prof_guia').attr('name', '');
-                    profes.forEach(list => {
-                        prof = list[1] + ' ' + list[2] + ' ' + list[3];
-                        prof = cadenaMay(prof);
-                        template += `
-                <li class='list-group-item listProf' id='${list[0]}' name='${prof}'> ${prof}</li>`
-                    });
-                }
-                $('#list_prof').html(template);
-                $('#list_prof').show();
-            }
-        })
-    }
-})
+    $('#prof_guia').attr('name','');
+    $('#list_prof').hide().empty();
+    const busqueda=$(this).val();
+    const consulta=++consultaGuiaEstudiante;
+    if (!busqueda) return;
+    $.ajax({url:'../ajax/docente.php',type:'POST',dataType:'json',data:{op:'read_prof',busqueda},
+        success:function(profes){
+            if (consulta!==consultaGuiaEstudiante) return;
+            const lista=$('#list_prof').empty();
+            profes.forEach(guia => {
+                const nombre=cadenaMayFichaEstudiante([guia.nombres,guia.ap_pat,guia.ap_mat].join(' '));
+                lista.append($('<li>').addClass('list-group-item listProf').attr('id',guia.id_usuario).attr('name',nombre).text(nombre));
+            });
+            if (!profes.length) lista.append($('<li>').addClass('list-group-item').text('Seleccione un Profesor aceptado.'));
+            lista.show();
+        },error:function(xhr){ errorProgramaEstudiante(xhr); }
+    });
+});
 //cargar profesor desde la lista
 $('body').on('click', '.listProf', function () {
     id = $(this).attr('id');
@@ -276,25 +261,18 @@ $("body").on("click", ".editarPers", function () {
 //cargar informacion estudiante
 //eliminar estudiante
 $('body').on('click', '.eliminarEst', function () {
-    id_login = $(this).attr('id');
-    $.ajax({
-        url: '../ajax/estudiante.php',
-        type: 'POST',
-        data: { id_login, op: 'delete' },
-        success: function (response) {
-            let mensaje = JSON.parse(response);
-            console.log(mensaje)
+    $.ajax({url:'../ajax/estudiante.php',type:'POST',dataType:'json',
+        data:{id_login:$(this).attr('id'),op:'delete',confirmar:1},
+        success:function(mensaje){
             $('#mnsj_row_encabezado').show();
-            $('#mnsj_encabezado').removeClass('alert-danger');
-            $('#mnsj_encabezado').addClass('alert-success');
-            $('#mnsj_encabezado').html(mensaje);
-            setTimeout(function () {
-            $("#mnsj_row_encabezado").fadeOut(1500);
-            cargarEst()
-        }, 3000);
+            $('#mnsj_encabezado').removeClass('alert-danger').addClass('alert-success').text(mensaje);
+            cargarEst();
+        },error:function(xhr){
+            $('#mnsj_row_encabezado').show();
+            $('#mnsj_encabezado').removeClass('alert-success').addClass('alert-danger').text(mensajeErrorFichaEstudiante(xhr));
         }
-    })
-})
+    });
+});
 $('.volverTablaEst').click(function () {
     listaEst()
     $('#datos_fichaest').html('');
@@ -306,61 +284,39 @@ $('.volverInfo').click(function () {
     $("#datos_fichaest").html('')
     cargarFichaEst($('#id_usuario').attr('name'))
 })
-$('#form_edit_prog').submit(function (e) {
+$('#form_edit_prog').submit(function(e){
     e.preventDefault();
-    let promedio = $('#promedio').val();
-    let inst = $('#inst_unid').val();
-    let trabaja = $('input:radio[name=trab]:checked').attr("value");
-    let profesor = $('#prof_guia').attr('name');
-    let orientacion = $('#orient').val();
-    let sit_ocup = guardar($('#sit_ocup').val());
-    let fech_ing = $('#fech_ing').val();
-    let fech_grad = $('#fech_grad').val();
-    // let tipo_est = $('#tipo_est_edit').val();
-    // let permisos = []
-    // if (tipo_est == 1 || tipo_est == 4) {
-    //     permisos = [5]
-    // } else if (tipo_est == 2 || tipo_est == 3) {
-    //     permisos = [3,5]
-    // } 
-    // console.log(permisos)
-    let lineaInv = []
-
-    $("input:checkbox:checked").each(function () {
-        lineaInv.push($(this).val())
+    if (!gestionaProgramaEstudiante()) return;
+    const lineaInv=[];
+    $("input:checkbox[name='linea']:checked").each(function(){ lineaInv.push($(this).val()); });
+    const inst=$('#inst_unid').val();
+    const datos={op:'update-inf-prog',id_usu:$('#info_est').attr('name'),id_login:$('#login_est').attr('name'),
+        promedio:$('#promedio').val(),inst:inst==='otro'?0:inst,trabaja:$('input:radio[name=trab]:checked').val(),
+        profesor:$('#prof_guia').attr('name'),orientacion:$('#orient').val(),sit_ocup:$('#sit_ocup').val(),
+        fech_ing:$('#fech_ing').val(),fech_grad:$('#fech_grad').val(),lineaInv};
+    if ($('#estado_estudiante_programa').length) datos.tipo_est=$('#estado_estudiante_programa').val();
+    if (inst==='otro') datos.nueva_institucion=$('#otro_inst_est').val();
+    const botones=$(this).find(':submit').prop('disabled',true);
+    $.ajax({url:'../ajax/estudiante.php',type:'POST',dataType:'json',data:datos,
+        success:function(mensaje){
+            $('#mnsj_row_acad_est').show();
+            $('#mnsj_acad_est').removeClass('alert-danger').addClass('alert-success').text(mensaje);
+            setTimeout(function(){
+                if (String(datos.tipo_est)==='6' && typeof listaEst==='function') {
+                    listaEst(); $('#mnsj_row_encabezado').show();
+                    $('#mnsj_encabezado').removeClass('alert-danger').addClass('alert-success').text(mensaje);
+                } else reiniciarInfoEst();
+                if (typeof cargarEst==='function') cargarEst();
+            },1500);
+        },error:errorProgramaEstudiante,
+        complete:function(){ botones.prop('disabled',false); }
     });
-    console.log(lineaInv)
-    datProg = {  promedio, inst, trabaja, profesor, orientacion, sit_ocup, fech_ing, fech_grad, lineaInv}
-    console.log(datProg)
-    datProg.id_usu = $('#info_est').attr('name')
-    datProg.id_login = $('#login').attr('name')
-    // actualizo la variable op para editar los valores en el modelo
-    datProg.op = 'update-inf-prog'
-    console.log(datProg)
-
-    $.post('../ajax/estudiante.php', datProg, function (response) {
-        console.log(response)
-        let dato = JSON.parse(response);
-        console.log(dato)
-        $('#mnsj_row_acad_est').show();
-        $('#mnsj_acad_est').removeClass('alert-danger');
-        $('#mnsj_acad_est').addClass('alert-success');
-        $('#mnsj_acad_est').html(dato);
-        setTimeout(function () {
-            $("#mnsj_row_acad_est").fadeOut(1500);
-            reiniciarInfoEst()
-            cargarEst()
-        }, 3000);
-    })
-
-
-})
-$("body").on("click", ".editarProgEst", function () {
-    $("html, body").animate({ scrollTop: 0 }, 100);
-    editProgEst()
-    llenarFormProgEst($('#info_est').attr('name'))
-    $('#mnsj_row_acad_est').hide()
-
+});
+$("body").on('click','.editarProgEst',function(){
+    if (!gestionaProgramaEstudiante()) return;
+    $('#mnsj_row_acad_est').hide();
+    editProgEst();
+    llenarFormProgEst($('#info_est').attr('name'));
 });
 //submit para guardar datos personales
 $('#form_edit_pers').submit(function (e) {
@@ -398,49 +354,3 @@ $('#form_edit_pers').submit(function (e) {
         }
     });
 });
-//submmit para editar los dayos asociados a programa de estudiantes
-$('#form_edit_prog_est').submit(function (e) {
-    e.preventDefault();
-    datProg = leerDatProgEst()
-    console.log(datProg)
-    // datProg.id_usu=$('#info_doc').attr('name')
-    // datProg.id_login=$('#login').attr('name')
-    // // actualizo la variable op para editar los valores en el modelo
-    // datProg.op='update-inf-prog'
-    console.log(datProg)
-    // $.ajax({
-    //     url:'../ajax/docente.php',
-    //     type: 'POST',
-    //     async:false,
-    //     data: {op:'read_prof_prog',id_usu:datProg['id_usu']},
-    //     success: function(response){ 
-    //       console.log('usu cargado con ajax')
-    //      let usu = JSON.parse(response);
-    //      console.log(usu)
-    //      // creo un array para guardar los permisos que no han sido actualizados 
-    //      datProg['instTrab']=datProg['instTrab']==0?usu[0]['inst_usuario']:datProg['instTrab']
-    //      datProg['catAcad']=datProg['catAcad']==0?usu[0]['cat_academica']:datProg['catAcad']
-    //      datProg['anio_ing']=datProg['anio_ing']==0?usu[0]['anio_ingreso']:datProg['anio_ing']
-    //      datProg['vinculo']=datProg['vinculo']==0?usu[0]['vinculo']:datProg['vinculo']
-    //     //  datProg['permisos']=datProg['vinculo']==0?usu[0]['vinculo']:datProg['vinculo']
-
-    //     }
-    //   })
-    //   console.log(datProg)
-
-    //     $('#permiso').removeClass('is-invalid')
-    //     $.post('../ajax/docente.php',datProg,function(response){
-    //       let dato = JSON.parse(response);
-    //       console.log(dato)
-    //       $('#mnsj_row_prog_doc').show();
-    //       $('#mnsj_prog_doc').removeClass('alert-danger');
-    //       $('#mnsj_prog_doc').addClass('alert-success');
-    //       $('#mnsj_prog_doc').html(dato);
-    //       setTimeout(function() {
-    //           $("#mnsj_row_prog_doc").fadeOut(1500);
-    //           reiniciarInfoDoc()
-    //       },3000);
-    //    }) 
-
-
-})

@@ -187,7 +187,7 @@ require('datos.pers.php')
         require('footer.php');
         ?>
 
-<script src="scripts/estudiante.js"></script>
+<script src="scripts/estudiante.js?v=<?php echo filemtime(__DIR__ . '/scripts/estudiante.js'); ?>"></script>
   
     
           

@@ -47,6 +47,17 @@
   <div class="col" id="log" name="0">
     <h3 class="mb-5 text-center" id="text-tit">EDITAR INFORMACIÓN PROGRAMA</h3>
     <form class="form" id="form_edit_prog">
+      <?php if (isset($_SESSION['admin']) || isset($_SESSION['comite'])): ?>
+      <div class="row mb-3"><div class="col-md-6">
+        <label for="estado_docente_programa" class="form-label">Estado del Docente</label>
+        <select id="estado_docente_programa" class="form-select">
+          <option value="1">Pendiente</option><option value="2">Aceptado</option>
+          <option value="3">Rechazado</option>
+          <option value="4" <?= \App\Security\AcademicSession::migrationReady(conexion()) ? '' : 'disabled' ?>>Inactivo</option>
+        </select>
+        <div class="form-text">Los inactivos se consultan desde el filtro Inactivos de la grilla.</div>
+      </div></div>
+      <?php endif; ?>
       <?php require ('../form-doc/agr.form.dat.prog.doc.php'); ?>
 
       <div class="row mt-5 justify-content-between ">

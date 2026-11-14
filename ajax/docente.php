@@ -4,6 +4,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 require_once __DIR__ . '/../src/bootstrap/app.php';
+\App\Security\AcademicSession::enforce();
 use App\Model\Docente;
 use App\Security\Authorization;
 
@@ -17,15 +18,32 @@ function responderDocente(int $estado, array $respuesta): void
     exit;
 }
 
-function exigirAdminDocente(): void
-{
-    if (!Authorization::hasAny(['admin'])) {
-        responderDocente(403, [
-            'ok' => false,
-            'error' => 'NO_AUTORIZADO',
-            'mensaje' => 'No tiene autorización para gestionar esta operación Docente.',
-        ]);
+function identificadorDocente(mixed $value): int|false {
+    if (!is_int($value) && !is_string($value)) return false;
+    return filter_var($value,FILTER_VALIDATE_INT,['options'=>['min_range'=>1]]);
+}
+
+function exigirGestorEstadoDocente(bool $soloAdmin=false): void {
+    $value=$_SESSION['login']??null;
+    if (identificadorDocente($value)===false) {
+        responderDocente(401,['ok'=>false,'error'=>'NO_AUTENTICADO','mensaje'=>'Debe iniciar sesión.']);
     }
+    $pdo=conexion();
+    $q=$pdo->prepare('SELECT id_permiso FROM permiso_login WHERE id_login=:login'.($pdo->inTransaction()?' FOR UPDATE':''));
+    $q->execute(['login'=>(int)$value]); $permissions=array_map('intval',$q->fetchAll(\PDO::FETCH_COLUMN));
+    $allowed=(string)($_SESSION['admin']??'')===(string)$value && in_array(1,$permissions,true);
+    if (!$soloAdmin) $allowed=$allowed || ((string)($_SESSION['comite']??'')===(string)$value && in_array(2,$permissions,true));
+    if (!$allowed) { if ($pdo->inTransaction()) $pdo->rollBack(); responderDocente(403,['ok'=>false,'error'=>'NO_AUTORIZADO','mensaje'=>'No tiene autorización para gestionar el estado Docente.']); }
+}
+function exigirAdminDocente(): void { exigirGestorEstadoDocente(true); }
+function mensajeEstadoDocente(string $code): string {
+    return match($code) {
+        'INACTIVACION_NO_DISPONIBLE'=>'La inactivación aún no está habilitada. Solicite a administración que complete la actualización.',
+        'DATOS_PROGRAMA_INVALIDOS'=>'Revise la institución, vínculo, categoría, año de ingreso y líneas de investigación.',
+        'NO_AUTORIZADO'=>'No tiene autorización para modificar el estado Docente.',
+        'DOCENTE_ADMIN_DEBE_ESTAR_ACEPTADO'=>'Para conservar un rol administrativo, reactive el perfil Docente como Aceptado.',
+        default=>'No fue posible actualizar el estado. Revise la identidad y los permisos del perfil.',
+    };
 }
 
 function loginActorDocente(): int
@@ -44,16 +62,7 @@ function loginActorDocente(): int
     return count($candidatos) === 1 ? $candidatos[0] : 0;
 }
 
-function exigirAdminComiteDocente(): void
-{
-    if (!Authorization::hasAny(['admin', 'comite'])) {
-        responderDocente(403, [
-            'ok' => false,
-            'error' => 'NO_AUTORIZADO',
-            'mensaje' => 'No tiene autorización para gestionar esta operación Docente.',
-        ]);
-    }
-}
+function exigirAdminComiteDocente(): void { exigirGestorEstadoDocente(); }
 
 function sesionAutenticadaProfesor(): bool
 {
@@ -95,6 +104,7 @@ function tokenAutoaltaProfesorValido(): bool
 function contextoAltaProfesor(): string
 {
     if (Authorization::hasAny(['admin', 'comite'])) {
+        exigirAdminComiteDocente();
         return 'administrativa';
     }
     if (!sesionAutenticadaProfesor() && tokenAutoaltaProfesorValido()) {
@@ -120,7 +130,7 @@ function estadoFiltroProfesor(): int
         ]);
     }
     $estado = (int) $_POST['estado'];
-    if (!in_array($estado, [0, 1, 2, 3], true)) {
+    if (!in_array($estado, [0, 1, 2, 3, 4], true)) {
         responderDocente(400, [
             'ok' => false,
             'error' => 'ESTADO_FILTRO_INVALIDO',
@@ -192,9 +202,7 @@ if ($operacionSolicitada === 'delete') {
             'mensaje' => 'Sólo un administrador puede eliminar un Profesor.',
         ]);
     }
-    $idLoginValidado = isset($_POST['id_login']) && is_scalar($_POST['id_login'])
-        ? filter_var($_POST['id_login'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])
-        : false;
+    $idLoginValidado = identificadorDocente($_POST['id_login']??null);
     if ($idLoginValidado === false) {
         responderDocente(400, [
             'ok' => false,
@@ -351,6 +359,13 @@ switch ($op) {
     case 'insert-update':
         $contextoAlta = contextoAltaProfesor();
         $esAutoalta = $contextoAlta === 'autoalta';
+        if ($esAutoalta && !in_array($_POST['acuerdos_muestra'] ?? null, [1, '1'], true)) {
+            responderDocente(422, [
+                'ok' => false,
+                'error' => 'ACEPTACION_REQUERIDA',
+                'mensaje' => 'Debe aceptar los acuerdos y condiciones para completar el registro.',
+            ]);
+        }
         $estadoProfesor = $esAutoalta ? 1 : 2;
         $lineasValidas = array_values(array_unique(array_filter(
             array_map('intval', $lineaInv),
@@ -519,14 +534,9 @@ switch ($op) {
         break;
     case 'update-estado-profesor':
         exigirAdminComiteDocente();
-        $idLoginEstado = isset($_POST['id_login']) && is_scalar($_POST['id_login'])
-            ? filter_var($_POST['id_login'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])
-            : false;
-        $estadoObjetivo = isset($_POST['estado_objetivo']) && is_scalar($_POST['estado_objetivo'])
-            && ctype_digit((string) $_POST['estado_objetivo'])
-                ? (int) $_POST['estado_objetivo']
-                : 0;
-        if ($idLoginEstado === false || !in_array($estadoObjetivo, [2, 3], true)) {
+        $idLoginEstado = identificadorDocente($_POST['id_login']??null);
+        $estadoObjetivo = identificadorDocente($_POST['estado_objetivo']??null);
+        if ($idLoginEstado === false || !in_array($estadoObjetivo, [1, 2, 3, 4], true)) {
             responderDocente(400, [
                 'ok' => false,
                 'error' => 'ESTADO_OBJETIVO_INVALIDO',
@@ -539,16 +549,14 @@ switch ($op) {
                 responderDocente(409, [
                     'ok' => false,
                     'error' => $resultadoEstado['codigo'],
-                    'mensaje' => 'El estado actual del Profesor no permite esta transicion.',
+                    'mensaje' => mensajeEstadoDocente($resultadoEstado['codigo']),
                 ]);
             }
             responderDocente(200, [
                 'ok' => true,
                 'codigo' => $resultadoEstado['codigo'],
                 'estado_profesor' => $resultadoEstado['estado_profesor'],
-                'mensaje' => $estadoObjetivo === 2
-                    ? 'Profesor aceptado. Debe volver a iniciar sesion para reflejar la habilitacion.'
-                    : 'Solicitud de Profesor rechazada.',
+                'mensaje' => $estadoObjetivo===4 ? 'Docente inactivado. Su historial se conserva; puede reactivarlo desde el filtro Inactivos y Datos del programa.' : 'Estado actualizado. Vuelva a iniciar sesión para reflejar los accesos del perfil.',
             ]);
         } catch (\Throwable $error) {
             error_log('[DOCENTE_ESTADO] ' . $error->getMessage());
@@ -604,6 +612,8 @@ switch ($op) {
             ]);
         }
     case 'delete':
+        exigirAdminDocente();
+        if (!in_array($_POST['confirmar']??null,[1,'1'],true)) responderDocente(400,['ok'=>false,'error'=>'CONFIRMACION_REQUERIDA','mensaje'=>'Debe confirmar la inactivación.']);
         if (!Authorization::hasAny(['admin'])) {
             responderDocente(403, [
                 'ok' => false,
@@ -631,14 +641,12 @@ switch ($op) {
                 responderDocente(409, [
                     'ok' => false,
                     'error' => $resultadoEliminar['codigo'],
-                    'mensaje' => $resultadoEliminar['codigo'] === 'DOCENTE_CON_ROL_ADMINISTRATIVO'
-                        ? 'Docente con rol administrativo; eliminación completa no permitida.'
-                        : 'La identidad seleccionada no corresponde a un Profesor simple eliminable.',
+                    'mensaje' => mensajeEstadoDocente($resultadoEliminar['codigo']),
                 ]);
             }
             responderDocente(200, [
                 'ok' => true,
-                'mensaje' => 'Profesor eliminado correctamente.',
+                'mensaje' => 'Docente inactivado. Su historial se conserva; puede reactivarlo desde el filtro Inactivos y Datos del programa.',
             ]);
         } catch (\Throwable $error) {
             error_log('[DOCENTE_DELETE] ' . $error->getMessage());
@@ -691,7 +699,10 @@ switch ($op) {
         }
     case 'update-inf-prog':
     case 'update-inf-prog-perfil':
+        $conexionPrograma=null;
         try {
+            $conexionPrograma=conexion();
+            if ($op==='update-inf-prog') exigirAdminComiteDocente();
             $objetivoEdicion = resolverObjetivoEdicionDocente(
                 $doc,
                 $actorLogin,
@@ -701,44 +712,43 @@ switch ($op) {
             );
             $id_usu = $objetivoEdicion['id_usuario'];
             $id_login = $objetivoEdicion['id_login'];
-
-            //editar Linea Inv
-            //validar las lineas que no existen en la base de datoa
-            foreach ($lineaInv as $linea) {
-                //buscar si linea esta guardada
-                $existLinea = (array) $doc->buscarLinInv($linea, $id_usu);
-                $existLinea = $existLinea ? true : false;
-                if (!$existLinea) {
-                    $respuesta = $doc->insertarLineaInv($id_usu, $linea);
-                    if (!($respuesta instanceof \PDOStatement) || $respuesta->rowCount() !== 1) {
-                        throw new \RuntimeException('No fue posible agregar una línea de investigación.');
-                    }
-                }
-            }
-            $lineasDB = $doc->todasLinInv($id_usu);
-            //validar linea que existen en la base de dato, pero deben ser eliminadas
-            foreach ($lineasDB as $lin) {
-                if (!in_array($lin['linea_inv'], $lineaInv)) {
-                    $respuestaLinea = $doc->borrarLineaInv($id_usu, $lin['linea_inv']);
-                    if (!($respuestaLinea instanceof \PDOStatement)) {
-                        throw new \RuntimeException('No fue posible retirar una línea de investigación.');
-                    }
-                }
+            if (!$conexionPrograma->beginTransaction()) throw new \RuntimeException('TRANSACCION_NO_INICIADA');
+            $lock=$conexionPrograma->prepare('SELECT id_login FROM login WHERE id_login=:login FOR UPDATE');
+            $lock->execute(['login'=>$id_login]);
+            if ($lock->fetchColumn()===false) throw new \DomainException('IDENTIDAD_DOCENTE_INCOMPATIBLE',409);
+            $lock=$conexionPrograma->prepare('SELECT id_usuario FROM usuario WHERE login=:login FOR UPDATE');
+            $lock->execute(['login'=>$id_login]);
+            if (array_map('intval',$lock->fetchAll(\PDO::FETCH_COLUMN))!==[(int)$id_usu]) throw new \DomainException('IDENTIDAD_DOCENTE_INCOMPATIBLE',409);
+            $lock=$conexionPrograma->prepare('SELECT id_profesor FROM profesor WHERE usuario=:usuario FOR UPDATE');
+            $lock->execute(['usuario'=>$id_usu]);
+            if (count($lock->fetchAll())!==1) throw new \DomainException('IDENTIDAD_DOCENTE_INCOMPATIBLE',409);
+            if ($op==='update-inf-prog') exigirAdminComiteDocente();
+            $estadoSolicitado=null;
+            if (array_key_exists('estado_profesor',$_POST)) {
+                // A solicitud de estado no puede usar el modo de edición propia para eludir el rol.
+                if (!Authorization::hasAny(['admin','comite'])) throw new \DomainException('NO_AUTORIZADO',403);
+                exigirAdminComiteDocente();
+                $raw=$_POST['estado_profesor'];
+                if ((!is_int($raw)&&!is_string($raw)) || !in_array((string)$raw,['1','2','3','4'],true)) throw new \DomainException('ESTADO_OBJETIVO_INVALIDO',422);
+                $estadoSolicitado=(int)$raw;
+                $resultadoEstado=$doc->cambiarEstadoProfesor((int)$id_login,$estadoSolicitado);
+                if (!$resultadoEstado['ok']) throw new \DomainException($resultadoEstado['codigo'],409);
             }
 
-            //editar datos programa; rowCount 0 puede representar datos idénticos
-            $resp_prof = $doc->editarDatProg($id_usu, $vinculo, $catAcad, $anioIng);
-            $resp_inst = $doc->editarInstDoc($id_usu, $inst);
-            if (!($resp_prof instanceof \PDOStatement) || !($resp_inst instanceof \PDOStatement)) {
-                throw new \RuntimeException('No fue posible actualizar los datos de programa del Profesor.');
-            }
 
+            $doc->guardarProgramaDocente((int)$id_usu,$_POST);
+
+            if (!$conexionPrograma->commit()) throw new \RuntimeException('COMMIT_NO_CONFIRMADO');
             responderDocente(200, [
                 'ok' => true,
                 'codigo' => 'PROGRAMA_DOCENTE_ACTUALIZADO',
-                'mensaje' => 'Los datos de programa fueron editados correctamente.',
+                'mensaje' => $estadoSolicitado===4 ? 'Docente inactivado. Su historial se conserva; puede reactivarlo desde el filtro Inactivos y Datos del programa.' : 'Datos del programa y estado guardados. Si reactivó el perfil, vuelva a iniciar sesión para recuperar sus accesos.',
             ]);
+        } catch (\DomainException $error) {
+            if ($conexionPrograma!==null && $conexionPrograma->inTransaction()) $conexionPrograma->rollBack();
+            responderDocente((int)$error->getCode(),['ok'=>false,'error'=>$error->getMessage(),'mensaje'=>mensajeEstadoDocente($error->getMessage())]);
         } catch (\Throwable $error) {
+            if ($conexionPrograma!==null && $conexionPrograma->inTransaction()) $conexionPrograma->rollBack();
             error_log('[DOCENTE_UPDATE_PROGRAMA] ' . $error->getMessage());
             responderDocente(500, [
                 'ok' => false,

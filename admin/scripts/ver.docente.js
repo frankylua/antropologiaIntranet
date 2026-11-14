@@ -219,9 +219,10 @@ function cargarDocentes(tipo, busqueda, estado) {
     async: false,
     url: "../ajax/docente.php",
     type: "POST",
+    dataType: "json",
     data: { op, tipo: tipoFiltro, busqueda, estado: estadoFiltro },
     success: function (response, textStatus, xhr) {
-      let docentes = JSON.parse(response);
+      let docentes = Array.isArray(response) ? response : [];
       let template = "";
       const puedeEliminar = xhr.getResponseHeader("X-Puede-Eliminar-Docente") === "1";
       if (!puedeEliminar) {
@@ -250,6 +251,8 @@ function cargarDocentes(tipo, busqueda, estado) {
             ? "Aceptado"
             : estadoProfesor === 3
             ? "Rechazado"
+            : estadoProfesor === 4
+            ? "Inactivo"
             : "Invalido";
           let accionesEstado = "";
           if (estadoProfesor === 1) {
@@ -258,9 +261,10 @@ function cargarDocentes(tipo, busqueda, estado) {
           } else if (estadoProfesor === 3) {
             accionesEstado = `<button type="button" class="btn btn-outline-success btn-sm cambiarEstadoProfesor" data-login="${doc["id_login"]}" data-estado="2">Aceptar</button>`;
           }
-          const accionEliminar = puedeEliminar
+          if (estadoProfesor === 4) accionesEstado = 'Reactivar en Información → Datos del programa';
+          const accionEliminar = puedeEliminar && estadoProfesor !== 4
             ? `<td class="text-center"><button type="button" class="btn btn-outline-danger btn-sm eliminarDoc text-center" id="${doc["id_login"]}" ><i class="fa-solid fa-trash-can"></i></button></td>`
-            : "";
+            : (puedeEliminar ? '<td></td>' : "");
           template += `<tr>
                         <td >${nombre}</td>
                         <td>${vinculo}</td>
@@ -384,31 +388,29 @@ $("body").on("click", "#guardar_rol_docente", function () {
 });
 $("body").on("click", ".eliminarDoc", function () {
   const id_login = $(this).attr("id");
-  if (!window.confirm("Esta operación eliminará completamente la cuenta del Profesor. ¿Desea continuar?")) {
+  if (!window.confirm("El Docente pasará a Inactivo y se ocultará de la grilla habitual. Se conservarán su cuenta, antecedentes y relaciones. Podrá reactivarlo desde Inactivos y Datos del programa. ¿Desea continuar?")) {
     return;
   }
   $.ajax({
     url: "../ajax/docente.php",
     type: "POST",
     dataType: "json",
-    data: { id_login, op: "delete" },
+    data: { id_login, op: "delete", confirmar: 1 },
     success: function (response) {
       if (!response.ok) {
-        $("#mnsj_elim").show();
-        $("#eliminado").removeClass("alert-success").addClass("alert-danger");
-        $("#eliminado").text(response.mensaje || "No fue posible eliminar al Profesor.");
+        $("#mensaje_estado_docente").removeClass("d-none");
+        $("#mensaje_estado_docente").removeClass("alert-success").addClass("alert-danger");
+        $("#mensaje_estado_docente").text(response.mensaje || "No fue posible inactivar al Docente.");
         return;
       }
-      $("#mnsj_elim").show();
-      $("#eliminado").removeClass("alert-danger").addClass("alert-success");
-      $("#eliminado").text(response.mensaje);
+      $("#mensaje_estado_docente").removeClass("d-none");
+      $("#mensaje_estado_docente").removeClass("alert-danger").addClass("alert-success");
+      $("#mensaje_estado_docente").text(response.mensaje);
       cargarDocentes($("#tipo_doc").val(), undefined, $("#estado_profesor_filtro").val());
-      setTimeout(function () {
-        $("#mnsj_elim").fadeOut(1500);
-      }, 3000);
+
     },
     error: function (xhr) {
-      let mensaje = "No fue posible eliminar al Profesor.";
+      let mensaje = "No fue posible inactivar al Docente.";
       if (xhr.responseJSON && xhr.responseJSON.mensaje) {
         mensaje = xhr.responseJSON.mensaje;
       } else {
@@ -418,9 +420,9 @@ $("body").on("click", ".eliminarDoc", function () {
         } catch (error) {
         }
       }
-      $("#mnsj_elim").show();
-      $("#eliminado").removeClass("alert-success").addClass("alert-danger");
-      $("#eliminado").text(mensaje);
+      $("#mensaje_estado_docente").removeClass("d-none");
+      $("#mensaje_estado_docente").removeClass("alert-success").addClass("alert-danger");
+      $("#mensaje_estado_docente").text(mensaje);
     },
   });
 });

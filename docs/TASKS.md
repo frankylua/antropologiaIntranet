@@ -1,5 +1,32 @@
 # Registro de TASK
 
+Unidad activa: [TASK-EPIC001-ESTUDIANTE-CRUD-INTEGRAL-001](tasks/TASK-EPIC001-ESTUDIANTE-CRUD-INTEGRAL-001.md). Inactivación de Docente y Estudiante implementada en 22 archivos de aplicación con autorización «autorizo» del 14/11. REVIEW TÉCNICO — APROBADO PARA VF; Migración reportada ejecutada por el usuario y verificada en lectura; VF de inactivación/reactivación Docente y Estudiante PASS («docente estudiante pass»). Admin y Comité gestionan estado y reactivación; Eliminar conserva cuentas/relaciones y bloquea solo el perfil inactivo. 111 pruebas backend nuevas y 11 frontend PASS, regresiones conformes y SQL preparado nativamente sin execute. Respaldo completo local generado; CHECK (1,2,3,4), etiqueta inactivo(a) y habilitación verificados, conteos conservados. PASS manuales anteriores conservados. Incremento validado técnica y funcionalmente; staging y commit autorizados expresamente por el usuario el 14/11. Publicación pendiente de autorización de push. No retomar VF de DELETE físico.
+
+## TASK-EPIC001-ESTUDIANTE-READ-UPDATE-SEGURO-001
+
+### Estado y alcance
+
+Cierre técnico y funcional aprobado. Registro documental incorporado el 13/11/2026; pendiente de commit documental. EPIC-001 — Autorización y permisos. Origen indicado por el usuario: AT-EPIC001-CONTRATOS-PRELOGIN-AUTOALTA-001, no encontrado como documento local. Se utiliza el contrato completo aportado en la conversación y sus aprobaciones expresas; no se reconstruye un AT ausente.
+
+Protección de `read_est_id`, `read_est_perfil` y `update-inf-pers`, con identidad resuelta en backend, ownership, SQL parametrizado, proyección sin `login.pass`, comprobación de cardinalidad, transacción y rollback. La edición propia aplica desde Postulante en estados habilitados (1, 2, 3, 4, 5 y 7), sin derivar escritura de `perfil.ver`. La lectura histórica transitoria del perfil se conserva.
+
+Reglas adicionales aprobadas expresamente por el usuario: modificación de correo propio conservando contraseña; edición de datos personales ajenos por Admin/Comité conservando las credenciales del titular. Se retiró el cambio de contraseña de la ficha y se rechazan solicitudes explícitas. PF-03 permanece bloqueado para ese cambio. No se amplió esta implementación a edición del programa, estados ni eliminación.
+
+### Evidencia y validación
+
+- Implementación autorizada y limitada a siete archivos: `ajax/estudiante.php`, `src/Model/Estudiante.php`, `src/Model/Usuario.php`, `src/Model/Login.php`, `form-doc/scripts/ficha.estudiante.js`, `form-doc/scripts/info.estudiante.js` y `admin/scripts/ver.estudiante.js`.
+- Review del diff y sintaxis PHP/JS conformes; `git diff --check` sin errores.
+- 71/71 casos de backend con fixtures SQLite aislados y 12/12 casos de callbacks JS con adaptador jQuery en Node VM. No equivalen a VF manual ni reproducen la concurrencia real de MySQL.
+- 19 consultas preparadas nativamente en MySQL, sin ejecutar escrituras reales; proyección READ comprobada con identificador sin coincidencia. Comprobaciones HTTP sin sesión: tres operaciones protegidas con 401 y val-mail con 403.
+- VF manual ejecutada y confirmada por el usuario: VF-01 a VF-07 y VF-09 PASS (8 casos). Comprende edición desde Postulante, guardado sin cambios, correo propio/login, conflicto de correo sin cambios parciales, IDOR, contraseña bloqueada, Admin/Comité y regresión de edición Docente.
+- VF-08, lectura y edición propia de Eliminado con sesión histórica, no se ejecutó manualmente: omisión aprobada expresamente por el usuario («se aprueba sin vf 8»). No se contabiliza como PASS; existe cobertura automatizada aislada adicional de lectura y denegación de escritura.
+
+### Publicación y continuidad
+
+Commit de implementación: `4e002b7621276f076bf6325bb90bc43155226117` — `TASK-EPIC001-ESTUDIANTE-READ-UPDATE-SEGURO-001: protege lectura y edición personal`. Rama: `refactor/fase-0-seguridad`. Staging/commit autorizados expresamente; push ejecutado y aprobado por el usuario según su confirmación. No se repitió verificación remota posterior.
+
+Sin migraciones ni modificación de registros reales por Codex. La nueva prioridad aprobada es la [muestra interna del CRUD principal al 20/11/2026](roadmap/ROADMAP.md#entrega-prioritaria-aprobada--muestra-interna-al-20112026), incluyendo acuerdos y condiciones de autoalta. Los pendientes restantes de Estudiante se tratan como objeto funcional integral dentro de esa planificación, sin reabrir este incremento personal ya validado.
+
 ## TASK-FEATURE001-PERSIST-006
 
 ### Identificación

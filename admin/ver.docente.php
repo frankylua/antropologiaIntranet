@@ -16,7 +16,8 @@ require_once __DIR__ . '/../src/bootstrap/session.php';
 <div class="container mt-5">
   <div class="row" id="lista_doc">
     <div class="col g-3 m-5">
-      <h3 class=" text-center "> DOCENTES</h3>      
+      <h3 class=" text-center "> DOCENTES</h3>
+      <p>Para recuperar un registro, seleccione Inactivos y abra Información → Editar Datos Programa. Elija un estado vigente y guarde. La cuenta deberá volver a iniciar sesión para recuperar el perfil.</p>
       <div class="alert d-none" id="mensaje_estado_docente" role="alert"></div>
       <div class="row mt-5">
         <div class="col-md-4 mb-3">
@@ -29,10 +30,11 @@ require_once __DIR__ . '/../src/bootstrap/session.php';
         </div>
         <div class="col-md-4 mb-3">
           <select id="estado_profesor_filtro" class="form-select">
-            <option value="0" selected>Todos los estados</option>
+            <option value="0" selected>Todos los activos</option>
             <option value="1">Pendientes</option>
             <option value="2">Aceptados</option>
             <option value="3">Rechazados</option>
+            <option value="4">Inactivos</option>
           </select>
         </div>
         <div class="col-md-4 mb-3">
@@ -104,8 +106,8 @@ require_once __DIR__ . '/../src/bootstrap/session.php';
 <?php
     require('../form-doc/footer.php')
 ?>
-<script src="../form-doc/scripts/ficha.docente.js"></script>
-<script src="scripts/ver.docente.js"></script>
+<script src="../form-doc/scripts/ficha.docente.js?v=<?= filemtime(__DIR__ . '/../form-doc/scripts/ficha.docente.js') ?>"></script>
+<script src="scripts/ver.docente.js?v=<?= filemtime(__DIR__ . '/scripts/ver.docente.js') ?>"></script>
 <?php
 }
 ob_end_flush();

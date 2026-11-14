@@ -58,5 +58,19 @@ class Login
         $consulta->execute(['id_login' => $idLogin]);
         return $consulta->fetchAll(\PDO::FETCH_ASSOC);
     }
+    public function obtenerActividadPorLogin(int $idLogin): array {
+        $pdo=conexion();
+        $queries=[
+            'usuarios'=>'SELECT id_usuario FROM usuario WHERE login=:login',
+            'estudiantes'=>'SELECT e.tipo_est FROM usuario u JOIN estudiante e ON e.usuario=u.id_usuario WHERE u.login=:login',
+            'profesores'=>'SELECT p.estado_profesor FROM usuario u JOIN profesor p ON p.usuario=u.id_usuario WHERE u.login=:login',
+        ];
+        $result=[];
+        foreach ($queries as $key=>$sql) {
+            $q=$pdo->prepare($sql); $q->execute(['login'=>$idLogin]);
+            $result[$key]=$q->fetchAll(\PDO::FETCH_COLUMN);
+        }
+        return $result;
+    }
 }
 ?>

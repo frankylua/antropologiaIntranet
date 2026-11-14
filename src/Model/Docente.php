@@ -48,14 +48,15 @@ class Docente extends Usuario{
         return $consulta->fetchAll(\PDO::FETCH_BOTH);
     }
     public function buscarProfAdministrativo($busqueda, int $excluirLogin = 0, int $estadoProfesor = 0){
-        if (!in_array($estadoProfesor, [0, 1, 2, 3], true)) {
+        if (!in_array($estadoProfesor, [0, 1, 2, 3, 4], true)) {
             return [];
         }
         $sql = 'SELECT u.id_usuario,u.nombres,u.ap_pat,u.ap_mat,p.vinculo,p.estado_profesor,l.id_login '
             . 'FROM usuario u JOIN profesor p ON u.id_usuario=p.usuario '
             . 'JOIN login l ON u.login=l.id_login WHERE u.nombres LIKE :busqueda';
         $parametros = ['busqueda' => $busqueda . '%'];
-        if ($excluirLogin > 0) {
+        if ($estadoProfesor !== 4) $sql .= ' AND p.estado_profesor<>4';
+        if ($excluirLogin > 0 && $estadoProfesor !== 4) {
             $sql .= ' AND l.id_login <> :excluir_login';
             $parametros['excluir_login'] = $excluirLogin;
         }
@@ -69,15 +70,15 @@ class Docente extends Usuario{
         return $consulta->fetchAll();
     }
     public function mostrarProf(int $excluirLogin = 0, int $estadoProfesor = 0){
-        if (!in_array($estadoProfesor, [0, 1, 2, 3], true)) {
+        if (!in_array($estadoProfesor, [0, 1, 2, 3, 4], true)) {
             return [];
         }
         $sql = 'SELECT u.id_usuario,u.nombres,u.ap_pat,u.ap_mat,p.vinculo,p.estado_profesor,l.id_login '
             . 'FROM usuario u JOIN profesor p ON u.id_usuario=p.usuario '
             . 'JOIN login l ON u.login=l.id_login';
         $parametros = [];
-        $condiciones = [];
-        if ($excluirLogin > 0) {
+        $condiciones = $estadoProfesor===4 ? [] : ['p.estado_profesor<>4'];
+        if ($excluirLogin > 0 && $estadoProfesor !== 4) {
             $condiciones[] = 'l.id_login <> :excluir_login';
             $parametros['excluir_login'] = $excluirLogin;
         }
@@ -94,7 +95,7 @@ class Docente extends Usuario{
         return $consulta->fetchAll();
     }
     public function mostrarProfId($id_usu){    
-        $sql="SELECT u.id_usuario, u.pais_res, u.pais_nac, u.login, u.fecha_nac, u.nombres, u.ap_mat, u.ap_pat, u.tipo_doc, u.nro_doc, u.inst_usuario, u.genero, u.region, u.comuna, u.telefono, u.direccion, u.cont_em, u.tel_em, l.id_login, l.correo, p.id_profesor, p.usuario, p.vinculo, p.cat_academica, p.anio_ingreso, p.estado_profesor, i.id_inst, i.inst, pu.id_pueblo, pu.pueblo, lu.id_linea_usuario, lu.linea_inv, li.id_linea_inv, li.linea, pr.pais as p_resi, pn.pais as p_nac FROM usuario u JOIN login l ON u.login=l.id_login JOIN profesor p ON u.id_usuario=p.usuario JOIN institucion i ON u.inst_usuario=i.id_inst JOIN pais pn ON u.pais_nac=pn.id_pais JOIN pais pr ON u.pais_res=pr.id_pais JOIN pueblo pu ON u.pueblo=pu.id_pueblo JOIN linea_usuario lu ON u.id_usuario=lu.usuario JOIN linea_investigacion li ON li.id_linea_inv=lu.linea_inv WHERE u.id_usuario= :id_usuario order by u.nombres";
+        $sql="SELECT u.id_usuario, u.pais_res, u.pais_nac, u.login, u.fecha_nac, u.nombres, u.ap_mat, u.ap_pat, u.tipo_doc, u.nro_doc, u.inst_usuario, u.genero, u.region, u.comuna, u.telefono, u.direccion, u.cont_em, u.tel_em, l.id_login, l.correo, p.id_profesor, p.usuario, p.vinculo, p.cat_academica, p.anio_ingreso, p.estado_profesor, i.id_inst, i.inst, pu.id_pueblo, pu.pueblo, lu.id_linea_usuario, lu.linea_inv, li.id_linea_inv, li.linea, pr.pais as p_resi, pn.pais as p_nac FROM usuario u JOIN login l ON u.login=l.id_login JOIN profesor p ON u.id_usuario=p.usuario JOIN institucion i ON u.inst_usuario=i.id_inst JOIN pais pn ON u.pais_nac=pn.id_pais JOIN pais pr ON u.pais_res=pr.id_pais JOIN pueblo pu ON u.pueblo=pu.id_pueblo LEFT JOIN linea_usuario lu ON u.id_usuario=lu.usuario LEFT JOIN linea_investigacion li ON li.id_linea_inv=lu.linea_inv WHERE u.id_usuario= :id_usuario order by u.nombres";
         $consulta = conexion()->prepare($sql);
         $consulta->execute(['id_usuario' => (int) $id_usu]);
         return $consulta->fetchAll();
@@ -130,20 +131,21 @@ class Docente extends Usuario{
         return $permisos === [] ? 'none' : 'conflicto';
     }
     public function mostrarDatosProg($id_usu){
-        $sql="SELECT u.inst_usuario,u.id_usuario,p.id_profesor,p.vinculo,p.cat_academica,p.anio_ingreso,p.estado_profesor,l.linea_inv,lo.id_login FROM usuario u JOIN profesor p ON u.id_usuario=p.usuario JOIN linea_usuario l ON u.id_usuario=l.usuario JOIN login lo ON u.login=lo.id_login WHERE u.id_usuario=:id_usuario";
+        $sql="SELECT u.inst_usuario,u.id_usuario,p.id_profesor,p.vinculo,p.cat_academica,p.anio_ingreso,p.estado_profesor,l.linea_inv,lo.id_login FROM usuario u JOIN profesor p ON u.id_usuario=p.usuario LEFT JOIN linea_usuario l ON u.id_usuario=l.usuario JOIN login lo ON u.login=lo.id_login WHERE u.id_usuario=:id_usuario";
         $consulta = conexion()->prepare($sql);
         $consulta->execute(['id_usuario' => (int) $id_usu]);
         return $consulta->fetchAll();
     }
     public function mostrarProfTipo($tipo, int $excluirLogin = 0, int $estadoProfesor = 0){
-        if (!in_array($estadoProfesor, [0, 1, 2, 3], true)) {
+        if (!in_array($estadoProfesor, [0, 1, 2, 3, 4], true)) {
             return [];
         }
         $sql = 'SELECT u.id_usuario,u.nombres,u.ap_pat,u.ap_mat,p.vinculo,p.estado_profesor,l.id_login '
             . 'FROM usuario u JOIN profesor p ON u.id_usuario=p.usuario '
             . 'JOIN login l ON u.login=l.id_login WHERE p.vinculo=:vinculo';
         $parametros = ['vinculo' => (int) $tipo];
-        if ($excluirLogin > 0) {
+        if ($estadoProfesor !== 4) $sql .= ' AND p.estado_profesor<>4';
+        if ($excluirLogin > 0 && $estadoProfesor !== 4) {
             $sql .= ' AND l.id_login <> :excluir_login';
             $parametros['excluir_login'] = $excluirLogin;
         }
@@ -519,94 +521,81 @@ class Docente extends Usuario{
         }
     }
 
-    public function cambiarEstadoProfesor(int $idLogin, int $estadoObjetivo): array{
-        if (!in_array($estadoObjetivo, [self::ESTADO_ACEPTADO, self::ESTADO_RECHAZADO], true)) {
-            return ['ok' => false, 'codigo' => 'ESTADO_OBJETIVO_INVALIDO'];
+    /** Programa y estado comparten la transacción abierta por el endpoint. */
+    public function guardarProgramaDocente(int $usuario, array $input): void {
+        $pdo=conexion();
+        if (!$pdo->inTransaction()) throw new \RuntimeException('TRANSACCION_REQUERIDA');
+        $values=[];
+        foreach (['instTrab','vinculo','catAcad','anio_ing'] as $field) {
+            $raw=$input[$field]??null;
+            if ((!is_int($raw)&&!is_string($raw)) || !preg_match('/^[1-9]\d*$/D',(string)$raw)
+                || filter_var($raw,FILTER_VALIDATE_INT)===false) throw new \DomainException('DATOS_PROGRAMA_INVALIDOS',422);
+            $values[$field]=(int)$raw;
         }
+        if (!in_array($values['vinculo'],[1,2,3],true) || !in_array($values['catAcad'],[1,2,3,4,5],true)) throw new \DomainException('DATOS_PROGRAMA_INVALIDOS',422);
+        $lines=$input['lineaInv']??null;
+        if (!is_array($lines) || !$lines || count($lines)>100) throw new \DomainException('DATOS_PROGRAMA_INVALIDOS',422);
+        foreach ($lines as &$line) {
+            if ((!is_int($line)&&!is_string($line)) || !preg_match('/^[1-9]\d*$/D',(string)$line)
+                || filter_var($line,FILTER_VALIDATE_INT)===false) throw new \DomainException('DATOS_PROGRAMA_INVALIDOS',422);
+            $line=(int)$line;
+        } unset($line);
+        $lines=array_values(array_unique($lines));
+        $q=$pdo->prepare('SELECT id_inst FROM institucion WHERE id_inst=:inst FOR UPDATE');
+        $q->execute(['inst'=>$values['instTrab']]);
+        if ($q->fetchColumn()===false) throw new \DomainException('DATOS_PROGRAMA_INVALIDOS',422);
+        $q=$pdo->prepare('SELECT id_linea_inv FROM linea_investigacion WHERE id_linea_inv IN ('.implode(',',array_fill(0,count($lines),'?')).') FOR UPDATE');
+        $q->execute($lines);
+        if (count($q->fetchAll(\PDO::FETCH_COLUMN))!==count($lines)) throw new \DomainException('DATOS_PROGRAMA_INVALIDOS',422);
+        $q=$pdo->prepare('UPDATE profesor SET vinculo=:vinculo,cat_academica=:categoria,anio_ingreso=:anio WHERE usuario=:usuario');
+        $q->execute(['vinculo'=>$values['vinculo'],'categoria'=>$values['catAcad'],'anio'=>$values['anio_ing'],'usuario'=>$usuario]);
+        $q=$pdo->prepare('UPDATE usuario SET inst_usuario=:inst WHERE id_usuario=:usuario');
+        $q->execute(['inst'=>$values['instTrab'],'usuario'=>$usuario]);
+        $q=$pdo->prepare('SELECT linea_inv FROM linea_usuario WHERE usuario=:usuario');
+        $q->execute(['usuario'=>$usuario]); $current=array_map('intval',$q->fetchAll(\PDO::FETCH_COLUMN));
+        foreach (array_diff($lines,$current) as $line) {
+            $q=$pdo->prepare('INSERT INTO linea_usuario (usuario,linea_inv) VALUES (:usuario,:linea)');
+            $q->execute(['usuario'=>$usuario,'linea'=>$line]);
+        }
+        foreach (array_diff($current,$lines) as $line) {
+            $q=$pdo->prepare('DELETE FROM linea_usuario WHERE usuario=:usuario AND linea_inv=:linea');
+            $q->execute(['usuario'=>$usuario,'linea'=>$line]);
+        }
+    }
 
-        $conexion = conexion();
-        $conexion->beginTransaction();
-
+    public function cambiarEstadoProfesor(int $idLogin, int $estadoObjetivo): array {
+        if (!in_array($estadoObjetivo,[1,2,3,4],true)) return ['ok'=>false,'codigo'=>'ESTADO_OBJETIVO_INVALIDO'];
+        $pdo=conexion(); $own=!$pdo->inTransaction();
+        if ($own) $pdo->beginTransaction();
         try {
-            $consultaIdentidad = $conexion->prepare(
-                'SELECT u.id_usuario, p.id_profesor, p.estado_profesor FROM login l '
-                . 'JOIN usuario u ON u.login = l.id_login '
-                . 'JOIN profesor p ON p.usuario = u.id_usuario '
-                . 'WHERE l.id_login = :id_login FOR UPDATE'
-            );
-            $consultaIdentidad->execute(['id_login' => $idLogin]);
-            $identidades = $consultaIdentidad->fetchAll(\PDO::FETCH_ASSOC);
-            if (count($identidades) !== 1) {
-                $conexion->rollBack();
-                return ['ok' => false, 'codigo' => 'IDENTIDAD_DOCENTE_INCOMPATIBLE'];
+            $q=$pdo->prepare('SELECT id_usuario FROM usuario WHERE login=:login FOR UPDATE');
+            $q->execute(['login'=>$idLogin]); $users=$q->fetchAll(\PDO::FETCH_COLUMN);
+            if (count($users)!==1) throw new \DomainException('IDENTIDAD_DOCENTE_INCOMPATIBLE',409);
+            $q=$pdo->prepare('SELECT id_profesor,estado_profesor FROM profesor WHERE usuario=:usuario FOR UPDATE');
+            $q->execute(['usuario'=>$users[0]]); $profiles=$q->fetchAll(\PDO::FETCH_ASSOC);
+            if (count($profiles)!==1 || !in_array((int)$profiles[0]['estado_profesor'],[1,2,3,4],true)) {
+                throw new \DomainException('IDENTIDAD_DOCENTE_INCOMPATIBLE',409);
             }
-
-            $estadoActual = (int) $identidades[0]['estado_profesor'];
-            if (!in_array($estadoActual, [self::ESTADO_PENDIENTE, self::ESTADO_ACEPTADO, self::ESTADO_RECHAZADO], true)) {
-                $conexion->rollBack();
-                return ['ok' => false, 'codigo' => 'ESTADO_PROFESOR_INVALIDO'];
+            $current=(int)$profiles[0]['estado_profesor'];
+            if ($estadoObjetivo===4 || $current===4) \App\Security\AcademicSession::requireMigration($pdo);
+            $q=$pdo->prepare('SELECT id_permiso FROM permiso_login WHERE id_login=:login FOR UPDATE');
+            $q->execute(['login'=>$idLogin]); $permissions=array_map('intval',$q->fetchAll(\PDO::FETCH_COLUMN));
+            if (!in_array(4,$permissions,true) || array_diff($permissions,[1,2,3,4,5])) {
+                throw new \DomainException('PERMISOS_INCOMPATIBLES',409);
             }
-
-            $consultaPermisos = $conexion->prepare(
-                'SELECT id_permiso FROM permiso_login '
-                . 'WHERE id_login = :id_login ORDER BY id_permiso, id_per_log FOR UPDATE'
-            );
-            $consultaPermisos->execute(['id_login' => $idLogin]);
-            $permisos = array_map('intval', $consultaPermisos->fetchAll(\PDO::FETCH_COLUMN));
-            $representacionesValidas = [
-                [self::PERMISO_DOCENTE],
-                [self::PERMISO_ADMIN, self::PERMISO_DOCENTE],
-                [self::PERMISO_COMITE, self::PERMISO_DOCENTE],
-            ];
-            if (
-                !in_array($permisos, $representacionesValidas, true)
-                || ($estadoActual !== self::ESTADO_ACEPTADO && $permisos !== [self::PERMISO_DOCENTE])
-            ) {
-                $conexion->rollBack();
-                return ['ok' => false, 'codigo' => 'PERMISOS_INCOMPATIBLES'];
+            // Inactivar conserva roles. Su habilitación académica requiere Aceptado al reactivar.
+            if ($estadoObjetivo!==4 && $estadoObjetivo!==2 && array_intersect($permissions,[1,2])) {
+                throw new \DomainException('DOCENTE_ADMIN_DEBE_ESTAR_ACEPTADO',409);
             }
-
-            $transicionValida =
-                ($estadoActual === self::ESTADO_PENDIENTE
-                    && in_array($estadoObjetivo, [self::ESTADO_ACEPTADO, self::ESTADO_RECHAZADO], true))
-                || ($estadoActual === self::ESTADO_RECHAZADO && $estadoObjetivo === self::ESTADO_ACEPTADO);
-            if (!$transicionValida) {
-                $conexion->rollBack();
-                return ['ok' => false, 'codigo' => 'TRANSICION_ESTADO_INVALIDA'];
-            }
-
-            $actualizarEstado = $conexion->prepare(
-                'UPDATE profesor SET estado_profesor = :estado_objetivo '
-                . 'WHERE id_profesor = :id_profesor AND estado_profesor = :estado_actual'
-            );
-            $actualizarEstado->execute([
-                'estado_objetivo' => $estadoObjetivo,
-                'id_profesor' => (int) $identidades[0]['id_profesor'],
-                'estado_actual' => $estadoActual,
-            ]);
-            if ($actualizarEstado->rowCount() !== 1) {
-                throw new \RuntimeException('No fue posible actualizar el estado del Profesor.');
-            }
-
-            $verificarEstado = $conexion->prepare(
-                'SELECT estado_profesor FROM profesor WHERE id_profesor = :id_profesor'
-            );
-            $verificarEstado->execute(['id_profesor' => (int) $identidades[0]['id_profesor']]);
-            $estadoFinal = array_map('intval', $verificarEstado->fetchAll(\PDO::FETCH_COLUMN));
-            if ($estadoFinal !== [$estadoObjetivo]) {
-                throw new \RuntimeException('La transicion de estado no pudo verificarse.');
-            }
-
-            $conexion->commit();
-            return [
-                'ok' => true,
-                'codigo' => 'ESTADO_PROFESOR_ACTUALIZADO',
-                'estado_profesor' => $estadoObjetivo,
-            ];
+            $q=$pdo->prepare('UPDATE profesor SET estado_profesor=:estado WHERE id_profesor=:profesor');
+            if (!$q->execute(['estado'=>$estadoObjetivo,'profesor'=>$profiles[0]['id_profesor']])) throw new \RuntimeException('ESTADO_NO_CONFIRMADO');
+            if ($own) $pdo->commit();
+            return ['ok'=>true,'codigo'=>'ESTADO_PROFESOR_ACTUALIZADO','estado_profesor'=>$estadoObjetivo];
+        } catch (\DomainException $error) {
+            if ($own && $pdo->inTransaction()) $pdo->rollBack();
+            return ['ok'=>false,'codigo'=>$error->getMessage()];
         } catch (\Throwable $error) {
-            if ($conexion->inTransaction()) {
-                $conexion->rollBack();
-            }
+            if ($own && $pdo->inTransaction()) $pdo->rollBack();
             throw $error;
         }
     }
@@ -704,89 +693,8 @@ class Docente extends Usuario{
         }
     }
 
-    public function eliminarProfesorInequivoco(int $idLogin): array{
-        $conexion = conexion();
-        $conexion->beginTransaction();
-
-        try {
-            $consultaLogin = $conexion->prepare(
-                'SELECT id_login FROM login WHERE id_login = :id_login FOR UPDATE'
-            );
-            $consultaLogin->execute(['id_login' => $idLogin]);
-            if (count($consultaLogin->fetchAll()) !== 1) {
-                $conexion->rollBack();
-                return ['ok' => false, 'codigo' => 'LOGIN_INEXISTENTE'];
-            }
-
-            $consultaUsuario = $conexion->prepare(
-                'SELECT id_usuario FROM usuario WHERE login = :id_login FOR UPDATE'
-            );
-            $consultaUsuario->execute(['id_login' => $idLogin]);
-            $usuarios = $consultaUsuario->fetchAll(\PDO::FETCH_COLUMN);
-            if (count($usuarios) !== 1) {
-                $conexion->rollBack();
-                return ['ok' => false, 'codigo' => 'IDENTIDAD_INCOMPATIBLE'];
-            }
-            $idUsuario = (int) $usuarios[0];
-
-            $consultaProfesor = $conexion->prepare(
-                'SELECT id_profesor FROM profesor WHERE usuario = :id_usuario FOR UPDATE'
-            );
-            $consultaProfesor->execute(['id_usuario' => $idUsuario]);
-            if (count($consultaProfesor->fetchAll()) !== 1) {
-                $conexion->rollBack();
-                return ['ok' => false, 'codigo' => 'OBJETIVO_NO_PROFESOR'];
-            }
-
-            $consultaAdmin = $conexion->prepare(
-                'SELECT id_admin FROM admin WHERE id_login = :id_login FOR UPDATE'
-            );
-            $consultaAdmin->execute(['id_login' => $idLogin]);
-            if ($consultaAdmin->fetch() !== false) {
-                $conexion->rollBack();
-                return ['ok' => false, 'codigo' => 'REPRESENTACION_INCOMPATIBLE'];
-            }
-
-            $consultaEstudiante = $conexion->prepare(
-                'SELECT id_est FROM estudiante WHERE usuario = :id_usuario FOR UPDATE'
-            );
-            $consultaEstudiante->execute(['id_usuario' => $idUsuario]);
-            if ($consultaEstudiante->fetch() !== false) {
-                $conexion->rollBack();
-                return ['ok' => false, 'codigo' => 'IDENTIDAD_ESTUDIANTE'];
-            }
-
-            $consultaPermisos = $conexion->prepare(
-                'SELECT id_permiso FROM permiso_login '
-                . 'WHERE id_login = :id_login ORDER BY id_per_log FOR UPDATE'
-            );
-            $consultaPermisos->execute(['id_login' => $idLogin]);
-            $permisos = array_map('intval', $consultaPermisos->fetchAll(\PDO::FETCH_COLUMN));
-            if (
-                in_array(self::PERMISO_ADMIN, $permisos, true)
-                || in_array(self::PERMISO_COMITE, $permisos, true)
-            ) {
-                $conexion->rollBack();
-                return ['ok' => false, 'codigo' => 'DOCENTE_CON_ROL_ADMINISTRATIVO'];
-            }
-            if ($permisos !== [self::PERMISO_DOCENTE]) {
-                $conexion->rollBack();
-                return ['ok' => false, 'codigo' => 'PERMISOS_INCOMPATIBLES'];
-            }
-
-            $eliminacion = $this->eliminar($idLogin);
-            if (!$eliminacion instanceof \PDOStatement || $eliminacion->rowCount() !== 1) {
-                throw new \RuntimeException('El DELETE docente no eliminó exactamente un login.');
-            }
-
-            $conexion->commit();
-            return ['ok' => true, 'codigo' => 'ELIMINADO'];
-        } catch (\Throwable $error) {
-            if ($conexion->inTransaction()) {
-                $conexion->rollBack();
-            }
-            throw $error;
-        }
+    public function eliminarProfesorInequivoco(int $idLogin): array {
+        // Compatibilidad de operación: ahora solo actualiza el estado, nunca borra identidades.
+        return $this->cambiarEstadoProfesor($idLogin,4);
     }
-
 }

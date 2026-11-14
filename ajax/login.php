@@ -6,6 +6,7 @@ require_once __DIR__ . '/../src/bootstrap/session.php';
 use App\Identity\Cardinality;
 use App\Identity\IdentityResolver;
 use App\Model\Login;
+use App\Security\AcademicSession;
 
 if (strlen(session_id()) < 1) {
     session_start();
@@ -237,6 +238,9 @@ try {
         respondLoginJson(403, ['error' => 'AUTH_CONTEXT_PERMISSIONS_EMPTY']);
     }
 
+    $permissionsStored = $permissions;
+    $activity = AcademicSession::activity($connection,$loginId,$permissions);
+    $permissions = $activity['permissions'];
     $login = new Login();
     $authContext = [
         'login' => $loginId,
@@ -270,7 +274,7 @@ try {
         }
     }
 
-    observeIdentity($loginId, $permissions);
+    observeIdentity($loginId, $permissionsStored);
 
     $academicStates = $login->obtenerEstadosAcademicosPorLogin($loginId);
     if (!is_array($academicStates)) {
@@ -374,6 +378,10 @@ try {
 
     $_SESSION = $sessionAfterAuthentication;
     respondLoginJson(200, $permissions);
+} catch (\DomainException $exception) {
+    respondLoginJson(403, ['error'=>$exception->getMessage(), 'mensaje'=>$exception->getMessage()==='PERFIL_INACTIVO'
+        ? 'El perfil está inactivo. Solicite su reactivación a Admin o Comité.'
+        : 'No fue posible validar el acceso de la cuenta.']);
 } catch (\Throwable $exception) {
     $technicalCode = $exception instanceof \UnexpectedValueException
         && str_starts_with($exception->getMessage(), 'AUTH_CONTEXT_')

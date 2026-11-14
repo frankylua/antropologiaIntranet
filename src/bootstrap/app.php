@@ -25,4 +25,6 @@ if (!function_exists('app_config')) {
 
 require_once dirname(__DIR__) . '/Config/conexion.php';
 
+\App\Security\AcademicSession::enforce();
+
 return $GLOBALS['app_config'];
