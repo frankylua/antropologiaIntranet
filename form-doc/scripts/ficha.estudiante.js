@@ -54,21 +54,60 @@ function editPersDoc() {
     $("#edit_prog_est").fadeOut();
     $("#edit_acad_est").fadeOut();
 }
+
+function mensajeErrorFichaEstudiante(xhr) {
+    const codigo = xhr && xhr.responseJSON ? xhr.responseJSON.error : '';
+    const mensajes = {
+        NO_AUTENTICADO: 'Debe iniciar sesión nuevamente.',
+        NO_AUTORIZADO: 'No tiene autorización para realizar esta operación.',
+        FORBIDDEN: 'No tiene autorización para consultar esta ficha.',
+        IDENTIDAD_INCOMPATIBLE: 'No fue posible resolver una identidad de Estudiante válida.',
+        CAMBIO_PASSWORD_NO_AUTORIZADO: 'El cambio de contraseña no está disponible en esta ficha.',
+        CREDENCIALES_AJENAS_NO_AUTORIZADAS: 'No puede cambiar el correo de acceso de otra persona.',
+        DATOS_INVALIDOS: 'Revise los datos y las opciones seleccionadas.',
+        DATOS_INCOMPATIBLES: 'Los datos son incompatibles con un registro existente.',
+        ESTUDIANTE_NO_ENCONTRADO: 'No se encontró la ficha del Estudiante.'
+    };
+    return mensajes[codigo] || 'No fue posible completar la operación. Revise los datos e intente nuevamente.';
+}
+
+function mostrarErrorFichaEstudiante(xhr) {
+    $('#info_est,#id_usuario').attr('name', '0');
+    $('#login').attr('name', '');
+    $('#datos_fichaest').empty().append($('<tr>').append(
+        $('<td>').attr('colspan', 2).addClass('text-danger').text(mensajeErrorFichaEstudiante(xhr))
+    ));
+    $('#ant_acad_est,#grado_est,#postdoc_est,#publi_est,#cong_est,#pasant_est,#proy_est,#beca_est').empty();
+}
+
+function ocultarPasswordFichaEstudiante() {
+    $('#box-pass,#btn_cambiar_pass').hide();
+    $('#pass,#pass2').val('').prop('disabled', true);
+}
+ocultarPasswordFichaEstudiante();
+
+function cadenaMayFichaEstudiante(valor) {
+    const texto = String(valor == null ? '' : valor).trim().replace(/\s+/g, ' ');
+    return texto ? cadenaMay(texto) : '';
+}
+
 function llenarFormPersEst(id_usu) {
     $.ajax({
         async: false,
         url: "../ajax/estudiante.php",
         type: "POST",
+        dataType: 'json',
         data: { op: "read_est_id", id_usu },
-        success: function (response) {
-            console.log(response)
-            let usu = JSON.parse(response);
-            console.log('editar usu')
-            console.log(usu)
+        success: function (usu) {
+            if (!Array.isArray(usu) || !usu.length) {
+                mostrarErrorFichaEstudiante();
+                fichaEst();
+                return;
+            }
             $('#login').attr('name', usu[0]['id_login'])
-            $('#nombres').val(cadenaMay(usu[0]['nombres']));
-            $('#ap_pat').val(cadenaMay(usu[0]['ap_pat']));
-            $('#ap_mat').val(cadenaMay(usu[0]['ap_mat']));
+            $('#nombres').val(cadenaMayFichaEstudiante(usu[0]['nombres']));
+            $('#ap_pat').val(cadenaMayFichaEstudiante(usu[0]['ap_pat']));
+            $('#ap_mat').val(cadenaMayFichaEstudiante(usu[0]['ap_mat']));
             $('#fech_nac').val(usu[0]['fecha_nac']);
             $('#documento').val(usu[0]['tipo_doc']);
             $('#nro_doc').val(usu[0]['nro_doc']);
@@ -84,16 +123,20 @@ function llenarFormPersEst(id_usu) {
                 $('#select_pueb').val(usu[0]['id_pueblo']);
             }
             $('#pais_res').val(usu[0]['pais_res']);
-            $('#region').val(cadenaMay(usu[0]['region']));
-            $('#comuna').val(cadenaMay(usu[0]['comuna']));
+            $('#region').val(cadenaMayFichaEstudiante(usu[0]['region']));
+            $('#comuna').val(cadenaMayFichaEstudiante(usu[0]['comuna']));
             $('#telefono').val(usu[0]['telefono']);
-            $('#direccion').val(cadenaMay(usu[0]['direccion']));
-            $('#cont_em').val(cadenaMay(usu[0]['cont_em']));
+            $('#direccion').val(cadenaMayFichaEstudiante(usu[0]['direccion']));
+            $('#cont_em').val(cadenaMayFichaEstudiante(usu[0]['cont_em']));
             $('#tel_em').val(usu[0]['tel_em']);
             $('#genero').val(usu[0]['genero']);
             $('#correo').val(usu[0]['correo']);
-            $('#pass').val('');
-            $('#pass2').val('');
+            $('#correo').prop('readonly', /\/admin\/ver\.estudiante\.php$/i.test(window.location.pathname));
+            ocultarPasswordFichaEstudiante();
+        },
+        error: function (xhr) {
+            mostrarErrorFichaEstudiante(xhr);
+            fichaEst();
         },
     });
 }
@@ -171,7 +214,7 @@ function leerDatProgEst() {
     // cargarGrado($('#id_usuario').attr('name'), '#grados_card')
   }
 function reiniciarInfoEst() {
-    $('#box-pass').show()
+    ocultarPasswordFichaEstudiante();
     $("html, body").animate({ scrollTop: 0 }, 100);
     fichaEst();
     $("#datos_fichadoc").html("");
@@ -226,7 +269,7 @@ $("body").on("click", ".editarPers", function () {
     $("html, body").animate({ scrollTop: 0 }, 100);
     editPersDoc()
     llenarFormPersEst($('#info_est').attr('name'))
-    $('#btn_cambiar_pass').show();
+    ocultarPasswordFichaEstudiante();
 });
 
 
@@ -319,82 +362,42 @@ $("body").on("click", ".editarProgEst", function () {
     $('#mnsj_row_acad_est').hide()
 
 });
-$('#btn_cambiar_pass').click(function () {
-    $("#box-pass").show();
-    $('#btn_cambiar_pass').hide();
-    $('#box-pass').attr('name', 1);
-})
 //submit para guardar datos personales
 $('#form_edit_pers').submit(function (e) {
     e.preventDefault();
-    usuario = leerDatPers()
-    usuario.id_usu = $('#info_est').attr('name')
-    usuario.id_login = $('#login').attr('name')
-    console.log(usuario)
-    if ($('#box-pass').attr('name') == "1" && usuario['pass'] != usuario['pass2']) {
-        $('#pass').addClass('is-invalid')
-        $('#pass2').addClass('is-invalid')
-        $('#mnsj_row_per_doc').show();
-        $('#mnsj_per_doc').addClass('alert-danger');
-        $('#mnsj_per_doc').html('Las contraseñas no coniciden');
-    } else if ($('#box-pass').attr('name') == "1" && usuario['pass'] == '') {
-        $('#pass').addClass('is-invalid')
-        $('#pass2').addClass('is-invalid')
-        $('#mnsj_row_per_doc').show();
-        $('#mnsj_per_doc').addClass('alert-danger');
-        $('#mnsj_per_doc').html('Rellene los campos con su nueva contraseña');
-
+    const datos = leerDatPers();
+    datos.id_usu = $('#info_est').attr('name');
+    datos.id_login = $('#login').attr('name');
+    datos.pueblo = datos.pueblo == null ? 1 : datos.pueblo;
+    datos.op = 'update-inf-pers';
+    delete datos.pass;
+    delete datos.pass2;
+    if ($('#correo').prop('readonly')) {
+        delete datos.correo;
     }
-    else {
-        $('#pass').removeClass('is-invalid')
-        $('#pass2').removeClass('is-invalid')
-
-        $.ajax({
-            url: '../ajax/estudiante.php',
-            type: 'POST',
-            async: false,
-            data: { op: 'read_est_id', id_usu: usuario['id_usu'] },
-
-            success: function (response) {
-                console.log(response)
-                let usu = JSON.parse(response);
-                console.log(usu)
-                usuario['nombres'] = usuario['nombres'] == '' ? usu[0]['nombres'] : usuario['nombres']
-                usuario['ap_pat'] = usuario['ap_pat'] == '' ? usu[0]['ap_pat'] : usuario['ap_pat']
-                usuario['ap_mat'] = usuario['ap_mat'] == '' ? usu[0]['ap_mat'] : usuario['ap_mat']
-                usuario['ap_mat'] = usuario['ap_mat'] == '' ? usu[0]['ap_mat'] : usuario['ap_mat']
-                usuario['comuna'] = usuario['comuna'] == '' ? usu[0]['comuna'] : usuario['comuna']
-                usuario['cont_em'] = usuario['cont_em'] == '' ? usu[0]['cont_em'] : usuario['cont_em']
-                usuario['correo'] = usuario['correo'] == '' ? usu[0]['correo'] : usuario['correo']
-                usuario['direccion'] = usuario['direccion'] == '' ? usu[0]['direccion'] : usuario['direccion']
-                usuario['nro_doc'] = usuario['nro_doc'] == '' ? usu[0]['nro_doc'] : usuario['nro_doc']
-                usuario['pais_nac'] = usuario['pais_nac'] == 0 ? usu[0]['pais_nac'] : usuario['pais_nac']
-                usuario['genero'] = usuario['genero'] == '' ? usu[0]['genero'] : usuario['genero']
-                usuario['pais_res'] = usuario['pais_res'] == '' ? usu[0]['pais_res'] : usuario['pais_res']
-                usuario['pass'] = usuario['pass'] == '' ? usu[0]['pass'] : usuario['pass']
-                usuario['pueblo'] = usuario['pueblo'] == null ? 1 : usuario['pueblo']
-                usuario['region'] = usuario['region'] == '' ? usu[0]['region'] : usuario['region']
-                usuario['tel_em'] = usuario['tel_em'] == '' ? usu[0]['tel_em'] : usuario['tel_em']
-                usuario['telefono'] = usuario['telefono'] == '' ? usu[0]['telefono'] : usuario['telefono']
-            }
-        })
-        usuario.op = 'update-inf-pers'
-        console.log(usuario)
-        $.post('../ajax/estudiante.php', usuario, function (response) {
-            let dato = JSON.parse(response);
+    const botones = $(this).find(':submit').prop('disabled', true);
+    $.ajax({
+        url: '../ajax/estudiante.php',
+        type: 'POST',
+        dataType: 'json',
+        data: datos,
+        success: function (mensaje) {
             $('#mnsj_row_per_est').show();
-            $('#mnsj_per_est').removeClass('alert-danger');
-            $('#mnsj_per_est').addClass('alert-success');
-            $('#mnsj_per_est').html(dato);
+            $('#mnsj_per_est').removeClass('alert-danger').addClass('alert-success').text(mensaje);
             setTimeout(function () {
-                $("#mnsj_row_per_est").fadeOut(1500);
-                reiniciarInfoEst()
+                $('#mnsj_row_per_est').fadeOut(1500);
+                reiniciarInfoEst();
             }, 3000);
-        })
-
-
-    }
-})
+        },
+        error: function (xhr) {
+            $('#mnsj_row_per_est').show();
+            $('#mnsj_per_est').removeClass('alert-success').addClass('alert-danger').text(mensajeErrorFichaEstudiante(xhr));
+        },
+        complete: function () {
+            botones.prop('disabled', false);
+        }
+    });
+});
 //submmit para editar los dayos asociados a programa de estudiantes
 $('#form_edit_prog_est').submit(function (e) {
     e.preventDefault();

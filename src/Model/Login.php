@@ -15,9 +15,17 @@ class Login
     }
 
    
-    public function editarLogin($id_login,$correo,$pass){
-        $sql="UPDATE login SET correo = '$correo', pass = '$pass' WHERE id_login = '$id_login'";
-        return ejecutarConsulta($sql);
+    public function editarLogin($id_login,$correo,$pass=null){
+        // null conserva la contraseña sin leerla ni reenviarla.
+        $parametros = ['correo' => $correo, 'id_login' => $id_login];
+        $sql = 'UPDATE login SET correo=:correo';
+        if ($pass !== null) {
+            $sql .= ',pass=:pass';
+            $parametros['pass'] = $pass;
+        }
+        $consulta = conexion()->prepare($sql . ' WHERE id_login=:id_login');
+        $consulta->execute($parametros);
+        return $consulta;
     }
     
     public function eliminar($id_login){

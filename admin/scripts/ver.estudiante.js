@@ -11,17 +11,21 @@ function listaEst(){
 }
 //vista de ficha estudiantes
 function cargarFichaEst(id_usu) {
+  let fichaCargada = false;
   $.ajax({
       async: false,
       url: '../ajax/estudiante.php',
       type: 'POST',
+      dataType: 'json',
       data: { op: 'read_est_id', id_usu },
-      success: function (response) {
-          let usu = JSON.parse(response);
-          console.log(usu)
+      success: function (usu) {
+          if (!Array.isArray(usu) || !usu.length) {
+              mostrarErrorFichaEstudiante();
+              return;
+          }
+          fichaCargada = true;
           let template;
-          nombre = cadenaMay(usu[0]['nombres']) + ' ' + letraMay(usu[0]['ap_pat']) + ' ' + letraMay(usu[0]['ap_mat'])
-          cat_acad = usu[0]['cat_academica'] == 1 ? 'Profesor(a) instructor(a)' : usu[0]['cat_academica'] == 2 ? 'Profesor(a) asistente' : usu[0]['cat_academica'] == 3 ? 'Profesor(a) asociado(a)' : usu[0]['cat_academica'] == 4 ? 'Profesor(a) titular' : 'Sin Jerarquía'
+          nombre = cadenaMayFichaEstudiante(usu[0]['nombres']) + ' ' + cadenaMayFichaEstudiante(usu[0]['ap_pat']) + ' ' + cadenaMayFichaEstudiante(usu[0]['ap_mat'])
           $('#info_est').attr('name', usu[0]['id_usuario'])
           $('#id_usuario').attr('name', usu[0]['id_usuario'])
           template = `
@@ -62,15 +66,15 @@ function cargarFichaEst(id_usu) {
       </tr>
       <tr>
       <td class="col-4">Dirección</td>
-      <td class="col-8">${cadenaMay(usu[0]['direccion'])}</td>
+      <td class="col-8">${cadenaMayFichaEstudiante(usu[0]['direccion'])}</td>
       </tr>
       <tr>
       <td class="col-4">Comuna</td>
-      <td class="col-8">${cadenaMay(usu[0]['comuna'])}</td>
+      <td class="col-8">${cadenaMayFichaEstudiante(usu[0]['comuna'])}</td>
       </tr>
       <tr>
       <td class="col-4">Región</td>
-      <td class="col-8">${cadenaMay(usu[0]['region'])}</td>
+      <td class="col-8">${cadenaMayFichaEstudiante(usu[0]['region'])}</td>
       </tr>
       <tr>
       <td class="col-4" >País Residencia</td>
@@ -82,7 +86,7 @@ function cargarFichaEst(id_usu) {
       </tr>
       <tr>
       <td class="col-4">Contacto de Emergencia</td>
-      <td class="col-8">${cadenaMay(usu[0]['cont_em'])}</td>
+      <td class="col-8">${cadenaMayFichaEstudiante(usu[0]['cont_em'])}</td>
       </tr>
       <tr>
       <td class="col-4">Teléfono Contacto Emergencia</td>
@@ -154,8 +158,12 @@ function cargarFichaEst(id_usu) {
     // La ficha ya está disponible y el subject corresponde a usuario.id_usuario.
     // Tesis se carga de forma contextual, sin intervenir en la ficha histórica.
     $(document).trigger('tesis:subject-ready');
+      },
+      error: function (xhr) {
+          mostrarErrorFichaEstudiante(xhr);
       }
   })
+  if (!fichaCargada) return;
   $("#ant_acad_est").html('')
   $("#ant_acad_est").append(
     '<div class="row m-2"><div class="col m-0 p-2 ps-0 ms-0 mt-2"><h4 class="text-left m-0 p-0">ANTECEDENTES ACADÉMICOS</h4></div></div>'

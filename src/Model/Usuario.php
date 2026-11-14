@@ -128,9 +128,22 @@ class Usuario extends Login {
         return ejecutarConsultaResultados($sql);
     }
     public function editarInfPers($nombres,$ap_mat,$ap_pat,$fech_nac,$documento,$nro_doc,$pais_nac,$genero,$pais_res,$region,$comuna,$telefono,$direccion,$cont_em,$tel_em,$correo,$pass,$pueblo,$id_usu,$id_login){
-        $sql="UPDATE usuario SET pueblo='$pueblo',pais_res='$pais_res',pais_nac='$pais_nac',login='$id_login',fecha_nac='$fech_nac',nombres='$nombres',ap_mat='$ap_mat',ap_pat='$ap_pat',tipo_doc='$documento',
-        nro_doc='$nro_doc',genero='$genero',region='$region',comuna='$comuna',telefono='$telefono',direccion='$direccion',cont_em='$cont_em',tel_em='$tel_em' where id_usuario='$id_usu'";
-        return ejecutarConsulta($sql);
+        $consulta = conexion()->prepare(
+            'UPDATE usuario SET pueblo=:pueblo,pais_res=:pais_res,pais_nac=:pais_nac,'
+            . 'login=:id_login,fecha_nac=:fecha_nac,nombres=:nombres,ap_mat=:ap_mat,'
+            . 'ap_pat=:ap_pat,tipo_doc=:documento,nro_doc=:nro_doc,genero=:genero,'
+            . 'region=:region,comuna=:comuna,telefono=:telefono,direccion=:direccion,'
+            . 'cont_em=:cont_em,tel_em=:tel_em WHERE id_usuario=:id_usuario'
+        );
+        $consulta->execute([
+            'pueblo' => $pueblo, 'pais_res' => $pais_res, 'pais_nac' => $pais_nac,
+            'id_login' => $id_login, 'fecha_nac' => $fech_nac, 'nombres' => $nombres,
+            'ap_mat' => $ap_mat, 'ap_pat' => $ap_pat, 'documento' => $documento,
+            'nro_doc' => $nro_doc, 'genero' => $genero, 'region' => $region,
+            'comuna' => $comuna, 'telefono' => $telefono, 'direccion' => $direccion,
+            'cont_em' => $cont_em, 'tel_em' => $tel_em, 'id_usuario' => $id_usu,
+        ]);
+        return $consulta;
         
     }
 

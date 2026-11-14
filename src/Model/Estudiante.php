@@ -48,9 +48,27 @@ class Estudiante extends Usuario{
         $sql="SELECT u.id_usuario,u.nombres,u.ap_pat,u.ap_mat,e.tipo_est,l.id_login, t.tipo FROM usuario u JOIN estudiante e ON u.id_usuario=e.usuario JOIN tipo_estudiante t ON e.tipo_est= JOIN login l ON u.login=l.id_login WHERE e.tipo_est='$tipo' order by u.nombres";
         return ejecutarConsultaResultados($sql);        
     }
-    public function mostrarEstId($id_usu){    
-        $sql="SELECT *, pr.pais as p_resi, pn.pais as p_nac FROM usuario u JOIN login l ON u.login=l.id_login JOIN estudiante e ON u.id_usuario=e.usuario JOIN institucion i ON u.inst_usuario=i.id_inst JOIN pais pn ON u.pais_nac=pn.id_pais JOIN pais pr ON u.pais_res=pr.id_pais JOIN pueblo pu ON u.pueblo=pu.id_pueblo JOIN tipo_estudiante te ON e.tipo_est=te.id_tipo_est JOIN linea_usuario lu ON u.id_usuario=lu.usuario JOIN linea_investigacion li ON li.id_linea_inv=lu.linea_inv WHERE u.id_usuario='$id_usu'order by u.nombres";
-        return ejecutarConsultaResultados($sql);            
+    public function mostrarEstId($id_usu){
+        $consulta = conexion()->prepare(
+            'SELECT u.id_usuario,u.pais_res,u.pais_nac,u.login,u.fecha_nac,'
+            . 'u.nombres,u.ap_mat,u.ap_pat,u.tipo_doc,u.nro_doc,u.inst_usuario,'
+            . 'u.genero,u.region,u.comuna,u.telefono,u.direccion,u.cont_em,u.tel_em,'
+            . 'l.id_login,l.correo,e.id_est,e.prof_guia,e.tipo_est,e.fech_ingr,'
+            . 'e.fecha_egr,e.prom_notas,e.trabaja,e.orient_disc,e.sit_previa,e.usuario,'
+            . 'i.id_inst,i.inst,pn.pais AS p_nac,pr.pais AS p_resi,pu.id_pueblo,pu.pueblo,'
+            . 'te.id_tipo_est,te.tipo,lu.id_linea_usuario,lu.linea_inv,li.id_linea_inv,li.linea '
+            . 'FROM usuario u JOIN login l ON u.login=l.id_login '
+            . 'JOIN estudiante e ON u.id_usuario=e.usuario '
+            . 'JOIN institucion i ON u.inst_usuario=i.id_inst '
+            . 'JOIN pais pn ON u.pais_nac=pn.id_pais JOIN pais pr ON u.pais_res=pr.id_pais '
+            . 'JOIN pueblo pu ON u.pueblo=pu.id_pueblo '
+            . 'JOIN tipo_estudiante te ON e.tipo_est=te.id_tipo_est '
+            . 'JOIN linea_usuario lu ON u.id_usuario=lu.usuario '
+            . 'JOIN linea_investigacion li ON li.id_linea_inv=lu.linea_inv '
+            . 'WHERE u.id_usuario=:id_usuario ORDER BY u.nombres'
+        );
+        $consulta->execute(['id_usuario' => $id_usu]);
+        return $consulta->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     // mostrar respuesta de la busqueda profesores 
