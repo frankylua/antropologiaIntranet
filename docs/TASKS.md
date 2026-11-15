@@ -1,5 +1,9 @@
 # Registro de TASK
 
+Actualización vigente del ensayo aislado: Review Técnico conforme y «Recuperación PASS» del usuario para ingreso, grillas y ficha histórica completa. Los EPIC003 son fixtures parciales y se retiró la propuesta de ampliar READ. La copia restaurada quedó verificada, el servidor temporal 8097 cerrado y la base aislada conservada; intranet original intacta. Cinco documentos de trazabilidad pendientes de autorización de staging/commit. Las menciones de VF pendiente/observada más abajo describen etapas anteriores.
+
+Unidad activa vigente: [TASK-ENTREGA-RECUPERACION-AISLADA-001](tasks/TASK-ENTREGA-RECUPERACION-AISLADA-001.md). Creación/importación autorizadas expresamente; recuperación en antropologia_muestra_restore_20261114 verificada (39 tablas, metadatos, binarios, archivos y 28 casos HTTP). Origen intacto. REVIEW TÉCNICO — APROBADO PARA VF mínima de la copia. Preparación anterior publicada en 834f1d0 según push informado por el usuario. Las unidades activas descritas más abajo son antecedentes y quedan superadas por esta anotación.
+
 Actualización vigente de la muestra: D-01 resuelto con Docente de prueba ID 18 elegido expresamente por el usuario. Se corrigieron solo las seis asignaciones TEST (usuarios 7–12), con respaldo previo, transacción, otras 38 tablas sin cambios y lecturas conformes. Respaldo posterior actualizado. REVIEW TÉCNICO APROBADO y VF operativa de las seis fichas PASS («Guías PASS»). Muestra interna localhost lista para el alcance acordado; siete documentos pendientes de autorización de staging/commit. Las referencias a decisión pendiente/entrega observada más abajo corresponden al hallazgo previo y quedan superadas por esta actualización.
 
 Unidad activa: [TASK-ENTREGA-MUESTRA-INTERNA-001](tasks/TASK-ENTREGA-MUESTRA-INTERNA-001.md), autorizada por «Autorizo preparar la muestra interna». Destino confirmado: este equipo, localhost. Aplicación base `f482ed8`; commits `498134e` y `f482ed8` con push informado por el usuario, sus VF conservadas. Preparación técnica: 54 comprobaciones integradas aisladas, 22 de disponibilidad HTTP y 12 de autoalta HTTP conformes; respaldo actual verificado y [guía de entrega/recuperación](entrega/MUESTRA-INTERNA-2026-11-20.md). Entrega observada por D-01: seis vínculos de guía a personas sin perfil Docente; decisión de tratamiento para la muestra pendiente. Sin cambios de código, esquema, cuentas o relaciones reales. Sin staging, commit ni push de estos documentos. Cursos conserva su bloqueo institucional independiente.
@@ -2381,3 +2385,6 @@ anotación no selecciona el siguiente incremento.
 
 
 Autorización documental del 14/11/2026: el usuario aprobó staging y commit de los siete documentos de TASK-ENTREGA-MUESTRA-INTERNA-001. La publicación documental por push conserva autorización separada. Las menciones a autorización pendiente anteriores son históricas.
+
+
+Autorización vigente del 15/11/2026: el usuario aprobó staging y commit de los cinco documentos del ensayo de recuperación aislada, tras Recuperación PASS. Las menciones anteriores a autorización pendiente son antecedentes. Push requiere autorización separada.

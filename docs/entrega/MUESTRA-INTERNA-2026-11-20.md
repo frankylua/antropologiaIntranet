@@ -1,5 +1,9 @@
 # Muestra interna — CRUD Docentes y Estudiantes
 
+Actualización vigente del ensayo aislado: Review Técnico conforme y «Recuperación PASS» del usuario para ingreso, grillas y ficha histórica completa. Los EPIC003 son fixtures parciales y se retiró la propuesta de ampliar READ. La copia restaurada quedó verificada, el servidor temporal 8097 cerrado y la base aislada conservada; intranet original intacta. Cinco documentos de trazabilidad pendientes de autorización de staging/commit. Las menciones de VF pendiente/observada más abajo describen etapas anteriores.
+
+Actualización vigente: el respaldo ya fue [recuperado en una base aislada](ENSAYO-RECUPERACION-2026-11-14.md) con autorización del usuario. 39 tablas y estructura coinciden, dos binarios/19 archivos verificados, 28 pruebas HTTP PASS; origen intacto. VF visual de la copia pendiente. Las anotaciones de «restauración no ensayada» que siguen describen el estado al preparar inicialmente el respaldo, anterior a este ensayo.
+
 Preparación: **14/11/2026, America/Santiago**. Objetivo acordado: **20/11/2026**. Destino confirmado por el usuario: este equipo, **localhost**. Revisión de aplicación: **f482ed898bafa23abca1877f14dafd570a05781c**, rama `refactor/fase-0-seguridad`.
 
 ## Dictamen actual
@@ -135,3 +139,6 @@ Resultados: guide-correction-result.json, con seis filas modificadas, otros camp
 
 
 Autorización documental del 14/11/2026: el usuario aprobó staging y commit de los siete documentos de TASK-ENTREGA-MUESTRA-INTERNA-001. La publicación documental por push conserva autorización separada. Las menciones a autorización pendiente anteriores son históricas.
+
+
+Autorización vigente del 15/11/2026: el usuario aprobó staging y commit de los cinco documentos del ensayo de recuperación aislada, tras Recuperación PASS. Las menciones anteriores a autorización pendiente son antecedentes. Push requiere autorización separada.

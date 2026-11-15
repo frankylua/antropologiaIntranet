@@ -1,5 +1,9 @@
 # Roadmap Maestro de Modernización
 
+Actualización vigente del ensayo aislado: Review Técnico conforme y «Recuperación PASS» del usuario para ingreso, grillas y ficha histórica completa. Los EPIC003 son fixtures parciales y se retiró la propuesta de ampliar READ. La copia restaurada quedó verificada, el servidor temporal 8097 cerrado y la base aislada conservada; intranet original intacta. Cinco documentos de trazabilidad pendientes de autorización de staging/commit. Las menciones de VF pendiente/observada más abajo describen etapas anteriores.
+
+Actualización de recuperación 14/11/2026: [ensayo aislado autorizado y ejecutado](../entrega/ENSAYO-RECUPERACION-2026-11-14.md) sobre el respaldo de la muestra. Se levantó el pendiente de ensayo técnico: 39 tablas recuperadas, estructura/archivos/binarios conformes, 28 pruebas HTTP PASS y origen sin cambios. VF visual mínima de la copia pendiente. No se modifica la publicación ni las condiciones de uso interno; la base aislada y configuración separada no sustituyen la intranet actual.
+
 Actualización vigente de la muestra: D-01 resuelto con Docente de prueba ID 18 elegido expresamente por el usuario. Se corrigieron solo las seis asignaciones TEST (usuarios 7–12), con respaldo previo, transacción, otras 38 tablas sin cambios y lecturas conformes. Respaldo posterior actualizado. REVIEW TÉCNICO APROBADO y VF operativa de las seis fichas PASS («Guías PASS»). Muestra interna localhost lista para el alcance acordado; siete documentos pendientes de autorización de staging/commit. Las referencias a decisión pendiente/entrega observada más abajo corresponden al hallazgo previo y quedan superadas por esta actualización.
 
 Este roadmap organiza la modernización incremental de la intranet a partir de problemas confirmados. Cada épica se descompondrá posteriormente en Features y Tasks mediante el flujo oficial de modernización. No define soluciones técnicas ni arquitectura futura.
@@ -1306,3 +1310,6 @@ Estas observaciones todavía no forman parte del roadmap aprobado.
 
 
 Autorización documental del 14/11/2026: el usuario aprobó staging y commit de los siete documentos de TASK-ENTREGA-MUESTRA-INTERNA-001. La publicación documental por push conserva autorización separada. Las menciones a autorización pendiente anteriores son históricas.
+
+
+Autorización vigente del 15/11/2026: el usuario aprobó staging y commit de los cinco documentos del ensayo de recuperación aislada, tras Recuperación PASS. Las menciones anteriores a autorización pendiente son antecedentes. Push requiere autorización separada.
