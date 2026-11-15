@@ -254,7 +254,7 @@ class Docente extends Usuario{
             );
             $parametros = [
                 'correo' => $correo,
-                'pass' => $pass,
+                'pass' => \App\Security\PasswordCredentials::hash($pass),
                 'id_login' => $idLogin,
             ];
         }
@@ -301,7 +301,7 @@ class Docente extends Usuario{
             );
             $insertarLogin->execute([
                 'correo' => $datos['correo'],
-                'pass' => $datos['pass'],
+                'pass' => \App\Security\PasswordCredentials::hash($datos['pass']),
             ]);
             $idLogin = (int) $conexion->lastInsertId();
             if ($insertarLogin->rowCount() !== 1 || $idLogin < 1) {

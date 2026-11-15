@@ -10,8 +10,10 @@ class Login
 
     }
     public function insertarLogin($correo,$pass){
-        $sql="INSERT INTO login (id_login,correo,pass) VALUES (NULL,'$correo','$pass')";
-        return obtenerIdConsulta($sql);
+        $pdo = conexion();
+        $q = $pdo->prepare('INSERT INTO login (correo,pass) VALUES (:correo,:pass)');
+        $q->execute(['correo'=>$correo,'pass'=>\App\Security\PasswordCredentials::hash($pass)]);
+        return $pdo->lastInsertId();
     }
 
    
@@ -21,7 +23,7 @@ class Login
         $sql = 'UPDATE login SET correo=:correo';
         if ($pass !== null) {
             $sql .= ',pass=:pass';
-            $parametros['pass'] = $pass;
+            $parametros['pass'] = \App\Security\PasswordCredentials::hash($pass);
         }
         $consulta = conexion()->prepare($sql . ' WHERE id_login=:id_login');
         $consulta->execute($parametros);
@@ -35,8 +37,12 @@ class Login
     }
 
     public function validarPermiso($correo,$pass){
-        $sql="SELECT * FROM login l JOIN permiso_login p WHERE l.id_login=p.id_login AND l.correo='$correo' AND l.pass='$pass'";
-        return ejecutarConsultaResultados($sql);
+        $pdo = conexion();
+        $id = \App\Security\PasswordCredentials::find($pdo, $correo, $pass);
+        if ($id === null || !\App\Security\PasswordCredentials::finalize($pdo, $id, $pass)) return [];
+        $q = $pdo->prepare('SELECT id_login,id_permiso FROM permiso_login WHERE id_login=:id_login');
+        $q->execute(['id_login'=>$id]);
+        return $q->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function retornarIdUsu($id_login){

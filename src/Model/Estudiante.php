@@ -226,7 +226,7 @@ class Estudiante extends Usuario{
         $pdo = conexion();
         if (!$pdo->inTransaction()) throw new \RuntimeException('TRANSACCION_REQUERIDA');
         $institucion = (new Institucion())->resolverId($programa['inst'],$programa['nueva_institucion']);
-        $this->escritura('INSERT INTO login (correo,pass) VALUES (:correo,:pass)', ['correo'=>$persona['correo'],'pass'=>$pass]);
+        $this->escritura('INSERT INTO login (correo,pass) VALUES (:correo,:pass)', ['correo'=>$persona['correo'],'pass'=>\App\Security\PasswordCredentials::hash($pass)]);
         $login = (int)$pdo->lastInsertId();
         if ($login < 1) throw new \RuntimeException('LOGIN_NO_CONFIRMADO');
         foreach ($permisos as $permiso) {

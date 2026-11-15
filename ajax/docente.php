@@ -215,11 +215,16 @@ function atenderEdicionPersonalDocente(string $operacion): never
         require_once __DIR__ . '/validaciones.php';
         $datos = [];
         foreach (['nombres','ap_mat','ap_pat','nro_doc','region','comuna','telefono','direccion',
-            'cont_em','tel_em','correo','pass'] as $campo) {
+            'cont_em','tel_em','correo'] as $campo) {
             $valor = $_POST[$campo] ?? '';
             if (!is_string($valor)) throw new \DomainException('SOLICITUD_INVALIDA',400);
-            // Mantener la normalización y el tratamiento de credenciales vigentes.
+            // La normalización de datos personales no se aplica a contraseñas.
             $datos[$campo] = limpiar_datos($valor);
+        }
+        $datos['pass'] = $_POST['pass'] ?? '';
+        if (!is_string($datos['pass'])) throw new \DomainException('SOLICITUD_INVALIDA',400);
+        if ($datos['pass'] !== '' && !\App\Security\PasswordCredentials::isValid($datos['pass'])) {
+            throw new \DomainException('PASSWORD_INVALIDA',422);
         }
         $datos['fech_nac'] = $_POST['fech_nac'] ?? '';
         if (!is_string($datos['fech_nac'])) throw new \DomainException('SOLICITUD_INVALIDA',400);
@@ -244,6 +249,7 @@ function atenderEdicionPersonalDocente(string $operacion): never
             'IDENTIDAD_DOCENTE_INCOMPATIBLE'=>'No fue posible validar la identidad del Docente; no se guardó ningún cambio.',
             'DATOS_INVALIDOS'=>'Revise los datos y el correo antes de guardar.',
             'SOLICITUD_INVALIDA'=>'La solicitud no es válida.',
+            'PASSWORD_INVALIDA'=>'La contraseña debe contener entre 1 y 200 caracteres válidos.',
         ];
         responderDocente((int)$error->getCode(),[
             'ok'=>false,'error'=>$codigo,'mensaje'=>$mensajes[$codigo] ?? 'No fue posible guardar los datos del Docente.',
@@ -503,7 +509,7 @@ switch ($op) {
                 'mensaje' => 'Usuario guardado correctamente.',
             ]);
         } catch (\Throwable $error) {
-            error_log('[DOCENTE_CREATE] ' . $error->getMessage());
+            error_log('[DOCENTE_CREATE] ' . get_class($error));
             responderDocente(500, [
                 'ok' => false,
                 'error' => 'ERROR_TECNICO',

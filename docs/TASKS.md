@@ -1,5 +1,11 @@
 # Registro de TASK
 
+Credenciales seguras: el usuario autorizó expresamente staging y commit de los 15 archivos de TASK-EPIC002-CREDENCIALES-SEGURAS-001 tras VF-1 a VF-4 PASS. Push conserva autorización separada. Las menciones anteriores a autorización pendiente son históricas.
+
+Credenciales seguras: el usuario confirmó «VF-1, VF-2, VF-3 y VF-4: PASS». Se registra VF completa aprobada de TASK-EPIC002-CREDENCIALES-SEGURAS-001; pendiente únicamente de autorización de staging y commit para esta etapa. Push separado. La mención de VF pendiente en el informe técnico siguiente corresponde al estado anterior a esa confirmación.
+
+Actualización vigente 15/11/2026: [TASK-EPIC002-CREDENCIALES-SEGURAS-001](tasks/TASK-EPIC002-CREDENCIALES-SEGURAS-001.md), autorizada por el usuario e implementada. Hash Argon2id en altas/cambios y conversión progresiva de credenciales heredadas al ingresar, con revalidación bajo bloqueo; contraseñas nuevas sin normalización. Sin migración ni cambios de roles. 247/247 comprobaciones automatizadas, lint 12/12 y Review Técnico APROBADO PARA VF. VF pendiente; sin staging/commit/push autorizados. Los pushes de recuperación anteriores fueron confirmados por el usuario; menciones anteriores a autorización pendiente son históricas.
+
 Actualización vigente del ensayo aislado: Review Técnico conforme y «Recuperación PASS» del usuario para ingreso, grillas y ficha histórica completa. Los EPIC003 son fixtures parciales y se retiró la propuesta de ampliar READ. La copia restaurada quedó verificada, el servidor temporal 8097 cerrado y la base aislada conservada; intranet original intacta. Cinco documentos de trazabilidad pendientes de autorización de staging/commit. Las menciones de VF pendiente/observada más abajo describen etapas anteriores.
 
 Unidad activa vigente: [TASK-ENTREGA-RECUPERACION-AISLADA-001](tasks/TASK-ENTREGA-RECUPERACION-AISLADA-001.md). Creación/importación autorizadas expresamente; recuperación en antropologia_muestra_restore_20261114 verificada (39 tablas, metadatos, binarios, archivos y 28 casos HTTP). Origen intacto. REVIEW TÉCNICO — APROBADO PARA VF mínima de la copia. Preparación anterior publicada en 834f1d0 según push informado por el usuario. Las unidades activas descritas más abajo son antecedentes y quedan superadas por esta anotación.

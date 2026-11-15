@@ -491,7 +491,7 @@ function atenderCrudEstudiante(string $operacion): never
         $persona = datosEdicionFichaEstudiante($pdo,$base);
         $persona['fecha_nac'] = fechaCrudEstudiante('fech_nac');
         $pass = $_POST['pass'] ?? null;
-        if (!is_string($pass) || trim($pass) === '' || preg_match('/^.{1,200}$/usD',$pass) !== 1
+        if (!is_string($pass) || trim($pass) === '' || !\App\Security\PasswordCredentials::isValid($pass)
             || (array_key_exists('pass2',$_POST) && $_POST['pass2'] !== $pass)) {
             throw new \DomainException('DATOS_INVALIDOS',422);
         }

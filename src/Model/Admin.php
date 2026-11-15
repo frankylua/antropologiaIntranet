@@ -29,7 +29,7 @@ class Admin extends Login {
             $consultaLogin = $conexion->prepare('INSERT INTO login (correo, pass) VALUES (:correo, :pass)');
             $consultaLogin->execute([
                 'correo' => $correo,
-                'pass' => $pass,
+                'pass' => \App\Security\PasswordCredentials::hash($pass),
             ]);
             $idLogin = (int) $conexion->lastInsertId();
             if ($idLogin <= 0) {
@@ -97,7 +97,7 @@ class Admin extends Login {
                 );
                 $parametrosLogin = [
                     'correo' => $correo,
-                    'pass' => $pass,
+                    'pass' => \App\Security\PasswordCredentials::hash($pass),
                     'id_login' => $idLogin,
                 ];
             }

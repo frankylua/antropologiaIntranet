@@ -7,6 +7,7 @@ use App\Identity\Cardinality;
 use App\Identity\IdentityResolver;
 use App\Model\Login;
 use App\Security\AcademicSession;
+use App\Security\PasswordCredentials;
 
 if (strlen(session_id()) < 1) {
     session_start();
@@ -210,23 +211,11 @@ if ($email === '' || $password === '') {
 
 try {
     $connection = conexion();
-    $credentialsStatement = $connection->prepare(
-        'SELECT id_login FROM login WHERE correo = :correo AND pass = :pass'
-    );
-    $credentialsStatement->execute([
-        'correo' => $email,
-        'pass' => $password,
-    ]);
-    $loginIds = array_map('intval', $credentialsStatement->fetchAll(\PDO::FETCH_COLUMN));
-
-    if ($loginIds === []) {
+    $loginId = PasswordCredentials::find($connection, $email, $password);
+    if ($loginId === null) {
         respondLoginJson(401, ['error' => 'AUTHENTICATION_FAILED']);
     }
-    if (count($loginIds) !== 1 || $loginIds[0] <= 0) {
-        throw new \UnexpectedValueException('AUTH_CONTEXT_LOGIN_AMBIGUOUS');
-    }
 
-    $loginId = $loginIds[0];
     $permissionsStatement = $connection->prepare(
         'SELECT id_login, id_permiso FROM permiso_login WHERE id_login = :login_id ORDER BY id_permiso'
     );
@@ -355,6 +344,10 @@ try {
         $professorState
     )) {
         throw new \UnexpectedValueException('AUTH_CONTEXT_VALIDATION_FAILED');
+    }
+
+    if (!PasswordCredentials::finalize($connection, $loginId, $password)) {
+        respondLoginJson(401, ['error' => 'AUTHENTICATION_FAILED']);
     }
 
     $managedKeys = [

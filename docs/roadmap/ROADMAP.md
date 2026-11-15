@@ -1,5 +1,11 @@
 # Roadmap Maestro de Modernización
 
+Credenciales seguras: staging y commit de sus 15 archivos autorizados expresamente por el usuario tras Review y cuatro VF PASS. Push pendiente de autorización separada; las menciones anteriores a autorización de commit pendiente describen etapas previas.
+
+Credenciales seguras: VF-1, VF-2, VF-3 y VF-4 confirmadas PASS por el usuario. Implementación y validación funcional aprobadas; pendiente autorización de staging y commit, con push separado. Las referencias a VF pendiente del informe anterior quedan superadas por esta confirmación.
+
+15/11/2026: [credenciales seguras](../tasks/TASK-EPIC002-CREDENCIALES-SEGURAS-001.md) implementadas con autorización expresa: Argon2id, login compatible con actualización progresiva y contraseñas exactas sin normalizar. Review Técnico aprobado para VF; 247/247 comprobaciones y lint 12/12. No requiere migración ni cambia permisos. Pendientes VF y autorizaciones Git separadas. La confirmación de push del ensayo de recuperación cierra su publicación documental; no habilita publicación en Internet ni levanta pendientes institucionales de Cursos o del aviso de datos.
+
 Actualización vigente del ensayo aislado: Review Técnico conforme y «Recuperación PASS» del usuario para ingreso, grillas y ficha histórica completa. Los EPIC003 son fixtures parciales y se retiró la propuesta de ampliar READ. La copia restaurada quedó verificada, el servidor temporal 8097 cerrado y la base aislada conservada; intranet original intacta. Cinco documentos de trazabilidad pendientes de autorización de staging/commit. Las menciones de VF pendiente/observada más abajo describen etapas anteriores.
 
 Actualización de recuperación 14/11/2026: [ensayo aislado autorizado y ejecutado](../entrega/ENSAYO-RECUPERACION-2026-11-14.md) sobre el respaldo de la muestra. Se levantó el pendiente de ensayo técnico: 39 tablas recuperadas, estructura/archivos/binarios conformes, 28 pruebas HTTP PASS y origen sin cambios. VF visual mínima de la copia pendiente. No se modifica la publicación ni las condiciones de uso interno; la base aislada y configuración separada no sustituyen la intranet actual.

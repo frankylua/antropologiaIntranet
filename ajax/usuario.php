@@ -18,7 +18,19 @@ $direccion=isset($_POST['direccion'])?limpiar_datos($_POST['direccion']):"";
 $cont_em=isset($_POST['cont_em'])?limpiar_datos($_POST['cont_em']):"";
 $tel_em=isset($_POST['tel_em'])?limpiar_datos($_POST['tel_em']):"";
 $correo=isset($_POST['correo'])?limpiar_datos($_POST['correo']):"";
-$pass=isset($_POST['pass'])?limpiar_datos($_POST['pass']):"";
+if (isset($_POST['pass']) && !is_string($_POST['pass'])) {
+    http_response_code(400);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['ok'=>false,'error'=>'DATOS_INVALIDOS','mensaje'=>'La contraseña debe ser texto.']);
+    exit;
+}
+$pass = $_POST['pass'] ?? '';
+if ($pass !== '' && !\App\Security\PasswordCredentials::isValid($pass)) {
+    http_response_code(422);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['ok'=>false,'error'=>'PASSWORD_INVALIDA','mensaje'=>'La contraseña debe contener entre 1 y 200 caracteres válidos.']);
+    exit;
+}
 $inst=isset($_POST['inst'])?(int)$_POST['inst']:'';
 $pueblo=isset($_POST['pueblo'])?(int)$_POST['pueblo']:'';
 $permiso=isset($_POST['permisos'])?$_POST['permisos']:'';

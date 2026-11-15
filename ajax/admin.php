@@ -49,13 +49,19 @@ function loginAutenticado(): int
 
 $nombre = isset($_POST['nombre']) && is_string($_POST['nombre']) ? trim(limpiar_datos($_POST['nombre'])) : '';
 $correo = isset($_POST['correo']) && is_string($_POST['correo']) ? trim(limpiar_datos($_POST['correo'])) : '';
-$pass = isset($_POST['pass']) && is_string($_POST['pass']) ? limpiar_datos($_POST['pass']) : '';
+$pass = isset($_POST['pass']) && is_string($_POST['pass']) ? $_POST['pass'] : '';
 $permiso = isset($_POST['permiso']) && is_scalar($_POST['permiso']) ? (int) $_POST['permiso'] : 0;
 $idLogin = isset($_POST['id_login']) && is_scalar($_POST['id_login']) ? (int) $_POST['id_login'] : 0;
 $op = isset($_POST['op']) && is_string($_POST['op']) ? $_POST['op'] : '';
 $admin = new Admin();
 
 try {
+        if (isset($_POST['pass']) && !is_string($_POST['pass'])) {
+                responderAdmin(400, ['ok'=>false,'error'=>'DATOS_INVALIDOS','mensaje'=>'La contraseña debe ser texto.']);
+        }
+        if ($pass !== '' && !\App\Security\PasswordCredentials::isValid($pass)) {
+                responderAdmin(422, ['ok'=>false,'error'=>'PASSWORD_INVALIDA','mensaje'=>'La contraseña debe contener entre 1 y 200 caracteres válidos.']);
+        }
         switch ($op) {
                 case 'insert-update':
                         exigirGestionAdmin();
@@ -262,7 +268,7 @@ try {
                         ]);
         }
 } catch (\PDOException $error) {
-        error_log('[ADMIN] ' . $error->getMessage());
+        error_log('[ADMIN] ' . get_class($error));
         if ($error->getCode() === '23000') {
                 responderAdmin(409, [
                         'ok' => false,
@@ -276,7 +282,7 @@ try {
                 'mensaje' => 'No fue posible completar la operación administrativa.',
         ]);
 } catch (\Throwable $error) {
-        error_log('[ADMIN] ' . $error->getMessage());
+        error_log('[ADMIN] ' . get_class($error));
         responderAdmin(500, [
                 'ok' => false,
                 'error' => 'ERROR_TECNICO',
