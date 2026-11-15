@@ -1,144 +1,131 @@
 # Muestra interna — CRUD Docentes y Estudiantes
 
-Actualización vigente del ensayo aislado: Review Técnico conforme y «Recuperación PASS» del usuario para ingreso, grillas y ficha histórica completa. Los EPIC003 son fixtures parciales y se retiró la propuesta de ampliar READ. La copia restaurada quedó verificada, el servidor temporal 8097 cerrado y la base aislada conservada; intranet original intacta. Cinco documentos de trazabilidad pendientes de autorización de staging/commit. Las menciones de VF pendiente/observada más abajo describen etapas anteriores.
+Aceptación vigente: el usuario confirmó **«Consolidación PASS»** y **«Ayuda PASS»**, y autorizó staging/commit de los siete archivos. Las menciones anteriores de VF o autorización pendientes son históricas. El paquete final se genera sobre ese commit y se identifica mediante el manifiesto privado indicado a continuación; push separado.
 
-Actualización vigente: el respaldo ya fue [recuperado en una base aislada](ENSAYO-RECUPERACION-2026-11-14.md) con autorización del usuario. 39 tablas y estructura coinciden, dos binarios/19 archivos verificados, 28 pruebas HTTP PASS; origen intacto. VF visual de la copia pendiente. Las anotaciones de «restauración no ensayada» que siguen describen el estado al preparar inicialmente el respaldo, anterior a este ensayo.
+## Paquete final de la entrega aceptada
 
-Preparación: **14/11/2026, America/Santiago**. Objetivo acordado: **20/11/2026**. Destino confirmado por el usuario: este equipo, **localhost**. Revisión de aplicación: **f482ed898bafa23abca1877f14dafd570a05781c**, rama `refactor/fase-0-seguridad`.
+Ubicación privada estable:
 
-## Dictamen actual
+`C:/Users/volca/.codex/visualizations/2026/11/13/01a1d73e-4d1d-7201-8602-25624da60c81/consolidacion-muestra-20261115/version-final/`
 
-**LISTA PARA MUESTRA INTERNA LOCALHOST. REVIEW TÉCNICO APROBADO Y VF OPERATIVA PASS («Guías PASS»).** D-01 resuelto con autorización expresa: el usuario eligió resolver las seis asignaciones y seleccionó el Docente de prueba ID usuario 18. Se confirmó que eran fichas TEST, IDs usuario 7–12, con autorreferencia como guía. Tras respaldo previo, una transacción cambió solo prof_guia de esas seis filas a 18; se comprobaron los demás campos y las otras 38 tablas sin cambios. Las seis lecturas reales de nombre de guía ahora resuelven ID 18 y el preflight detecta cero guías sin perfil Docente.
+Archivos seleccionados: **respaldo-muestra-interna-final.zip**, **codigo-muestra-interna-final.zip** y **delivery-manifest.json**. El manifiesto identifica el commit exacto que incluye la ayuda desplegable y los SHA-256 del código, SQL y respaldo. Se genera después del commit para conservar trazabilidad sin modificar la revisión que identifica; los resultados de esa comprobación quedan en esa carpeta. Utilizar este paquete final cuando su manifiesto registre las verificaciones conformes.
 
-Respaldo actualizado después del ajuste y verificado. **No se ensayó una restauración.** El usuario confirmó visualmente las seis fichas TEST mediante «Guías PASS»; se cierra D-01 y no se repiten las VF ya aprobadas del CRUD. No se certifican módulos fuera del alcance de esta muestra localhost.
+Los paquetes y hashes 93fff17 descritos en las secciones siguientes son el estado anterior conservado. No contienen el ajuste de ayuda y quedan sustituidos como selección de entrega por el paquete final. El procedimiento de recuperación y los límites institucionales siguen vigentes. No extraer ni importar respaldos para la presentación.
 
-## Versión y cierres conciliados
+Ajuste posterior solicitado durante VF: la ayuda de recuperación de Docentes/Estudiantes queda desplegable y cerrada por defecto, con «Ayuda PASS» confirmado por el usuario. Los paquetes 93fff17 descritos abajo preceden ese ajuste visual y se conservan sin alteraciones. Falta versionar el ajuste y actualizar el paquete vigente antes del cierre definitivo de consolidación.
 
-| Incremento | Evidencia de cierre | Situación |
-| --- | --- | --- |
-| Protección personal Estudiante | Commit 4e002b7, VF del usuario y excepción expresa de VF-08 | Publicado; no reabrir las VF aprobadas |
-| Popup de muestra | Commit 55f0aa3, presentación aprobada; obligatoriedad incorporada después | Vigente como texto de prueba |
-| CRUD e inactivación | Commit 498134e; migración reportada por el usuario y verificada; «docente estudiante pass»; push ejecutado y aprobado por el usuario | Publicado |
-| Edición personal Docente atómica | Commit f482ed8; «VF Docente PASS» en cuatro recorridos; push ejecutado informado por el usuario | Publicado |
-| Preparación de entrega | TASK-ENTREGA-MUESTRA-INTERNA-001 | Documentación nueva, aún sin commit/push |
+Guía operativa consolidada el **15/11/2026**, America/Santiago. Presentación prevista: **20/11/2026**, en este equipo mediante **localhost**. Aplicación: **93fff17ca547540d16d58b3a051eae1f3baa77a0**, rama `refactor/fase-0-seguridad`. Esta guía sustituye las instrucciones de preparación de f482ed8; el detalle histórico permanece en Git y en los artefactos privados anteriores.
 
-Se usa la confirmación de push del usuario; no se hizo una nueva comprobación remota. Las fuentes antiguas que dicen «no iniciada» o presentan DELETE físico son históricas: prevalecen los incrementos y decisiones posteriores enlazados en esta guía.
+## Estado de la entrega
 
-## Alcance comprobado y evidencia disponible
+**CONSOLIDACIÓN TÉCNICA COMPLETA — REVIEW TÉCNICO APROBADO PARA VF OPERATIVA MÍNIMA.** CRUD, estados/inactivación, recuperación anterior, credenciales seguras y CSRF tienen sus validaciones previas aprobadas por el usuario. El paquete actualizado y las instrucciones todavía requieren la VF operativa mínima de esta consolidación. No se repite el CRUD ni se atribuyen pruebas manuales nuevas al usuario.
 
-| Operación / cruce | Evidencia técnica | Evidencia funcional y límite |
-| --- | --- | --- |
-| Altas Admin y autoaltas de ambos perfiles | Suites previas y cadena de 54 comprobaciones integradas | PASS del usuario en altas Admin y autoaltas; otras variantes específicas no se inventan como VF |
-| Docente autoalta Pendiente y alta administrativa Aceptado | Cadena nueva con persistencia entre peticiones; permiso 4 forzado | VF anterior de autoalta Docente PASS |
-| Aceptación/rechazo y habilitación Docente | Login real en fixture tras cada estado; propio permitido, acceso académico condicionado | Cobertura técnica nueva; no se declara otra VF del usuario |
-| Consulta, búsqueda y filtros Estudiante | Suite CRUD y pruebas previas | Usuario confirmó consulta/filtros PASS |
-| Datos personales de ambos perfiles | Suites 71 y 91, frontend 12 y 8; contrato sin exposición de contraseña | Estudiante VF anterior PASS; Docente VF-DP-01 a 04 PASS |
-| Datos del programa y estado | Transacciones y referencias comprobadas; cadena integrada usa Comité | Usuario confirmó programa/estado Admin e inactivación/reactivación en ambos perfiles |
-| Eliminar = Inactivar, listado y recuperación | 111 pruebas previas; nueva cadena con cuentas persistentes | «docente estudiante pass» del usuario |
-| Acceso tras inactivar y otros roles válidos | Cadena Docente+Comité mantiene Comité al inactivar Docente; rol Docente vuelve al iniciar sesión tras reactivar | VF anterior declarada PASS; no se atribuyen cuentas o pasos adicionales al usuario |
-| Asignar/retirar rol adicional por Admin | Cadena integrada, Comité no asigna roles; no pierde permiso Docente | Evidencia técnica; no nueva VF manual |
-| Admin agrega Docencia a una cuenta Comité existente | Cadena integrada conserva cuenta, credencial y rol administrativo, no duplica Docencia | Evidencia técnica; no nueva VF manual |
-| Guía histórico de Docente inactivo | Relación creada en la cadena, lectura posterior a inactivar, mismos IDs | Conservación de historial incluida en VF previa; D-01 documenta datos actuales ajenos a ese caso |
-| Arranque y recursos locales | 22 comprobaciones HTTP y 12 controles de autoalta tras iniciar servicios | Disponibilidad real, no una nueva VF autenticada de navegador |
+| Incremento | Evidencia vigente |
+| --- | --- |
+| Protección personal Estudiante | 4e002b7; VF aprobada con excepción expresa de VF-08 |
+| Acuerdos de muestra y obligatoriedad | Presentación 55f0aa3 y ajustes posteriores; autoaltas Docente/Estudiante PASS; contenido sigue provisional |
+| CRUD, programa, estados e inactivación | 498134e; migración reportada ejecutada y verificada; «docente estudiante pass» |
+| Edición personal Docente atómica | f482ed8 y «VF Docente PASS» |
+| Preparación y recuperación | 834f1d0 / 9f5864e; «Guías PASS» y «Recuperación PASS» |
+| Credenciales seguras | d75fa93; 247 comprobaciones y VF-1 a VF-4 PASS |
+| CSRF del CRUD principal | 93fff17; 687 comprobaciones y VF-CSRF-1 a VF-CSRF-3 PASS |
 
-La suite integrada usa endpoints reales, sesiones devueltas por Login y una misma BD SQLite aislada por cadena: cuatro cadenas y **54/54 PASS**. Los bloqueos FOR UPDATE se retiran solo en el fixture. **70 consultas preparadas nativamente en MariaDB, cero errores, sin execute de mutaciones reales.** Esto no simula concurrencia InnoDB ni sustituye aprobación funcional de variantes no ejecutadas por el usuario.
+Los pushes anteriores fueron confirmados por el usuario; no se repite comprobación remota. La documentación de esta consolidación se prepara después de 93fff17 y todavía no tiene autorización de staging/commit/push. No se modificó código ni esquema para consolidar.
 
-## Observaciones, bloqueantes y diferidos
+## Iniciar la muestra
 
-| ID | Hallazgo | Impacto y tratamiento |
-| --- | --- | --- |
-| D-01 — Resuelto por autorización | 6 de 10 Estudiantes apuntan como guía a una persona existente en usuario pero sin fila en profesor. Cinco están en estados 1–5 y uno en 6. El modelo actual devuelve cero filas de nombre de guía en los seis casos. | Se identificaron como fichas TEST autorreferentes; el usuario eligió Docente de prueba ID 18. Ajuste transaccional aplicado a seis filas y lecturas verificadas; cero vínculos inválidos al terminar. Comprobación visual PASS comunicada por el usuario. La descripción de la columna anterior corresponde al hallazgo previo. |
-| D-02 — Recuperación | ZIP/SQL y hashes verificados; restauración no ejecutada | No afirmar recuperación ensayada ni importar SQL sobre la base viva para probar. |
-| D-03 — Aviso de datos | Acuerdos siguen con texto provisional; aprobación institucional/versionado/persistencia pendientes | Uso de muestra interna según lo aprobado. No constituye cierre para publicación en Internet. |
-| D-04 — Cursos | Bloqueo institucional independiente documentado en TASKS.md | Fuera del recorrido y de la certificación de esta entrega; no se modifica navegación ni autorización de Cursos. |
-| D-05 — Credenciales y despliegue | Se mantiene normalización/almacenamiento heredado y APP_ENV=dev del entorno local | No se cambia como parte de esta preparación ni se certifica un despliegue público. |
-| D-06 — Recursos externos | Tipografías Google e iconos Font Awesome usan servicios externos; CSS/JS principal local comprobado | No se ensayó el uso totalmente desconectado. Mantener la conectividad habitual para la presentación. |
+1. Abrir XAMPP Control Panel y comprobar **Apache y MySQL**. Si están funcionando, conservar esas instancias. Si un servicio está detenido, iniciarlo; ante un puerto ocupado comprobar primero la instancia existente.
+2. Abrir [Ingreso local](http://localhost/antropologiaIntranet/form-doc/login.php). Usar las cuentas de prueba que ya empleaste en VF; esta guía no contiene contraseñas.
+3. Recargar con **Ctrl+F5**. Ingresar como Admin o Comité y abrir [Docentes](http://localhost/antropologiaIntranet/admin/ver.docente.php) y [Estudiantes](http://localhost/antropologiaIntranet/admin/ver.estudiante.php).
+4. Usar una ficha histórica completa o un registro de prueba creado mediante alta integral. Los TEST EPIC003 parciales de usuarios 7–12 no tienen todos los antecedentes de ficha; sus lecturas vacías conocidas no acreditan fallo de recuperación. No rellenar etnia, líneas o perfiles ficticios para completar esos registros.
+5. Para autoalta, usar una ventana privada independiente de la cuenta administrativa. El texto de acuerdos debe presentarse como **texto de prueba para muestra interna**.
 
-Detalle privado de D-01: `REVISION-GUIAS-PENDIENTES.md` en la carpeta externa de artefactos indicada abajo. No incorporar nombres ni configuración privada al repositorio. Si la asignación actual es incorrecta y se confirma el guía correcto, Admin/Comité pueden ajustar la ficha por Datos del programa; si representa un guía histórico válido sin perfil Docente, primero debe definirse el contrato histórico correspondiente, sin sustituir el vínculo por conveniencia.
+Entorno comprobado: Apache localhost disponible; PHP 8.2.12 con Argon2id, MariaDB 10.4.32 y 39 tablas InnoDB. Autoload/configuración íntegros. Docente admite estado 4 Inactivo y Estudiante usa tipo 6 Inactivo(a). No se cambiaron puertos, configuración ni servicios por esta consolidación.
 
-## Arranque de la muestra en este equipo
+## Recorrido de presentación
 
-1. Abrir XAMPP Control Panel y comprobar Apache y MySQL. Ambos fueron iniciados en segundo plano durante esta preparación porque estaban detenidos. Si ya están activos, no iniciar otra instancia. No se cambió configuración de red ni de servicios.
-2. Abrir [Ingreso local](http://localhost/antropologiaIntranet/form-doc/login.php). La raíz [intranet local](http://localhost/antropologiaIntranet/) redirige al destino de la sesión o al ingreso. Usar las cuentas de prueba que el usuario ya empleó en VF; no se crean ni se incluyen contraseñas en esta guía.
-3. Entrar como Admin/Comité y abrir [Docentes](http://localhost/antropologiaIntranet/admin/ver.docente.php) o [Estudiantes](http://localhost/antropologiaIntranet/admin/ver.estudiante.php). Refrescar con Ctrl+F5 antes del recorrido si existen pestañas antiguas.
-4. Usar una ventana privada separada para la autoalta y para comprobar la sesión del titular, sin mezclarla con la sesión administrativa.
-5. Comprobar en pantalla que las seis fichas TEST muestran al Docente de prueba ID 18 como guía. La corrección no oculta registros ni cambia sus estados.
+Duración orientativa: 10–15 minutos. Es un recorrido de demostración, no una repetición obligatoria de las VF.
 
-Entorno verificado: PHP CLI 8.2.12, Apache 2.4.58, MariaDB 10.4.32, pdo_mysql/fileinfo/mbstring/json/ctype/session disponibles. APP_URL apunta a `http://localhost/antropologiaIntranet/`; autoload de Composer presente. Las 39 tablas son InnoDB. Estado Docente admite 1/2/3/4; Estudiante 6 es inactivo(a); la guardia de inactivación está habilitada.
+1. Ingreso administrativo → grilla → búsqueda/filtro → ficha completa de prueba.
+2. Datos personales y del programa; mostrar que estado académico y rol de cuenta conservan sus reglas.
+3. Autoalta con aceptación obligatoria: Docente queda Pendiente y Estudiante Postulante. Registrar solo si se necesita mostrar el resultado, con datos de prueba y correo nuevo.
+4. Eliminar equivale a **inactivar** ambos perfiles. Admin/Comité pueden reactivar desde el estado del programa; los vínculos y antecedentes históricos permanecen. Una cuenta con otro rol válido lo conserva.
+5. Mostrar conservación de contraseña cuando el campo queda vacío. Las contraseñas nuevas/convertidas distinguen mayúsculas y espacios.
+6. Si una ficha abierta antes de cerrar sesión y volver a ingresar pide recargar al guardar, recargarla: el token CSRF del formulario anterior fue invalidado. El rechazo no guarda cambios ni reenvía la solicitud automáticamente.
 
-## Recorrido sugerido de presentación
+Utilizar registros de prueba para cualquier modificación y restituir sus valores al terminar. No demostrar eliminaciones físicas ni cambiar roles para forzar una pantalla.
 
-No es una solicitud de repetir las VF ni un nuevo PASS automático.
+## Paquete vigente y ubicación
 
-1. Ingreso administrativo → lista → búsqueda y filtro → ficha de un registro de prueba coherente.
-2. Editar dirección y datos del programa; volver a abrir la ficha. Mostrar estados y grilla sin mezclar estado con rol de cuenta.
-3. En ventana privada, mostrar autoalta con acuerdos de prueba; si se decide registrar durante la presentación, utilizar exclusivamente datos de prueba y correo nuevo. Docente entra Pendiente; Estudiante entra Postulante. Las pruebas técnicas de esta preparación no crearon cuentas reales.
-4. Mostrar Eliminar como inactivación, recuperación desde Inactivos y conservación de antecedentes/guías; utilizar cuentas de prueba y anotar el estado original para restituirlo.
-5. Mostrar, si interesa, el conflicto de correo y la conservación de los valores guardados. Terminar dejando los registros de prueba en un estado válido conocido.
+Carpeta **privada, fuera de htdocs y Git**:
 
-## Artefactos preparados
+`C:/Users/volca/.codex/visualizations/2026/11/13/01a1d73e-4d1d-7201-8602-25624da60c81/consolidacion-muestra-20261115/`
 
-Carpeta privada local:
+| Archivo | Contenido / uso |
+| --- | --- |
+| `codigo-93fff17.zip` | Snapshot Git de 93fff17; no contiene la configuración .env ni el runtime completo |
+| `respaldo-local-93fff17-2026-11-15.zip` | Respaldo privado completo: `app/` contiene código, vendor, configuración y archivos; `database/` contiene el SQL; LEEME explica la estructura |
+| `respaldo-bd-muestra-20261115-150705.sql` | Dump completo nuevo de 39 tablas; incluye CREATE DATABASE/USE del nombre original |
+| `documentacion-consolidada-2026-11-15.zip` | Cinco documentos actuales, posteriores al commit base; aún pendientes de versionado autorizado |
+| `MUESTRA-INTERNA-2026-11-20.md` | Copia externa de esta guía para la presentación |
+| `delivery-manifest.json` | Versión, tamaños, SHA-256, archivos y resultados; identifica los artefactos vigentes |
+| `native-http-results.json`, `origin-http-results.json`, `source-verification.json` | Evidencia agregada de ejecución y origen sin cambios |
 
-`C:/Users/volca/.codex/visualizations/2026/11/13/01a1d73e-4d1d-7201-8602-25624da60c81/entrega-muestra-interna-20261114/`
+La documentación incluida dentro de `app/docs/` pertenece a 93fff17. Para operar la muestra prevalecen esta guía consolidada y el ZIP documental externo. Los respaldos de f482ed8 siguen conservados como históricos, pero el paquete de esta tabla es el vigente. Los ZIP de intentos parciales conservados para diagnóstico no son respaldos vigentes: no figuran como paquete seleccionado en delivery-manifest.json.
 
-| Archivo | Contenido | Verificación |
-| --- | --- | --- |
-| codigo-f482ed8.zip | Código rastreado de la revisión f482ed8; no incluye .env, vendor ni el PDF no rastreado | Git archive de commit identificado; checksum abajo |
-| respaldo-local-f482ed8-2026-11-14.zip | Código f482ed8, configuración .env privada, vendor, contenido actual de files/ y archivos/, SQL completo y LEEME de respaldo | ZIP sin errores ni entradas duplicadas; 19 archivos de ejecución contrastados; SQL y configuración coinciden con el original |
-| respaldo-bd-muestra-20261115-003051.sql | Dump completo de BD; el nombre usa UTC, corresponde a esta preparación del 14/11 America/Santiago | Exit 0, marcador final, 39 CREATE TABLE y SHA-256 verificados |
-| delivery-manifest.json | Revisión, archivos, tamaños y checksums | Evidencia externa de preparación; no contiene credenciales |
-| integration-results.json / preflight-results.json / http-smoke-results.json | Resultados técnicos y metadatos agregados | Sin escrituras de aplicación reales |
-| REVISION-GUIAS-PENDIENTES.md | Detalle privado de D-01 para confirmar con el programa | Solo lectura; mantener fuera de Git/htdocs |
+El respaldo completo incluye configuración y datos privados, posiblemente contraseñas heredadas aún no convertidas: conservarlo privado. No poner el ZIP, SQL o .env en el directorio público ni compartirlos como material de presentación. El PDF de ejecución no rastreado se preserva únicamente en el respaldo; ADR-003 y el borrador institucional JSON ajenos siguen excluidos.
 
-El respaldo completo contiene configuración y datos privados. Mantenerlo fuera de htdocs y del paquete de código compartible. El PDF no rastreado se conserva como parte del respaldo de ejecución, **no se agrega al commit de esta Task**. El borrador institucional y ADR no rastreados no se incorporan al paquete de código.
+SHA-256 de los artefactos principales:
 
-Checksums SHA-256:
+- Código: `08019f48edf60e18c77a745c29717b7ca2ae5112bd294a86ded5ec467284576c`.
+- Respaldo completo: `495b2b04759b03d9ecfe4718f83342d2ee5e3dab7cdb1783339d7deba216a64c`.
+- SQL: `daa65ef68fba62d8cf933c650bb477575bc924ddbd33f4164a82353dbc0e31bf`.
 
-- Código: `25484bfc19919077c65b62f3f841a31a1a7f8e354a24b7bbb3fc49803a88d7ee`.
-- Respaldo completo: `ec0024d3ebbf748d49a4e8c901b7232901e61eaec7a22b399def222da41c051f`.
-- SQL: `4f7c64eaaf379eabd0263920600bb334f8e56a1dee67db4cbe2f6fbc62ff5abc`.
+Comprobación opcional de lectura en PowerShell:
 
-El respaldo tiene el esquema **posterior a la migración de inactivación**. No aplicar nuevamente las migraciones por orden de archivo ni ejecutar el SQL histórico de Profesor para «instalar»: podría contradecir el estado 4 ya vigente.
+```powershell
+Get-FileHash -Algorithm SHA256 -LiteralPath 'C:/Users/volca/.codex/visualizations/2026/11/13/01a1d73e-4d1d-7201-8602-25624da60c81/consolidacion-muestra-20261115/respaldo-local-93fff17-2026-11-15.zip'
+```
 
-## Recuperación preparada, no ejecutada
+## Validaciones de esta consolidación
 
-### Si solo faltan los servicios
+- Dump: exit 0, marcador final, 39 CREATE TABLE, tamaño y SHA-256 conformes.
+- ZIP: CRC, rutas únicas/seguras y 353 entradas extraídas verificadas. Los 223 archivos de código comparados coinciden con la fuente del commit; se respeta la normalización LF/CRLF de Git. Configuración y 19 archivos de runtime coinciden byte a byte con origen.
+- **33/33 pruebas HTTP/MariaDB PASS desde el paquete extraído**, contra la base aislada de recuperación existente: login sintético, seis vistas, token estable, lecturas/grillas, guardado administrativo, CSRF, sesión ajena/relogin/recarga y logout. Servidor temporal 127.0.0.1:8099 detenido.
+- **7/7 comprobaciones HTTP GET PASS en el Apache original**: ingreso, raíz, ambas páginas de autoalta y recursos locales. Sin iniciar sesión con cuentas reales.
+- Huellas antes/después de las 39 tablas, esquema y .env: **sin cambios en origen**. No se ejecutó DDL ni se crearon cuentas. Las peticiones autenticadas de prueba usaron exclusivamente la cuenta sintética de la base aislada.
 
-Abrir XAMPP y arrancar Apache/MySQL; volver a ingresar. No restaurar la base para resolver únicamente servicios detenidos. Si el panel informa puerto ocupado, comprobar primero si ya existe una instancia activa; no iniciar una segunda ni cambiar puertos del proyecto por ensayo.
+El ensayo de recuperación anterior importó el respaldo de f482ed8 con autorización y terminó en «Recuperación PASS». En esta consolidación **no se reimportó el SQL nuevo**: se verificó su integridad y se probó el código extraído con la base aislada ya existente. Esa distinción evita afirmar una restauración completa nueva que no se ejecutó.
 
-### Si se necesita recuperar código o datos
+## Recuperación y contingencia
 
-La restauración requiere autorización específica en el momento de realizarla. Esta Task preparó el procedimiento y el respaldo; no reemplazó archivos de ejecución ni importó SQL en la BD viva.
+Si solo falta un servicio, iniciar Apache/MySQL y volver a ingresar. No restaurar la base para corregir únicamente un servicio detenido.
 
-1. Interrumpir el uso de la intranet y detener Apache para evitar nuevas escrituras. Mantener MySQL operativo para exportar e importar. Tomar un respaldo del estado que se va a reemplazar, junto con .env y los archivos actuales, y guardarlo con otro nombre fuera de htdocs.
-2. Verificar el SHA-256 del ZIP seleccionado contra delivery-manifest.json. Ejemplo de PowerShell, sustituyendo la ruta por la del archivo preparado: `Get-FileHash -Algorithm SHA256 -LiteralPath 'C:\ruta-privada\respaldo-local-f482ed8-2026-11-14.zip'`.
-3. Extraer el respaldo **en una carpeta privada de recuperación fuera de htdocs**. El SQL y la configuración no se deben servir por HTTP. Conservar también una copia de la carpeta de aplicación que se va a reemplazar.
-4. Recuperar el código revisado en la misma ruta `C:/xampp/htdocs/antropologiaIntranet`, junto con vendor y los archivos de ejecución del respaldo. Recuperar .env como configuración de la aplicación, según la estructura vigente. No copiar el SQL ni LEEME-RESPALDO.txt al directorio público. El código solo, sin la configuración y vendor, no constituye la recuperación completa.
-5. En [phpMyAdmin local](http://localhost/phpmyadmin/), comprobar la instancia y nombre de la base contra DB_NAME de la configuración antes de importar. **El SQL contiene CREATE DATABASE y USE del nombre original**: elegir otra base en la interfaz no redirige esas sentencias. No usar este dump sin adaptar y revisar para ensayar en otra base. Para recuperar la base original, importar únicamente tras confirmar la autorización para sustituir ese estado y el respaldo previo del paso 1.
-6. Importar `respaldo-base-datos.sql` desde la copia privada; comprobar finalización sin errores. El respaldo usa hex-blob y contiene también los documentos binarios almacenados en BD. Restaurar los archivos de files/ y archivos/ del mismo snapshot para mantener la correspondencia con el código/BD.
-7. Comprobar metadatos: estado Docente 1/2/3/4, catálogo Estudiante 6 inactivo(a), conexión y autoload. Arrancar Apache, abrir login, iniciar una sesión nueva y revisar una ficha de prueba con guía coherente. No reutilizar sesiones antiguas para acreditar que el contexto se reconstruyó correctamente.
-8. Si falla, detener la apertura al uso, conservar evidencia y evaluar volver al snapshot anterior completo. No eliminar antecedentes ni reactivar perfiles en masa para forzar compatibilidad.
+Una recuperación que sustituya código o datos necesita autorización específica y respaldo previo del estado que se reemplazará:
 
-No se ofrece un comando automático destructivo ni se ha validado una restauración mediante importación. Una futura prueba de recuperación debe realizarse en un destino aislado, con autorización y dump preparado para ese nombre de base, antes de certificar ese criterio.
+1. Detener el uso de la aplicación y conservar un respaldo nuevo del estado actual, configuración y archivos antes de reemplazar cualquier componente.
+2. Verificar SHA-256 del paquete completo contra delivery-manifest.json y extraerlo **fuera de htdocs**, conservando la estructura `app/` y `database/`.
+3. Recuperar el contenido de `app/` con su vendor, .env y archivos coherentes. Mantener `database/`, LEEME y ZIP fuera del directorio público. Configurar/verificar el destino antes de iniciar la copia.
+4. Revisar el nombre de BD de la configuración y las sentencias CREATE DATABASE/USE del dump. Elegir otra base en phpMyAdmin **no redirige esas sentencias**. Una importación original sustituiría ese estado; no ejecutarla sin su autorización y respaldo previo. Para un ensayo aislado se necesita adaptación/revisión del dump y autorización de ese destino.
+5. No ejecutar otra vez las migraciones por orden de archivo: este snapshot ya incluye los estados de inactivación vigentes. Conservar documentos binarios del SQL y archivos del mismo snapshot.
+6. Iniciar una sesión nueva y comprobar ingreso, ambas grillas y una ficha completa. Recargar páginas para renovar el token CSRF.
+7. No volver al login antiguo de comparación en texto plano: las cuentas convertidas requieren el verificador de hashes. Cualquier contingencia debe conservar código compatible con Argon2id y sus consumidores CSRF.
 
-## Estado de control
+Ante un fallo de recuperación, conservar evidencia y evaluar el snapshot completo correspondiente. No eliminar antecedentes, reasignar guías o reactivar perfiles en masa para forzar compatibilidad.
 
-- Ningún archivo de aplicación ni esquema fue modificado por esta preparación.
-- No se crearon cuentas ni se alteraron roles. Se corrigió prof_guia de seis fichas TEST por elección expresa del usuario; existe respaldo previo y posterior. Se iniciaron Apache/MySQL para la comprobación local.
-- Los siete documentos de entrega/conciliación están pendientes de autorización de staging y commit.
-- D-01 está resuelto en BD y la VF visual de las seis fichas tiene PASS comunicado por el usuario; no se confunden las lecturas técnicas con esa aprobación manual.
+## Pendientes fuera de la muestra
 
-## Evidencia posterior de D-01
+| Tema | Estado / límite |
+| --- | --- |
+| Aviso institucional de datos | Texto provisional. Responsables, contacto, conservación, accesos/hosting y aprobación siguen pendientes del cliente; persistencia/versionado del consentimiento pendiente para publicación |
+| Cursos | Bloqueo institucional independiente; fuera del recorrido y de la certificación de esta muestra |
+| Publicación en Internet | Sin autorización de despliegue; pendientes revisión de hosting/HTTPS, configuración de producción y demás controles de acceso público |
+| Credenciales heredadas | Se convierten tras ingreso correcto o cambio autorizado; los respaldos anteriores mantienen su contenido histórico |
+| Recursos externos | Tipografías e iconos dependen de servicios externos; no se certifica funcionamiento totalmente desconectado |
 
-Resultados: guide-correction-result.json, con seis filas modificadas, otros campos sin cambios, 38 tablas adicionales sin cambios y seis lecturas de guía conformes. El preflight posterior tiene cero guías sin perfil. El respaldo pre-guide-correction-backup-report.json conserva el estado previo, y database-backup-report.json / delivery-manifest.json identifican el respaldo posterior. El reporte privado de guías se conserva como antecedente y se marca resuelto.
+## VF operativa mínima pendiente
 
-## Confirmación de cierre funcional
+1. Abrir esta guía y ubicar el respaldo completo y delivery-manifest.json en la carpeta privada indicada, sin extraer ni importar nada.
+2. En localhost, iniciar sesión con la cuenta de prueba habitual y abrir las grillas Docentes y Estudiantes. Esperado: ingreso y ambas grillas disponibles.
 
-«Guías PASS» comunicado por el usuario el 14/11/2026. Preparación y guía actualizadas; muestra interna localhost lista dentro del alcance. Siete documentos pendientes de autorización de staging/commit. El código base sigue siendo f482ed8; no hay nuevo despliegue ni publicación abierta por este registro.
-
-
-Autorización documental del 14/11/2026: el usuario aprobó staging y commit de los siete documentos de TASK-ENTREGA-MUESTRA-INTERNA-001. La publicación documental por push conserva autorización separada. Las menciones a autorización pendiente anteriores son históricas.
-
-
-Autorización vigente del 15/11/2026: el usuario aprobó staging y commit de los cinco documentos del ensayo de recuperación aislada, tras Recuperación PASS. Las menciones anteriores a autorización pendiente son antecedentes. Push requiere autorización separada.
+Informar **«Consolidación PASS»** o indicar FAIL/BLOQUEADA y el paso. No repetir alta, edición, inactivación, credenciales ni CSRF ya aprobados. Después se requiere autorización separada de staging/commit y de push documental. Esta guía y su paquete no autorizan publicación abierta.

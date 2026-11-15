@@ -17,7 +17,10 @@ require_once __DIR__ . '/../src/bootstrap/session.php';
   <div class="row" id="lista_doc">
     <div class="col g-3 m-5">
       <h3 class=" text-center "> DOCENTES</h3>
-      <p>Para recuperar un registro, seleccione Inactivos y abra Información → Editar Datos Programa. Elija un estado vigente y guarde. La cuenta deberá volver a iniciar sesión para recuperar el perfil.</p>
+      <details class="small text-muted mb-3">
+        <summary>Cómo recuperar un registro inactivo</summary>
+        <p class="mt-2 mb-0">Seleccione Inactivos y abra Información → Editar Datos Programa. Elija un estado vigente y guarde. La cuenta deberá volver a iniciar sesión para recuperar el perfil.</p>
+      </details>
       <div class="alert d-none" id="mensaje_estado_docente" role="alert"></div>
       <div class="row mt-5">
         <div class="col-md-4 mb-3">
@@ -125,4 +128,4 @@ ob_end_flush();
                     
 
 
-    
+

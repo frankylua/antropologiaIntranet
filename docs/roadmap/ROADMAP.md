@@ -1,5 +1,17 @@
 # Roadmap Maestro de Modernización
 
+Consolidación: siete archivos con staging/commit autorizados expresamente tras las dos VF aprobadas. Se finalizará el respaldo sobre ese commit, incluyendo las ayudas desplegables, con manifiesto privado en version-final/ y comprobación desde la copia extraída. Se conservan los respaldos anteriores; push permanece separado. Las referencias siguientes de autorización pendiente corresponden a etapas anteriores.
+
+Consolidación aceptada funcionalmente por «Consolidación PASS» del usuario, con «Ayuda PASS» previo. El alcance operativo de muestra está validado; resta versionar siete archivos y actualizar el paquete privado con el ajuste visual, conservando el respaldo anterior. Staging/commit y push mantienen autorización separada. No se extiende esta aceptación a producción ni al conjunto de épicas.
+
+El usuario confirmó «Ayuda PASS» al ajuste de recuperación desplegable. Se cierra su VF visual; resta confirmar el cierre operativo de consolidación y actualizar/versionar el paquete con esas dos vistas. El respaldo 93fff17 sigue conservado como estado previo al ajuste; no se declara por esta respuesta una VF completa adicional.
+
+Durante la VF de consolidación, el usuario pidió reducir el aviso de recuperación de las grillas. Se convirtió en ayuda desplegable cerrada en ambas vistas; pendiente VF visual y posterior actualización del paquete de entrega para incluirlo. Se conserva el respaldo 93fff17 como estado anterior identificado. No se cierra consolidación ni se atribuye PASS completo por esa observación.
+
+Consolidación de muestra interna autorizada y técnicamente completa: [TASK-ENTREGA-CONSOLIDACION-MUESTRA-001](../tasks/TASK-ENTREGA-CONSOLIDACION-MUESTRA-001.md), aplicación 93fff17, respaldo privado actualizado y guía conciliada. 33/33 pruebas del paquete extraído y 7/7 GET del localhost original conformes; origen intacto. Review aprobado para VF operativa mínima pendiente. El estimado anterior de 95% precede este trabajo; resta su aceptación operativa/documental, sin extender la estimación a Internet o a todas las épicas. Sin migración, importación, cambios de aplicación ni autorizaciones Git nuevas.
+
+CSRF cerrada en 93fff17ca547540d16d58b3a051eae1f3baa77a0 con push confirmado y VF completa PASS. Estimación de planificación del alcance de muestra interna: aproximadamente 95%; CRUD priorizado, permisos/estados, credenciales y CSRF tienen validación, y la recuperación anterior fue aprobada. Falta consolidar paquete/respaldo e instrucciones sobre la revisión actual: los artefactos iniciales de muestra se basan en f482ed8 y preceden los dos cambios de seguridad. Siguiente Task propuesta: TASK-ENTREGA-CONSOLIDACION-MUESTRA-001, 2–3 horas estimadas, pendiente de autorización. El porcentaje es orientativo del alcance acotado de muestra, no una medición de todas las épicas ni de preparación para Internet. No existe una estimación global verificable sin inventario/ponderación de los pendientes institucionales y de publicación.
+
 CSRF del CRUD principal: staging y commit de los 11 archivos autorizados por el usuario tras Review y las tres VF PASS. Push pendiente de autorización separada; las referencias siguientes a autorización de commit pendiente describen etapas anteriores.
 
 CSRF del CRUD principal: las tres VF fueron confirmadas PASS por el usuario. Implementación y validación funcional aprobadas; pendiente autorización de staging y commit, con push separado. Las referencias siguientes de VF pendiente quedan superadas por esta confirmación.

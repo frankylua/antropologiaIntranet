@@ -1,5 +1,17 @@
 # Registro de TASK
 
+Consolidación: staging y commit de los siete archivos autorizados expresamente después de «Consolidación PASS» y «Ayuda PASS». Tras el commit, el paquete final se identifica en consolidacion-muestra-20261115/version-final/delivery-manifest.json; se preservan los anteriores. Hash y resultados posteriores se guardan fuera de Git. Push pendiente de autorización separada; las menciones siguientes a autorización de commit pendiente son históricas.
+
+«Consolidación PASS» confirmado expresamente por el usuario: ubicación de respaldos, ingreso y ambas grillas aprobados; «Ayuda PASS» también vigente. TASK-ENTREGA-CONSOLIDACION-MUESTRA-001 queda con Review y VF completos, pendiente autorización de staging/commit de siete archivos. Tras versionar el ajuste se actualizará el paquete privado; push separado. Las referencias siguientes a VF pendiente son históricas.
+
+Ajuste visual de ayuda: «Ayuda PASS» confirmado por el usuario. Las dos vistas de ayuda desplegable quedan aprobadas técnica y funcionalmente. La consolidación conserva pendiente su confirmación operativa final y la actualización del paquete tras versionar el ajuste; siete archivos del alcance, sin autorización de staging/commit/push.
+
+Solicitud posterior durante VF de consolidación: convertir el aviso permanente de recuperación en ayuda desplegable cerrada de Docentes y Estudiantes. Ajuste aplicado únicamente a admin/ver.docente.php y admin/ver.estudiante.php, con revisión visual pendiente. El alcance de consolidación pasa de cinco documentos a siete archivos. Los paquetes previos 93fff17 se conservan y deben actualizarse tras validar/versionar este ajuste; todavía no hay Consolidación PASS ni autorización Git.
+
+Task activa: [TASK-ENTREGA-CONSOLIDACION-MUESTRA-001](tasks/TASK-ENTREGA-CONSOLIDACION-MUESTRA-001.md), autorizada expresamente e implementada sobre 93fff17. Paquetes privados nuevos verificados (39 tablas, 223 archivos de código y 19 de runtime), 33 pruebas desde copia extraída y 7 GET de origen PASS; fuente/esquema/configuración sin cambios. Guía operativa conciliada; Review Técnico APROBADO PARA VF mínima. Solo cinco documentos afectados; pendientes VF y autorizaciones separadas de staging/commit/push. No se importó el dump nuevo ni se alteró aplicación. Las propuestas siguientes por autorizar son antecedentes.
+
+CSRF del CRUD principal cerrada en 93fff17ca547540d16d58b3a051eae1f3baa77a0, con push confirmado por el usuario y las tres VF PASS. Siguiente propuesta pendiente de autorización: consolidar la muestra interna sobre la revisión actual, actualizar respaldo privado de código/BD/configuración/archivos, manifiesto e instrucciones, y comprobar arranque/ingreso. La guía de muestra aún identifica f482ed8 y contiene observaciones históricas de recuperación y credenciales que necesitan conciliación. No se abre otra implementación por registrar la propuesta.
+
 CSRF del CRUD principal: el usuario autorizó staging y commit de los 11 archivos de TASK-EPIC002-CSRF-CRUD-PRINCIPAL-001 tras Review y VF-CSRF-1 a 3 PASS. Push requiere autorización separada; las menciones siguientes de autorización de commit pendiente son históricas.
 
 CSRF del CRUD principal: el usuario confirmó «VF-CSRF-1, VF-CSRF-2 y VF-CSRF-3: PASS». TASK-EPIC002-CSRF-CRUD-PRINCIPAL-001 tiene Review Técnico y VF aprobados. Pendiente autorización de staging y commit de sus 11 archivos; push separado. Las menciones siguientes de VF pendiente corresponden al estado previo a la confirmación.

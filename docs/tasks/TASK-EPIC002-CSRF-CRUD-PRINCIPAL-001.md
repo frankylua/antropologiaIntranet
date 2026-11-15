@@ -1,5 +1,9 @@
 # TASK-EPIC002-CSRF-CRUD-PRINCIPAL-001
 
+## Cierre vigente
+
+El usuario confirmó «push ejecutado aiguiente task, dame la estimacion del porcentaje que tenemos avanzado» tras el commit 93fff17ca547540d16d58b3a051eae1f3baa77a0. Se registra el push según su confirmación, sin comprobación remota adicional. Task cerrada: Review aprobado, 687 comprobaciones automatizadas conformes, sintaxis 7/7 y VF-CSRF-1 a 3 PASS. Las menciones posteriores de autorizaciones pendientes describen etapas anteriores. No autoriza publicación en Internet ni implementar otra Task.
+
 ## Autorización, base y alcance
 
 Usuario: «Autorizo la Task de protección CSRF». Base: d75fa93cbe758f0f04c3ed16db97e4b04b26a429, rama refactor/fase-0-seguridad. Credenciales seguras cerrada con push confirmado. Tres documentos de cierre ya modificados al iniciar (TASKS, ROADMAP y Task de credenciales); se preservan e incorporan como trazabilidad. Se excluyen ADR-003, aviso JSON y PDF ajenos no rastreados.

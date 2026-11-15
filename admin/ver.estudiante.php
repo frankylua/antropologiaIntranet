@@ -17,7 +17,10 @@ if (!isset($_SESSION['admin']) && !isset($_SESSION['comite'])) {
     <div class="row" id="lista_est">
       <div class="col">
         <h3 class=" text-center"> ESTUDIANTES</h3>
-        <p>Para recuperar un registro, filtre por Inactivo(a), abra Información → Editar Datos Programa, elija un estado vigente y guarde. La cuenta deberá volver a iniciar sesión para recuperar el perfil.</p>
+        <details class="small text-muted mb-3">
+          <summary>Cómo recuperar un registro inactivo</summary>
+          <p class="mt-2 mb-0">Filtre por Inactivo(a), abra Información → Editar Datos Programa, elija un estado vigente y guarde. La cuenta deberá volver a iniciar sesión para recuperar el perfil.</p>
+        </details>
         
         <div class="row justify-content-center " id="mnsj_row_encabezado">
           <div class="col-lg-8 alert  mt-3 text-center alert-danger" role="alert" id="mnsj_encabezado"></div>
