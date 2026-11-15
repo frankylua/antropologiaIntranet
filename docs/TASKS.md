@@ -1,5 +1,13 @@
 # Registro de TASK
 
+CSRF del CRUD principal: el usuario autorizó staging y commit de los 11 archivos de TASK-EPIC002-CSRF-CRUD-PRINCIPAL-001 tras Review y VF-CSRF-1 a 3 PASS. Push requiere autorización separada; las menciones siguientes de autorización de commit pendiente son históricas.
+
+CSRF del CRUD principal: el usuario confirmó «VF-CSRF-1, VF-CSRF-2 y VF-CSRF-3: PASS». TASK-EPIC002-CSRF-CRUD-PRINCIPAL-001 tiene Review Técnico y VF aprobados. Pendiente autorización de staging y commit de sus 11 archivos; push separado. Las menciones siguientes de VF pendiente corresponden al estado previo a la confirmación.
+
+Task activa autorizada: [TASK-EPIC002-CSRF-CRUD-PRINCIPAL-001](tasks/TASK-EPIC002-CSRF-CRUD-PRINCIPAL-001.md). Implementada en 11 archivos, incluidos los tres cierres documentales anteriores. Protección CSRF de 17 operaciones autenticadas de Admin/Docente/Estudiante; autoaltas y módulos académicos conservan sus tokens. 687/687 comprobaciones, lint 7/7 y Review Técnico APROBADO PARA VF. VF-CSRF-1 a 3 pendientes; sin migración ni autorización de staging/commit/push. La anotación siguiente de propuesta por autorizar queda superada por la autorización expresa recibida.
+
+TASK-EPIC002-CREDENCIALES-SEGURAS-001 cerrada: commit d75fa93cbe758f0f04c3ed16db97e4b04b26a429, push confirmado por el usuario, Review Técnico aprobado y VF-1 a VF-4 PASS. Las menciones anteriores de autorizaciones pendientes quedan superadas. Siguiente incremento por autorizar: protección CSRF de escrituras autenticadas del CRUD principal; la inspección encontró tokens CSRF en módulos académicos, pero no en ajax/admin.php, ajax/docente.php y ajax/estudiante.php. No se implementa ese incremento por registrar la propuesta.
+
 Credenciales seguras: el usuario autorizó expresamente staging y commit de los 15 archivos de TASK-EPIC002-CREDENCIALES-SEGURAS-001 tras VF-1 a VF-4 PASS. Push conserva autorización separada. Las menciones anteriores a autorización pendiente son históricas.
 
 Credenciales seguras: el usuario confirmó «VF-1, VF-2, VF-3 y VF-4: PASS». Se registra VF completa aprobada de TASK-EPIC002-CREDENCIALES-SEGURAS-001; pendiente únicamente de autorización de staging y commit para esta etapa. Push separado. La mención de VF pendiente en el informe técnico siguiente corresponde al estado anterior a esa confirmación.

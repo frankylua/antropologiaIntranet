@@ -1,5 +1,13 @@
 # Roadmap Maestro de Modernización
 
+CSRF del CRUD principal: staging y commit de los 11 archivos autorizados por el usuario tras Review y las tres VF PASS. Push pendiente de autorización separada; las referencias siguientes a autorización de commit pendiente describen etapas anteriores.
+
+CSRF del CRUD principal: las tres VF fueron confirmadas PASS por el usuario. Implementación y validación funcional aprobadas; pendiente autorización de staging y commit, con push separado. Las referencias siguientes de VF pendiente quedan superadas por esta confirmación.
+
+Siguiente incremento ya autorizado e implementado: [CSRF del CRUD principal](../tasks/TASK-EPIC002-CSRF-CRUD-PRINCIPAL-001.md), 17 operaciones autenticadas sin modificar roles ni tokens de autoalta. 687/687 comprobaciones y lint 7/7; Review Técnico aprobado para VF-CSRF-1 a 3, todavía pendientes. Sin migración, staging, commit ni push. Las propuestas anteriores de este incremento quedan superadas por su autorización vigente; la publicación abierta sigue pendiente de sus demás condiciones.
+
+Credenciales seguras cerrada en d75fa93cbe758f0f04c3ed16db97e4b04b26a429; push confirmado por el usuario y cuatro VF PASS. Siguiente propuesta pendiente de autorización: CSRF en escrituras autenticadas del CRUD principal, conservando roles, ownership, transacciones y tokens propios de autoalta. No se modifica la aplicación ni se declara habilitada la publicación en Internet por este cierre.
+
 Credenciales seguras: staging y commit de sus 15 archivos autorizados expresamente por el usuario tras Review y cuatro VF PASS. Push pendiente de autorización separada; las menciones anteriores a autorización de commit pendiente describen etapas previas.
 
 Credenciales seguras: VF-1, VF-2, VF-3 y VF-4 confirmadas PASS por el usuario. Implementación y validación funcional aprobadas; pendiente autorización de staging y commit, con push separado. Las referencias a VF pendiente del informe anterior quedan superadas por esta confirmación.

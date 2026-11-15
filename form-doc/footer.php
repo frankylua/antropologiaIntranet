@@ -15,6 +15,13 @@
 </footer>
 <script src="<?php echo RUTA;?>/dist/js/bootstrap.bundle.min.js?"></script>
 <script src="<?php echo RUTA;?>js/jquery-3.7.0.min.js"></script>
+<script type="application/json" id="crud-csrf-config"><?php
+echo json_encode([
+    'token' => \App\Security\CrudCsrf::token(),
+    'endpoints' => [RUTA . 'ajax/admin.php', RUTA . 'ajax/docente.php', RUTA . 'ajax/estudiante.php'],
+], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_THROW_ON_ERROR);
+?></script>
+<script src="<?php echo RUTA;?>js/crudCsrf.js?v=<?php echo filemtime(__DIR__ . '/../js/crudCsrf.js');?>"></script>
 <script src="<?php echo RUTA;?>js/fechaCivil.js"></script>
 <script src="<?php echo RUTA;?>js/components/confirmDelete.js"></script>
 <script src="<?php echo RUTA;?>js/funcAjax.js?d=@DateTime.Now.ToString("ddMMyyddmmsss")"></script>

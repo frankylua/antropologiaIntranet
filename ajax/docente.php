@@ -5,6 +5,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 }
 require_once __DIR__ . '/../src/bootstrap/app.php';
 \App\Security\AcademicSession::enforce();
+\App\Security\CrudCsrf::enforce('docente');
 use App\Model\Docente;
 use App\Security\Authorization;
 

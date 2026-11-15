@@ -370,6 +370,8 @@ try {
     }
 
     $_SESSION = $sessionAfterAuthentication;
+    // Cada ingreso invalida los tokens de formularios de la sesión anterior.
+    unset($_SESSION['csrf_crud']);
     respondLoginJson(200, $permissions);
 } catch (\DomainException $exception) {
     respondLoginJson(403, ['error'=>$exception->getMessage(), 'mensaje'=>$exception->getMessage()==='PERFIL_INACTIVO'

@@ -1,5 +1,9 @@
 # TASK-EPIC002-CREDENCIALES-SEGURAS-001
 
+## Cierre vigente
+
+El usuario confirmó «push ejecutado siguiente task» después del commit d75fa93cbe758f0f04c3ed16db97e4b04b26a429. Se registra el push según su confirmación, sin repetir comprobación remota. Task cerrada con Review Técnico aprobado, 247 comprobaciones automatizadas conformes, lint 12/12 y VF-1 a VF-4 PASS. Las referencias posteriores a autorizaciones pendientes describen etapas anteriores. El cierre no autoriza publicación en Internet ni implementación de otra Task.
+
 ## Autorización y alcance
 
 15/11/2026: «Autorizo la Task de credenciales seguras». Base: rama refactor/fase-0-seguridad, HEAD 9f5864e126e1526e3b7a0a76a5ca562e0deabbf6. Sin cambios rastreados iniciales. Se preservan los tres archivos ajenos no rastreados (ADR-003, aviso JSON y PDF de programa).

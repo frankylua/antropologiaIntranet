@@ -3,6 +3,7 @@ require_once __DIR__ . '/../src/bootstrap/session.php';
 session_start();
 require_once __DIR__ . '/../src/bootstrap/app.php';
 \App\Security\AcademicSession::enforce();
+\App\Security\CrudCsrf::enforce('estudiante');
 use App\Model\Docente;
 use App\Model\Estudiante;
 use App\Security\Authorization;

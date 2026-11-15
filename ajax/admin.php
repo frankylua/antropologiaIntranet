@@ -9,6 +9,7 @@ require 'validaciones.php';
 if (session_status() !== PHP_SESSION_ACTIVE) {
         session_start();
 }
+\App\Security\CrudCsrf::enforce('admin');
 
 function responderAdmin(int $estado, $respuesta): void
 {
