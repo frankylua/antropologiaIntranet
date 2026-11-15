@@ -1,6 +1,8 @@
 # Registro de TASK
 
-Unidad activa: [TASK-EPIC001-DOCENTE-EDICION-PERSONAL-ATOMICA-001](tasks/TASK-EPIC001-DOCENTE-EDICION-PERSONAL-ATOMICA-001.md), autorizada expresamente por el usuario. Implementada en dos archivos backend y tres documentos; REVIEW TÉCNICO — APROBADO PARA VF. 91 pruebas backend, 8 frontend, regresiones 111+36 y 2 rechazos HTTP PASS; 12 consultas preparadas nativamente sin execute de mutaciones. VF-DP-01 a VF-DP-04 PASS comunicados por el usuario («VF Docente PASS»); incremento validado técnica y funcionalmente, staging y commit autorizados expresamente por el usuario. Publicación pendiente de autorización de push. Guardado personal y credenciales en una sola transacción, preservando reglas actuales; sin migración. Incremento anterior [CRUD e inactivación](tasks/TASK-EPIC001-ESTUDIANTE-CRUD-INTEGRAL-001.md) validado, commit `498134e`, push ejecutado y aprobado por el usuario. No repetir sus VF ni borrar físicamente perfiles. El usuario autorizó staging y commit de los cinco archivos de esta Task; el push requiere autorización posterior.
+Actualización vigente de la muestra: D-01 resuelto con Docente de prueba ID 18 elegido expresamente por el usuario. Se corrigieron solo las seis asignaciones TEST (usuarios 7–12), con respaldo previo, transacción, otras 38 tablas sin cambios y lecturas conformes. Respaldo posterior actualizado. REVIEW TÉCNICO APROBADO y VF operativa de las seis fichas PASS («Guías PASS»). Muestra interna localhost lista para el alcance acordado; siete documentos pendientes de autorización de staging/commit. Las referencias a decisión pendiente/entrega observada más abajo corresponden al hallazgo previo y quedan superadas por esta actualización.
+
+Unidad activa: [TASK-ENTREGA-MUESTRA-INTERNA-001](tasks/TASK-ENTREGA-MUESTRA-INTERNA-001.md), autorizada por «Autorizo preparar la muestra interna». Destino confirmado: este equipo, localhost. Aplicación base `f482ed8`; commits `498134e` y `f482ed8` con push informado por el usuario, sus VF conservadas. Preparación técnica: 54 comprobaciones integradas aisladas, 22 de disponibilidad HTTP y 12 de autoalta HTTP conformes; respaldo actual verificado y [guía de entrega/recuperación](entrega/MUESTRA-INTERNA-2026-11-20.md). Entrega observada por D-01: seis vínculos de guía a personas sin perfil Docente; decisión de tratamiento para la muestra pendiente. Sin cambios de código, esquema, cuentas o relaciones reales. Sin staging, commit ni push de estos documentos. Cursos conserva su bloqueo institucional independiente.
 
 ## TASK-EPIC001-ESTUDIANTE-READ-UPDATE-SEGURO-001
 
@@ -2376,3 +2378,6 @@ puede continuar con incrementos independientes que no modifiquen
 `ajax/curso.php`, `form-doc/scripts/curso.js`, `form-doc/ver.curso.php`, la
 navegación, las capacidades ni las reglas institucionales de Cursos. Esta
 anotación no selecciona el siguiente incremento.
+
+
+Autorización documental del 14/11/2026: el usuario aprobó staging y commit de los siete documentos de TASK-ENTREGA-MUESTRA-INTERNA-001. La publicación documental por push conserva autorización separada. Las menciones a autorización pendiente anteriores son históricas.

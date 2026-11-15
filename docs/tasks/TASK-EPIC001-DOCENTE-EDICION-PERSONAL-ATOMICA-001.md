@@ -2,7 +2,9 @@
 
 ## Estado, autorización y objetivo
 
-IMPLEMENTADA; REVIEW TÉCNICO — APROBADO PARA VF. Autorización: «Autorizo la Task de edición Docente». VF-DP-01 a VF-DP-04 PASS comunicados por el usuario mediante «VF Docente PASS». Incremento validado técnica y funcionalmente; staging y commit autorizados expresamente por el usuario. Publicación pendiente de autorización de push. Sin migración, staging, commit ni push. Resolver el guardado parcial de datos personales y credenciales del Docente: ambos se confirman juntos o se revierten. Prioridad: CRUD principal de la muestra interna al 20/11/2026. Estimación aprobada de referencia: 2–3 horas efectivas con pruebas y Review; no constituye un plazo ya consumido ni un resultado de pruebas.
+CERRADA: implementada, Review Técnico aprobado y VF-DP-01 a VF-DP-04 PASS del usuario. Commit `f482ed898bafa23abca1877f14dafd570a05781c`; push ejecutado informado por el usuario («push ejecutado»). Sin migración. La publicación pendiente de apartados anteriores corresponde al momento en que se redactaron. Preparación de muestra vigente: [TASK-ENTREGA-MUESTRA-INTERNA-001](TASK-ENTREGA-MUESTRA-INTERNA-001.md).
+
+Autorización original: «Autorizo la Task de edición Docente». Objetivo cumplido: guardar datos personales y credenciales juntos, o revertirlos ante un error. Prioridad del CRUD principal de la muestra interna al 20/11/2026.
 
 Línea base: rama `refactor/fase-0-seguridad`, HEAD `498134eb9a22d48f3e94a624f6cb289d7b6d95a8`. El usuario confirmó push ejecutado y aprobado de ese commit; no se repite verificación remota. Inactivación/reactivación anterior con PASS de Docente y Estudiante. Índice vacío, sin modificaciones rastreadas al inicio; se preservan ADR-003, borrador institucional JSON y PDF académico no rastreados.
 
@@ -99,3 +101,7 @@ Siguiente paso: autorización específica de staging y commit de cinco archivos:
 El usuario confirmó «Autorizo staging y commit». Preflight: los cinco archivos coinciden con el manifiesto posterior a VF; HEAD 498134eb9a22d48f3e94a624f6cb289d7b6d95a8, rama refactor/fase-0-seguridad e índice vacío. Se incorpora únicamente este registro de autorización a la documentación; el código revisado y validado no cambia.
 
 Este registro forma parte del commit autorizado `TASK-EPIC001: hace atomica la edicion personal de Docente`. Hash y verificación posterior se conservarán en el artefacto externo docente-edicion-personal/commit-result.json, evitando modificar nuevamente el documento para incluir el hash de su propio commit. Push pendiente de autorización específica. Mantener excluidos todos los archivos ajenos y artefactos externos.
+
+## Cierre conciliado — 14/11/2026
+
+El usuario informó «push ejecutado» para f482ed8, cuyo HEAD se comprobó localmente. Se registró el resultado en docente-edicion-personal/commit-result.json sin repetir la verificación remota. Esta conciliación únicamente actualiza documentación de cierre como parte de TASK-ENTREGA-MUESTRA-INTERNA-001; el código validado no cambió y no se repiten pruebas por este registro.

@@ -2,13 +2,21 @@
 
 ## Estado
 
-APROBADA PARA REVISIÓN TÉCNICA PREVIA.
+CONCILIADA DOCUMENTALMENTE PARA LA MUESTRA INTERNA EL 14/11/2026.
 
-Implementación:
-No iniciada.
+La anotación anterior «Implementación: No iniciada» no describe el código vigente. El objeto Profesor está implementado en la revisión f482ed8, con incrementos publicados, pruebas técnicas y VF documentadas en las Tasks posteriores. Esto no convierte todas las variantes de la matriz histórica en VF manual aprobada. Estado detallado y límites: [guía de entrega](../entrega/MUESTRA-INTERNA-2026-11-20.md).
 
-VF:
-Pendiente.
+## Precedencia de decisiones posteriores
+
+Este documento conserva el planteamiento original como antecedente. Para la muestra prevalecen las decisiones expresas posteriores registradas en TASK-EPIC001-ESTUDIANTE-CRUD-INTEGRAL-001 y TASK-EPIC001-DOCENTE-EDICION-PERSONAL-ATOMICA-001:
+
+- Eliminar significa inactivar; se conserva el registro y todas sus relaciones, incluso con antecedentes. Admin mantiene botón Eliminar; Admin y Comité editan estado y reactivan.
+- Estado Docente 4 Inactivo añadido a 1/2/3; Estudiante 6 Inactivo. Bloquear el perfil inactivo y conservar otros roles válidos. No aplicar el SQL histórico de dominio 1/2/3 sobre la base actual.
+- Mi Perfil resuelve propiedad en backend; edición personal y credenciales Docente ahora atómicas, sin cambiar reglas vigentes de credenciales.
+- Autoaltas exigen aceptación; el texto es provisional. Alta pública Docente fuerza Pendiente/permiso 4 y alta administrativa Aceptado.
+- La preparación de muestra no reabre el bloqueo institucional de Cursos ni autoriza implementar otra vez este plan histórico.
+
+Revisión documental actual sin cambios de código. Fuente de trazabilidad: [TASK-ENTREGA-MUESTRA-INTERNA-001](TASK-ENTREGA-MUESTRA-INTERNA-001.md). Cuatro cadenas nuevas, 54 comprobaciones técnicas PASS, incluyen roles adicionales y transición administrativa a Docencia; no constituyen VF manual adicional.
 
 ## Objetivo
 
