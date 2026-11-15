@@ -38,6 +38,17 @@ final class PasswordCredentials
         return self::matches($pdo, $id, (string)$rows[0]['pass'], $password) ? $id : null;
     }
 
+    /** Identidad del presupuesto: respeta la collation real sin comprobar el secreto. */
+    public static function accountIdentity(PDO $pdo, string $email): string
+    {
+        $q = $pdo->prepare('SELECT id_login FROM login WHERE correo = :correo');
+        $q->execute(['correo'=>$email]);
+        $ids = $q->fetchAll(PDO::FETCH_COLUMN);
+        return count($ids) === 1 && (int)$ids[0] > 0
+            ? 'login:' . (int)$ids[0]
+            : 'input:' . mb_strtolower(trim($email), 'UTF-8');
+    }
+
     private static function matches(PDO $pdo, int $id, string $stored, string $password): bool
     {
         if ($password === '') return false;

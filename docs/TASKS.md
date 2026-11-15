@@ -1,5 +1,13 @@
 # Registro de TASK
 
+Intentos de login: staging y commit de los once archivos de TASK-EPIC002-LOGIN-INTENTOS-001 autorizados expresamente por el usuario tras Review y tres VF PASS. Código/configuración contrastados con el Review aprobado. Push pendiente de autorización separada; las menciones siguientes de autorización de commit pendiente son históricas.
+
+Intentos de login: «VF-LOGIN-1, VF-LOGIN-2 y VF-LOGIN-3: PASS» confirmado por el usuario. TASK-EPIC002-LOGIN-INTENTOS-001 tiene Review Técnico y VF aprobados; pendiente autorización de staging/commit de once archivos, con push separado. Las referencias siguientes de VF pendiente son históricas.
+
+Task activa autorizada: [TASK-EPIC002-LOGIN-INTENTOS-001](tasks/TASK-EPIC002-LOGIN-INTENTOS-001.md), protección temporal del login por cuenta/origen. Implementada en once archivos: store operativo SQLite privado, límites configurables y aviso de espera; sin cambios de tablas MySQL, roles, estados o .env real. 363/363 comprobaciones y sintaxis 6/6; concurrencia de 20 procesos y HTTP/MariaDB aislados conformes. Origen comparado sin cambios en 39 tablas/esquema/configuración. Review Técnico APROBADO PARA VF-LOGIN-1 a 3, pendientes. Sin staging/commit/push; la propuesta siguiente por autorizar es histórica.
+
+TASK-ENTREGA-CONSOLIDACION-MUESTRA-001 cerrada en 989ac6e13e353b3c747d6d07de8ead12405964d5, push confirmado por el usuario. Paquete final con ayuda incluida, 35/35 pruebas posteriores PASS, origen intacto y las dos VF aprobadas. Siguiente propuesta pendiente de autorización: TASK-EPIC002-LOGIN-INTENTOS-001, limitar intentos repetidos de autenticación con espera temporal y recuperación automática. La inspección de ajax/login.php y src/Security no encontró un limitador de intentos de aplicación. No se implementa por registrar la propuesta.
+
 Consolidación: staging y commit de los siete archivos autorizados expresamente después de «Consolidación PASS» y «Ayuda PASS». Tras el commit, el paquete final se identifica en consolidacion-muestra-20261115/version-final/delivery-manifest.json; se preservan los anteriores. Hash y resultados posteriores se guardan fuera de Git. Push pendiente de autorización separada; las menciones siguientes a autorización de commit pendiente son históricas.
 
 «Consolidación PASS» confirmado expresamente por el usuario: ubicación de respaldos, ingreso y ambas grillas aprobados; «Ayuda PASS» también vigente. TASK-ENTREGA-CONSOLIDACION-MUESTRA-001 queda con Review y VF completos, pendiente autorización de staging/commit de siete archivos. Tras versionar el ajuste se actualizará el paquete privado; push separado. Las referencias siguientes a VF pendiente son históricas.

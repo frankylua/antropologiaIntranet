@@ -124,7 +124,7 @@ if (strlen(session_id()) < 1) {
     <script src="../dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="../js/buttons.js"></script>
-    <script src="scripts/login.js"></script>
+    <script src="scripts/login.js?v=<?php echo filemtime(__DIR__ . '/scripts/login.js');?>"></script>
 
 </html>
 <?php

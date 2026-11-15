@@ -8,6 +8,7 @@ use App\Identity\IdentityResolver;
 use App\Model\Login;
 use App\Security\AcademicSession;
 use App\Security\PasswordCredentials;
+use App\Security\LoginAttemptLimiter;
 
 if (strlen(session_id()) < 1) {
     session_start();
@@ -205,14 +206,34 @@ function isValidAuthContext(
 $email = isset($_POST['correo']) && is_string($_POST['correo']) ? $_POST['correo'] : '';
 $password = isset($_POST['pass']) && is_string($_POST['pass']) ? $_POST['pass'] : '';
 
-if ($email === '' || $password === '') {
-    respondLoginJson(401, ['error' => 'AUTHENTICATION_FAILED']);
-}
-
 try {
+    if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+        respondLoginJson(405, ['error'=>'SOLICITUD_INVALIDA']);
+    }
+    $limiter = LoginAttemptLimiter::fromConfiguration(app_config());
+    $origin = $_SERVER['REMOTE_ADDR'] ?? '';
+    $originTicket = $limiter->reserveOrigin(is_string($origin) ? $origin : '');
+    if ($originTicket['retry_after'] > 0) {
+        header('Retry-After: ' . $originTicket['retry_after']);
+        respondLoginJson(429, ['error'=>'AUTH_RATE_LIMITED','retry_after'=>$originTicket['retry_after'],
+            'mensaje'=>'Demasiados intentos de ingreso. Espere antes de volver a intentar.']);
+    }
+    if (strlen($email) > 320) {
+        respondLoginJson(401, ['error'=>'AUTHENTICATION_FAILED']);
+    }
     $connection = conexion();
+    $accountIdentity = PasswordCredentials::accountIdentity($connection, $email);
+    $accountTicket = $limiter->reserveAccount($accountIdentity);
+    if ($accountTicket['retry_after'] > 0) {
+        header('Retry-After: ' . $accountTicket['retry_after']);
+        respondLoginJson(429, ['error'=>'AUTH_RATE_LIMITED','retry_after'=>$accountTicket['retry_after'],
+            'mensaje'=>'Demasiados intentos de ingreso. Espere antes de volver a intentar.']);
+    }
+    if ($email === '' || $password === '') {
+        respondLoginJson(401, ['error'=>'AUTHENTICATION_FAILED']);
+    }
     $loginId = PasswordCredentials::find($connection, $email, $password);
-    if ($loginId === null) {
+    if ($loginId === null || $accountIdentity !== 'login:' . $loginId) {
         respondLoginJson(401, ['error' => 'AUTHENTICATION_FAILED']);
     }
 
@@ -369,6 +390,7 @@ try {
         respondLoginJson(500, ['error' => 'AUTH_CONTEXT_TECHNICAL_FAILURE']);
     }
 
+    $limiter->succeeded($accountTicket);
     $_SESSION = $sessionAfterAuthentication;
     // Cada ingreso invalida los tokens de formularios de la sesión anterior.
     unset($_SESSION['csrf_crud']);
@@ -378,6 +400,12 @@ try {
         ? 'El perfil está inactivo. Solicite su reactivación a Admin o Comité.'
         : 'No fue posible validar el acceso de la cuenta.']);
 } catch (\Throwable $exception) {
+    if ($exception->getMessage() === 'LOGIN_LIMITER_UNAVAILABLE') {
+        error_log('AUTH_THROTTLE_UNAVAILABLE');
+        header('Retry-After: 60');
+        respondLoginJson(503, ['error'=>'AUTH_THROTTLE_UNAVAILABLE',
+            'mensaje'=>'El ingreso no está disponible temporalmente. Intente nuevamente más tarde.']);
+    }
     $technicalCode = $exception instanceof \UnexpectedValueException
         && str_starts_with($exception->getMessage(), 'AUTH_CONTEXT_')
             ? $exception->getMessage()

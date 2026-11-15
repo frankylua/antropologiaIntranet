@@ -1,5 +1,13 @@
 # Roadmap Maestro de Modernización
 
+Protección de intentos de login: el usuario autorizó staging y commit de los once archivos tras las tres VF PASS. Se conserva el alcance validado de cuenta/origen y espera temporal. Push pendiente de autorización separada; las referencias siguientes de autorización de commit pendiente corresponden a etapas anteriores.
+
+Protección de intentos de login: tres VF confirmadas PASS por el usuario. Implementación y validación funcional aprobadas; pendiente autorización de staging/commit de once archivos y push separado. Las menciones siguientes de VF pendiente quedan superadas por la confirmación.
+
+Protección de intentos de login autorizada e implementada: [TASK-EPIC002-LOGIN-INTENTOS-001](../tasks/TASK-EPIC002-LOGIN-INTENTOS-001.md). Defaults 5 intentos/cuenta, 60/origen, ventana 15 minutos y pausa 60 segundos, con recuperación automática y SQLite operativo privado de un servidor. 363/363 comprobaciones y sintaxis 6/6; Review aprobado para VF pendiente. No modifica MySQL, roles ni la entrega de muestra 989ac6e; producción conserva dependencias de hosting/proxy/aviso institucional. Autorizaciones Git siguen separadas. La propuesta de implementación pendiente que sigue es un antecedente superado.
+
+Muestra interna consolidada y publicada por confirmación del usuario: 989ac6e13e353b3c747d6d07de8ead12405964d5, paquete final verificado con 35/35 pruebas y VF operativa/visual PASS. Las referencias siguientes a paquete/push pendientes describen etapas previas. Próximo incremento propuesto para preparar producción: TASK-EPIC002-LOGIN-INTENTOS-001, protección de login ante intentos repetidos, estimación 4–6 horas con pruebas/Review/VF, pendiente autorización. Aviso institucional, entorno público y Cursos conservan sus condiciones independientes.
+
 Consolidación: siete archivos con staging/commit autorizados expresamente tras las dos VF aprobadas. Se finalizará el respaldo sobre ese commit, incluyendo las ayudas desplegables, con manifiesto privado en version-final/ y comprobación desde la copia extraída. Se conservan los respaldos anteriores; push permanece separado. Las referencias siguientes de autorización pendiente corresponden a etapas anteriores.
 
 Consolidación aceptada funcionalmente por «Consolidación PASS» del usuario, con «Ayuda PASS» previo. El alcance operativo de muestra está validado; resta versionar siete archivos y actualizar el paquete privado con el ajuste visual, conservando el respaldo anterior. Staging/commit y push mantienen autorización separada. No se extiende esta aceptación a producción ni al conjunto de épicas.

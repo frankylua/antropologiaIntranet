@@ -22,10 +22,17 @@ final class Configuration
         $defaults = [
             'APP_NAME' => 'Doctorado Antropología',
             'DB_ENCODE' => 'utf8mb4',
+            'LOGIN_RATE_LIMIT_DIR' => '',
+            'LOGIN_RATE_ACCOUNT_MAX' => '5',
+            'LOGIN_RATE_IP_MAX' => '60',
+            'LOGIN_RATE_WINDOW_SECONDS' => '900',
+            'LOGIN_RATE_BLOCK_SECONDS' => '60',
         ];
         $required = [
             'APP_NAME', 'APP_ENV', 'APP_URL', 'DB_HOST', 'DB_NAME',
             'DB_USERNAME', 'DB_PASS', 'DB_ENCODE',
+            'LOGIN_RATE_LIMIT_DIR', 'LOGIN_RATE_ACCOUNT_MAX', 'LOGIN_RATE_IP_MAX',
+            'LOGIN_RATE_WINDOW_SECONDS', 'LOGIN_RATE_BLOCK_SECONDS',
         ];
 
         $values = [];
@@ -135,6 +142,12 @@ final class Configuration
         }
         if (strtolower($values['DB_ENCODE']) !== 'utf8mb4') {
             throw new RuntimeException('La variable DB_ENCODE contiene una codificación no permitida.');
+        }
+        foreach (['LOGIN_RATE_ACCOUNT_MAX'=>10000, 'LOGIN_RATE_IP_MAX'=>10000,
+            'LOGIN_RATE_WINDOW_SECONDS'=>86400, 'LOGIN_RATE_BLOCK_SECONDS'=>3600] as $key=>$maximum) {
+            if (!ctype_digit($values[$key]) || (int)$values[$key] < 1 || (int)$values[$key] > $maximum) {
+                throw new RuntimeException("La variable {$key} no contiene un límite válido.");
+            }
         }
     }
 }

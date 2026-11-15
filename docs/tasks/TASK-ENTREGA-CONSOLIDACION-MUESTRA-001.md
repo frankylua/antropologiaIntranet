@@ -1,5 +1,11 @@
 # TASK-ENTREGA-CONSOLIDACION-MUESTRA-001
 
+## Cierre vigente
+
+Commit 989ac6e13e353b3c747d6d07de8ead12405964d5, siete archivos autorizados, «Ayuda PASS» y «Consolidación PASS» confirmados. El usuario informó posteriormente «push ejecutado siguiente task»; se registra su confirmación sin repetir consulta remota. Task cerrada dentro del alcance de muestra interna.
+
+Paquete final actualizado y verificado en consolidacion-muestra-20261115/version-final/delivery-manifest.json: incluye las ayudas desplegables del commit, 35/35 pruebas HTTP desde la copia extraída, ZIP/SQL/runtime conformes y 39 tablas/esquema/configuración de origen sin cambios. Servidor temporal detenido; respaldos anteriores conservados. Los resultados posteriores al commit están en artefactos privados; las menciones posteriores de paquete/versionado/push pendientes son históricas. Este cierre no autoriza producción ni otra implementación.
+
 ## Autorización y base
 
 Usuario: «Autorizo consolidar la muestra interna». Aplicación base 93fff17ca547540d16d58b3a051eae1f3baa77a0, rama refactor/fase-0-seguridad. Destino vigente: este equipo por localhost, muestra del 20/11/2026. Credenciales y CSRF tienen Review/VF aprobados y push confirmado por el usuario.
