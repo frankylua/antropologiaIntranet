@@ -1,0 +1,17 @@
+# Apache 2.4: política HTTP del proyecto. No altera includes/autoload locales de PHP.
+# Requiere AllowOverride Options FileInfo AuthConfig y mod_rewrite/authz_core.
+Options -Indexes -MultiViews
+
+RewriteEngine On
+
+# Directorios internos; incluir variantes de puntos/espacios finales de Windows.
+RewriteRule "^(?:src|vendor|docs|migrations|\.git|\.svn|\.hg|\.vscode|\.vs|\.idea|\.agents|\.codex)[. ]*(?:/|$)" "-" [F,END,NC]
+
+# Configuración de entorno, también con PATH_INFO o sufijos de copia.
+RewriteRule (?:^|/)\.env[^/]*(?:/|$) - [F,END,NC]
+
+# Configuración, metadata, dumps, claves, fuentes auxiliares y copias operativas.
+# No bloquear globalmente JSON/PDF: sus endpoints y reglas privadas siguen vigentes.
+<FilesMatch "(?i)(?:^(?:\.env.*|\.ht(?:access|passwd).*|\.git.*|\.DS_Store|composer\.(?:json|lock)(?:\..*)?|error_log|php_error_log)[. ]*$|\.(?:sql|sqlite3?|db|log|bak|old|orig|save|swp|swo|tmp|ini|conf|ya?ml|toml|lock|zip|tar|tgz|gz|7z|rar|phar|phps|inc|pem|key|pfx|p12|md)[. ]*$|~$)">
+    Require all denied
+</FilesMatch>

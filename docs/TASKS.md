@@ -1,5 +1,13 @@
 # Registro de TASK
 
+Archivos internos: staging y commit de los cinco archivos de TASK-SEGURIDAD-ARCHIVOS-INTERNOS-001 autorizados expresamente tras Review y ambas VF PASS. Política HTTP contrastada con el Review aprobado. Push pendiente de autorización separada; las menciones siguientes de autorización de commit pendiente son históricas.
+
+Archivos internos: VF-ARCHIVOS-1 y VF-ARCHIVOS-2 confirmadas PASS por el usuario. TASK-SEGURIDAD-ARCHIVOS-INTERNOS-001 tiene Review Técnico y validación funcional aprobados; pendiente autorización de staging/commit de cinco archivos, con push separado. Las menciones siguientes de VF pendiente son históricas.
+
+Task activa autorizada: [TASK-SEGURIDAD-ARCHIVOS-INTERNOS-001](tasks/TASK-SEGURIDAD-ARCHIVOS-INTERNOS-001.md). .htaccess raíz implementado y cuatro documentos conciliados (cinco archivos). 158/158 comprobaciones HTTP en Apache real: recursos internos/listados denegados, uso público y descarga autorizada conservados. Origen con 39 tablas/esquema/.env sin cambios. Review Técnico APROBADO PARA VF-ARCHIVOS-1 y 2, pendientes. Sin migración, staging, commit ni push; la propuesta siguiente por autorizar es histórica.
+
+TASK-EPIC002-LOGIN-INTENTOS-001 cerrada en 72058dfdf66672c859dca8195192ab1e8bffbe97 con push confirmado por el usuario y tres VF PASS. Siguiente propuesta por autorizar: TASK-SEGURIDAD-ARCHIVOS-INTERNOS-001. Inspección HEAD del Apache local respondió 200 a /.env, /.git/HEAD, /composer.json y SQL de migrations bajo la raíz de la aplicación; no se leyeron cuerpos ni credenciales. Se propone denegar acceso HTTP a configuración/metadatos/fuentes internas y deshabilitar listados, comprobando que aplicación y recursos sigan disponibles. Sin implementación por registrar este hallazgo.
+
 Intentos de login: staging y commit de los once archivos de TASK-EPIC002-LOGIN-INTENTOS-001 autorizados expresamente por el usuario tras Review y tres VF PASS. Código/configuración contrastados con el Review aprobado. Push pendiente de autorización separada; las menciones siguientes de autorización de commit pendiente son históricas.
 
 Intentos de login: «VF-LOGIN-1, VF-LOGIN-2 y VF-LOGIN-3: PASS» confirmado por el usuario. TASK-EPIC002-LOGIN-INTENTOS-001 tiene Review Técnico y VF aprobados; pendiente autorización de staging/commit de once archivos, con push separado. Las referencias siguientes de VF pendiente son históricas.

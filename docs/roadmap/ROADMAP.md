@@ -1,5 +1,13 @@
 # Roadmap Maestro de Modernización
 
+Protección de archivos internos: el usuario autorizó staging y commit de los cinco archivos tras ambas VF PASS. Se conserva la política HTTP validada en Apache. Push pendiente de autorización separada; las referencias siguientes de autorización de commit pendiente corresponden a etapas anteriores.
+
+Protección de archivos internos: ambas VF confirmadas PASS por el usuario. Implementación y validación funcional aprobadas; pendiente autorización de staging/commit de cinco archivos y push separado. Las referencias siguientes de VF pendiente quedan superadas por esa confirmación.
+
+Protección de archivos internos autorizada e implementada: [TASK-SEGURIDAD-ARCHIVOS-INTERNOS-001](../tasks/TASK-SEGURIDAD-ARCHIVOS-INTERNOS-001.md), mediante .htaccess de Apache. 158/158 comprobaciones reales conformes, incluida descarga autorizada con guards vigentes; origen y servidor global preservados. Review aprobado para VF pendiente. Cinco archivos del alcance, sin autorizaciones Git nuevas. Producción requiere que el servidor de destino aplique y verifique reglas equivalentes; no se levanta el bloqueo institucional de Cursos.
+
+Login con límites cerrado y push confirmado en 72058df. Próximo pendiente de producción priorizado: protección HTTP de archivos internos. El Apache local aceptó HEAD con 200 para configuración .env, metadatos Git, composer.json y una migración SQL; cuerpos no consultados. TASK-SEGURIDAD-ARCHIVOS-INTERNOS-001 propuesta, 2–4 horas con pruebas/Review/VF, pendiente autorización. No se modifica todavía Apache, datos ni aplicación por este diagnóstico.
+
 Protección de intentos de login: el usuario autorizó staging y commit de los once archivos tras las tres VF PASS. Se conserva el alcance validado de cuenta/origen y espera temporal. Push pendiente de autorización separada; las referencias siguientes de autorización de commit pendiente corresponden a etapas anteriores.
 
 Protección de intentos de login: tres VF confirmadas PASS por el usuario. Implementación y validación funcional aprobadas; pendiente autorización de staging/commit de once archivos y push separado. Las menciones siguientes de VF pendiente quedan superadas por la confirmación.

@@ -1,5 +1,9 @@
 # TASK-EPIC002-LOGIN-INTENTOS-001
 
+## Cierre vigente
+
+Commit 72058dfdf66672c859dca8195192ab1e8bffbe97 con los once archivos autorizados. Review Técnico, 363 comprobaciones, sintaxis 6/6 y VF-LOGIN-1 a 3 aprobados. El usuario confirmó posteriormente «push ejecutado siguiente task»; se registra su confirmación sin nueva comprobación remota. Task cerrada; las referencias posteriores a autorizaciones pendientes son históricas. No autoriza otra implementación ni publicación en Internet.
+
 ## Autorización y base
 
 Usuario: «Autorizo la Task de protección de intentos de login». Base 989ac6e13e353b3c747d6d07de8ead12405964d5, rama refactor/fase-0-seguridad. Al iniciar existen tres documentos de cierre modificados (TASKS, ROADMAP y Task de consolidación): se conservan en este incremento. Excluir ADR-003, aviso JSON y PDF no rastreados ajenos. Sin staging, commit, push ni publicación autorizados.
