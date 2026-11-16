@@ -15,6 +15,7 @@
 </footer>
 <script src="<?php echo RUTA;?>/dist/js/bootstrap.bundle.min.js?"></script>
 <script src="<?php echo RUTA;?>js/jquery-3.7.0.min.js"></script>
+<script src="<?php echo RUTA;?>js/components/crudHtml.js?v=<?php echo filemtime(__DIR__ . '/../js/components/crudHtml.js');?>"></script>
 <script type="application/json" id="crud-csrf-config"><?php
 echo json_encode([
     'token' => \App\Security\CrudCsrf::token(),

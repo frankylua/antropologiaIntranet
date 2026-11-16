@@ -14,11 +14,11 @@ function cargarFichaEst() {
                 return;
             }
             fichaCargada = true;
-            let template;
-            nombre = cadenaMayFichaEstudiante(usu[0]['nombres']) + ' ' + cadenaMayFichaEstudiante(usu[0]['ap_pat']) + ' ' + cadenaMayFichaEstudiante(usu[0]['ap_mat'])
+            let template = "";
+            nombre = CrudHtml.title(usu[0]['nombres']) + ' ' + CrudHtml.title(usu[0]['ap_pat']) + ' ' + CrudHtml.title(usu[0]['ap_mat'])
             $('#info_est').attr('name', usu[0]['id_usuario'])
             $('#id_usuario').attr('name', usu[0]['id_usuario'])
-            template = `
+            template = CrudHtml.html`
         <tr>
         <td class="col-4" ><h4 class="pt-1 mt-3">ANTECEDENTES PERSONALES</h4></td>
         <td class="col-8 ps-0"><h4 class=" mt-3"><button type="button" class="btn btn-dark btn-sm  ps-1    editarPers" id="${usu[0]['id_usuario']}">Editar Datos Personales</button></h4></td>
@@ -29,7 +29,7 @@ function cargarFichaEst() {
         </tr>
         <tr>
         <td class="col-4" >País Nacionalidad</td>
-        <td class="col-8">${letraMay(usu[0]['p_nac'])}</td>
+        <td class="col-8">${CrudHtml.firstUpper(usu[0]['p_nac'])}</td>
         </tr>
         <td class="col-4" >${usu[0]['tipo_doc'] == 1 ? 'Rut' : 'Pasaporte'}</td>
         <td class="col-8">${usu[0]['nro_doc']}</td>
@@ -44,7 +44,7 @@ function cargarFichaEst() {
         </tr>
         <tr>
         <td class="col-4" >Pueblo Indígena</td>
-        <td class="col-8">${letraMay(usu[0]['pueblo'])}</td>
+        <td class="col-8">${CrudHtml.firstUpper(usu[0]['pueblo'])}</td>
         </tr>
         <tr>
         <td class="col-4"><h5 class=" mt-3">DATOS DE CONTACTO</h5></td>
@@ -56,19 +56,19 @@ function cargarFichaEst() {
         </tr>
         <tr>
         <td class="col-4">Dirección</td>
-        <td class="col-8">${cadenaMayFichaEstudiante(usu[0]['direccion'])}</td>
+        <td class="col-8">${CrudHtml.title(usu[0]['direccion'])}</td>
         </tr>
         <tr>
         <td class="col-4">Comuna</td>
-        <td class="col-8">${cadenaMayFichaEstudiante(usu[0]['comuna'])}</td>
+        <td class="col-8">${CrudHtml.title(usu[0]['comuna'])}</td>
         </tr>
         <tr>
         <td class="col-4">Región</td>
-        <td class="col-8">${cadenaMayFichaEstudiante(usu[0]['region'])}</td>
+        <td class="col-8">${CrudHtml.title(usu[0]['region'])}</td>
         </tr>
         <tr>
         <td class="col-4" >País Residencia</td>
-        <td class="col-8">${letraMay(usu[0]['p_resi'])}</td>
+        <td class="col-8">${CrudHtml.firstUpper(usu[0]['p_resi'])}</td>
         </tr>
         <tr>
         <td class="col-4">Teléfono</td>
@@ -76,7 +76,7 @@ function cargarFichaEst() {
         </tr>
         <tr>
         <td class="col-4">Contacto de Emergencia</td>
-        <td class="col-8">${cadenaMayFichaEstudiante(usu[0]['cont_em'])}</td>
+        <td class="col-8">${CrudHtml.title(usu[0]['cont_em'])}</td>
         </tr>
         <tr>
         <td class="col-4">Teléfono Contacto Emergencia</td>
@@ -88,7 +88,7 @@ function cargarFichaEst() {
         </tr>
         <tr>
         <td class="col-4">Estado</td>
-        <td class="col-8">${cadenaMay(usu[0]['tipo'])}</td>
+        <td class="col-8">${CrudHtml.title(usu[0]['tipo'])}</td>
         </tr>
         <tr>
         <td class="col-4">Fecha de Ingreso</td>
@@ -116,10 +116,10 @@ function cargarFichaEst() {
                     }
                     let prof = response.datos;
                     console.log(prof)
-                    nombre = cadenaMay(prof[0]['nombres']) + ' ' + cadenaMay(prof[0]['ap_pat']) + ' ' + cadenaMay(prof[0]['ap_mat'])
+                    nombre = CrudHtml.title(prof[0]['nombres']) + ' ' + CrudHtml.title(prof[0]['ap_pat']) + ' ' + CrudHtml.title(prof[0]['ap_mat'])
                     docente = nombre
 
-                    template += `<tr>
+                    template += CrudHtml.html`<tr>
                     <td>Profesor Guía</td>
                     <td>${docente}</td>
                     </tr>`
@@ -129,17 +129,17 @@ function cargarFichaEst() {
                 }
             })
 
-            template += `<tr>
+            template += CrudHtml.html`<tr>
             <td class="col-4">Linea(s) de Investigación</td>
             <td class="col-8">
             <ul class="list-group list-group-flush">
             `
             usu.forEach(usuario => {
-                template += `
+                template += CrudHtml.html`
           <li class="list-group-item">${usuario['linea']}</li>
         `
             });
-            template += `</ul></td></tr>`
+            template += CrudHtml.html`</ul></td></tr>`
             $('#datos_fichaest').html(template);
             // El perfil propio ya tiene el usuario.id_usuario autoritativo en #info_est.
             // Notifica a los OA contextuales sin depender de una selección desde Admin.

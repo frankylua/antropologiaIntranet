@@ -1,5 +1,9 @@
 # TASK-SEGURIDAD-ARCHIVOS-INTERNOS-001
 
+## Cierre vigente
+
+Commit 08073f188c67cc1bee0bafade6aea8c9eae53ecb con los cinco archivos autorizados. Review Técnico, 158 comprobaciones HTTP y VF-ARCHIVOS-1/2 aprobados. El usuario confirmó posteriormente «push ejecutado siguiente task»; se registra su confirmación sin nueva comprobación remota. Task cerrada para el Apache verificado. Las referencias posteriores a autorizaciones pendientes son históricas; no constituye aprobación de despliegue público ni de otra implementación.
+
 ## Autorización y base
 
 Usuario: «Autorizo la Task de protección de archivos internos». Base 72058dfdf66672c859dca8195192ab1e8bffbe97, rama refactor/fase-0-seguridad. Al iniciar existen tres cierres documentales modificados (TASKS, ROADMAP y Task de intentos de login): se conservan en este incremento. Excluir ADR-003, aviso JSON y PDF no rastreados ajenos. Sin staging, commit, push o publicación autorizados.

@@ -1,5 +1,15 @@
 # Roadmap Maestro de Modernización
 
+El usuario autorizó expresamente staging y commit de los trece archivos de TASK-SEGURIDAD-SALIDA-HTML-CRUD-001 tras Review Técnico y VF-HTML-1/2/3 PASS. Se conserva el alcance revisado y se excluyen los tres archivos ajenos no rastreados. Push pendiente de autorización separada; las referencias anteriores a autorización de commit pendiente son históricas.
+
+TASK-SEGURIDAD-SALIDA-HTML-CRUD-001: el usuario confirmó VF-HTML-1, VF-HTML-2 y VF-HTML-3 PASS. Review Técnico y VF aprobados; pendiente autorización de staging/commit de los trece archivos conciliados y push separado. Las referencias anteriores a VF pendiente quedan superadas por esta confirmación.
+
+TASK-SEGURIDAD-SALIDA-HTML-CRUD-001 autorizada e implementada. Review Técnico APROBADO PARA VF: 433 comprobaciones funcionales automatizadas (197 en DOM real), 9 verificaciones de sintaxis y entrega HTTP del helper conformes. Trece archivos conciliados; detalle, comandos y riesgos en docs/tasks/TASK-SEGURIDAD-SALIDA-HTML-CRUD-001.md. Pendiente VF-HTML-1/2/3 y autorización posterior de staging/commit. La propuesta previa de esta Task queda superada por la autorización expresa; hosting/dominio siguen pendientes.
+
+Hosting/dominio de producción confirmados «pendiente» por el usuario. La configuración de HTTPS/sesiones espera esa definición. Se propone avanzar en paralelo con TASK-SEGURIDAD-SALIDA-HTML-CRUD-001 (4–6 horas estimadas con pruebas/Review/VF): mostrar datos de grillas y fichas como texto seguro, conservando entidades heredadas, acentos y comillas. Propuesta pendiente de autorización; no cambia permisos, datos ni arquitectura de producción por esta anotación.
+
+Protección HTTP cerrada en 08073f1 con push confirmado. La siguiente etapa propuesta es configuración segura de producción (TASK-PRODUCCION-CONFIGURACION-SEGURA-001): HTTPS, sesiones, ambiente de producción y comprobación de protección HTTP/store privado en destino. Depende de confirmar hosting/dominio/terminación TLS; no inferir esas condiciones del localhost. Proveedor y URL solicitados al usuario. La muestra sigue disponible; publicación y nueva implementación requieren sus autorizaciones.
+
 Protección de archivos internos: el usuario autorizó staging y commit de los cinco archivos tras ambas VF PASS. Se conserva la política HTTP validada en Apache. Push pendiente de autorización separada; las referencias siguientes de autorización de commit pendiente corresponden a etapas anteriores.
 
 Protección de archivos internos: ambas VF confirmadas PASS por el usuario. Implementación y validación funcional aprobadas; pendiente autorización de staging/commit de cinco archivos y push separado. Las referencias siguientes de VF pendiente quedan superadas por esa confirmación.

@@ -26,7 +26,7 @@ if (!Authorization::hasCapability('perfil.ver') && !Authorization::hasAny(['admi
     <?php
     require 'footer.php';
     ?>
-    <script src="scripts/info.estudiante.js"></script>
+    <script src="scripts/info.estudiante.js?v=<?= filemtime(__DIR__ . '/scripts/info.estudiante.js') ?>"></script>
     <script src="scripts/ficha.estudiante.js"></script>
     <?php
 }

@@ -1,5 +1,15 @@
 # Registro de TASK
 
+El usuario autorizó expresamente staging y commit de los trece archivos de TASK-SEGURIDAD-SALIDA-HTML-CRUD-001 tras Review Técnico y VF-HTML-1/2/3 PASS. Se conserva el alcance revisado y se excluyen los tres archivos ajenos no rastreados. Push pendiente de autorización separada; las referencias anteriores a autorización de commit pendiente son históricas.
+
+TASK-SEGURIDAD-SALIDA-HTML-CRUD-001: el usuario confirmó VF-HTML-1, VF-HTML-2 y VF-HTML-3 PASS. Review Técnico y VF aprobados; pendiente autorización de staging/commit de los trece archivos conciliados y push separado. Las referencias anteriores a VF pendiente quedan superadas por esta confirmación.
+
+TASK-SEGURIDAD-SALIDA-HTML-CRUD-001 autorizada e implementada. Review Técnico APROBADO PARA VF: 433 comprobaciones funcionales automatizadas (197 en DOM real), 9 verificaciones de sintaxis y entrega HTTP del helper conformes. Trece archivos conciliados; detalle, comandos y riesgos en docs/tasks/TASK-SEGURIDAD-SALIDA-HTML-CRUD-001.md. Pendiente VF-HTML-1/2/3 y autorización posterior de staging/commit. La propuesta previa de esta Task queda superada por la autorización expresa; hosting/dominio siguen pendientes.
+
+El usuario confirmó que hosting y dominio están «pendiente». La propuesta de configuración productiva queda condicionada a esos antecedentes; no se cambia HTTPS/cookie_secure por inferencia. Incremento independiente propuesto, aún sin autorizar: TASK-SEGURIDAD-SALIDA-HTML-CRUD-001, reforzar renderizado de grillas y fichas Docente/Estudiante. La inspección encontró valores de API interpolados directamente en plantillas insertadas con .html(), mientras los escritores actuales suelen almacenar entidades HTML. Se requiere salida segura compatible con esos datos; no se afirma explotación o incidente confirmado ni se modifica la aplicación al registrar la propuesta.
+
+TASK-SEGURIDAD-ARCHIVOS-INTERNOS-001 cerrada en 08073f188c67cc1bee0bafade6aea8c9eae53ecb, con push confirmado y ambas VF PASS. Próxima propuesta: TASK-PRODUCCION-CONFIGURACION-SEGURA-001, preparación de configuración/HTTPS/sesiones y verificación de controles en el servidor de destino. La solicitud de antecedentes HTTPS existente mantiene dominio/hosting/terminación TLS sin definir; se pidió proveedor y URL al usuario, sin credenciales. No se modifica cookie_secure, .env real ni un servidor público sin esos antecedentes y autorización de la nueva Task.
+
 Archivos internos: staging y commit de los cinco archivos de TASK-SEGURIDAD-ARCHIVOS-INTERNOS-001 autorizados expresamente tras Review y ambas VF PASS. Política HTTP contrastada con el Review aprobado. Push pendiente de autorización separada; las menciones siguientes de autorización de commit pendiente son históricas.
 
 Archivos internos: VF-ARCHIVOS-1 y VF-ARCHIVOS-2 confirmadas PASS por el usuario. TASK-SEGURIDAD-ARCHIVOS-INTERNOS-001 tiene Review Técnico y validación funcional aprobados; pendiente autorización de staging/commit de cinco archivos, con push separado. Las menciones siguientes de VF pendiente son históricas.

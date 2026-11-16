@@ -22,8 +22,8 @@ if (!isset($_SESSION['docente'])) {
     require 'footer.php';
     ?>
     <script>window.contextoDocenteTercero = false;</script>
-    <script src="scripts/ficha.docente.js"></script>
-    <script src="scripts/info.docente.js"></script>
+    <script src="scripts/ficha.docente.js?v=<?= filemtime(__DIR__ . '/scripts/ficha.docente.js') ?>"></script>
+    <script src="scripts/info.docente.js?v=<?= filemtime(__DIR__ . '/scripts/info.docente.js') ?>"></script>
     <?php
 }
 ob_end_flush();

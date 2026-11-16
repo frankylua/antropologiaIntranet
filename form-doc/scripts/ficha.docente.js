@@ -168,11 +168,11 @@ function cargarFichaDoc(id_usu) {
       }
       let template = "";
       nombre =
-        cadenaMay(usu[0]["nombres"]) +
+        CrudHtml.title(usu[0]["nombres"]) +
         " " +
-        letraMay(usu[0]["ap_pat"]) +
+        CrudHtml.firstUpper(usu[0]["ap_pat"]) +
         " " +
-        letraMay(usu[0]["ap_mat"]);
+        CrudHtml.firstUpper(usu[0]["ap_mat"]);
       cat_acad =
         usu[0]["cat_academica"] == 1
           ? "Profesor(a) instructor(a)"
@@ -185,7 +185,7 @@ function cargarFichaDoc(id_usu) {
           : "Sin Jerarquía";
       $("#info_doc").attr("name", usu[0]["id_usuario"]);
       $("#id_usuario").attr("name", usu[0]["id_usuario"]);
-      template += `
+      template += CrudHtml.html`
         <tr>
         <td class="col-4" ><h4 class=" mt-3">ANTECEDENTES PERSONALES</h4></td>
         <td class="col-8 ps-0"><h4 class=" mt-3"><button type="button" class="btn btn-dark btn-sm  ps-1 editarPersDoc" id="${
@@ -198,7 +198,7 @@ function cargarFichaDoc(id_usu) {
         </tr>
         <tr>
         <td class="col-4" >País Nacionalidad</td>
-        <td class="col-8">${letraMay(usu[0]["p_nac"])}</td>
+        <td class="col-8">${CrudHtml.firstUpper(usu[0]["p_nac"])}</td>
         </tr>
         <td class="col-4" >${usu[0]["tipo_doc"] == 1 ? "Rut" : "Pasaporte"}</td>
         <td class="col-8">${usu[0]["nro_doc"]}</td>
@@ -221,7 +221,7 @@ function cargarFichaDoc(id_usu) {
         </tr>
         <tr>
         <td class="col-4" >Pueblo Indígena</td>
-        <td class="col-8">${letraMay(usu[0]["pueblo"])}</td>
+        <td class="col-8">${CrudHtml.firstUpper(usu[0]["pueblo"])}</td>
         </tr>
         <tr>
         <td class="col-4"><h5 class="mt-3">DATOS DE CONTACTO</h5></td>
@@ -233,19 +233,19 @@ function cargarFichaDoc(id_usu) {
         </tr>
         <tr>
         <td class="col-4">Dirección</td>
-        <td class="col-8">${cadenaMay(usu[0]["direccion"])}</td>
+        <td class="col-8">${CrudHtml.title(usu[0]["direccion"])}</td>
         </tr>
         <tr>
         <td class="col-4">Comuna</td>
-        <td class="col-8">${cadenaMay(usu[0]["comuna"])}</td>
+        <td class="col-8">${CrudHtml.title(usu[0]["comuna"])}</td>
         </tr>
         <tr>
         <td class="col-4">Región</td>
-        <td class="col-8">${cadenaMay(usu[0]["region"])}</td>
+        <td class="col-8">${CrudHtml.title(usu[0]["region"])}</td>
         </tr>
         <tr>
         <td class="col-4" >País Residencia</td>
-        <td class="col-8">${letraMay(usu[0]["p_resi"])}</td>
+        <td class="col-8">${CrudHtml.firstUpper(usu[0]["p_resi"])}</td>
         </tr>
         <tr>
         <td class="col-4">Teléfono</td>
@@ -253,7 +253,7 @@ function cargarFichaDoc(id_usu) {
         </tr>
         <tr>
         <td class="col-4">Contacto de Emergencia</td>
-        <td class="col-8">${cadenaMay(usu[0]["cont_em"])}</td>
+        <td class="col-8">${CrudHtml.title(usu[0]["cont_em"])}</td>
         </tr>
         <tr>
         <td class="col-4">Teléfono Contacto Emergencia</td>
@@ -267,7 +267,7 @@ function cargarFichaDoc(id_usu) {
         </tr>
         <tr>
         <td class="col-4">Institución/Unidad Académica</td>
-        <td class="col-8">${cadenaMay(usu[0]["inst"])}</td>
+        <td class="col-8">${CrudHtml.title(usu[0]["inst"])}</td>
         </tr>
         <tr>
         <td class="col-4">Vínculo con el Programa</td>
@@ -289,17 +289,17 @@ function cargarFichaDoc(id_usu) {
         </tr>
      
         `;
-        template+=`<tr>
+        template+=CrudHtml.html`<tr>
         <td class="col-4">Linea(s) de Investigación</td>
         <td class="col-8">
         <ul class="list-group list-group-flush">
         `
         usu.forEach(usuario => {
-          template+=`
+          template+=CrudHtml.html`
           <li class="list-group-item">${usuario['linea']}</li>
         `
         });
-        template+=`</ul></td></tr>`
+        template+=CrudHtml.html`</ul></td></tr>`
       $("#datos_fichadoc").html(template);
     },
   });
@@ -349,9 +349,9 @@ function cargarFichaDoc(id_usu) {
             return
           }
           $('#login').attr('name',usu[0]['id_login'])
-          $('#nombres').val(cadenaMay(usu[0]['nombres']));
-          $('#ap_pat').val(cadenaMay(usu[0]['ap_pat']));
-          $('#ap_mat').val(cadenaMay(usu[0]['ap_mat']));
+          $('#nombres').val(CrudHtml.title(usu[0]['nombres']));
+          $('#ap_pat').val(CrudHtml.title(usu[0]['ap_pat']));
+          $('#ap_mat').val(CrudHtml.title(usu[0]['ap_mat']));
           $('#fech_nac').val(usu[0]['fecha_nac']);
           $('#documento').val(usu[0]['tipo_doc']);
           $('#nro_doc').val(usu[0]['nro_doc']);
@@ -367,11 +367,11 @@ function cargarFichaDoc(id_usu) {
           }
           $('#select_pueb').val(usu[0]['id_pueblo']);
           $('#pais_res').val(usu[0]['pais_res']);
-          $('#region').val(cadenaMay(usu[0]['region']));
-          $('#comuna').val(cadenaMay(usu[0]['comuna']));
+          $('#region').val(CrudHtml.title(usu[0]['region']));
+          $('#comuna').val(CrudHtml.title(usu[0]['comuna']));
           $('#telefono').val(usu[0]['telefono']);
-          $('#direccion').val(cadenaMay(usu[0]['direccion']));
-          $('#cont_em').val(cadenaMay(usu[0]['cont_em']));
+          $('#direccion').val(CrudHtml.title(usu[0]['direccion']));
+          $('#cont_em').val(CrudHtml.title(usu[0]['cont_em']));
           $('#tel_em').val(usu[0]['tel_em']);
           $('#genero').val(usu[0]['genero']);
           $('#correo').val(usu[0]['correo']);
@@ -446,7 +446,7 @@ $('#form_edit_pers').submit(function(e){
             datosCargados=false;
             $('#mnsj_row_per_doc').show();
             $('#mnsj_per_doc').removeClass('alert-success').addClass('alert-danger');
-            $('#mnsj_per_doc').html(mensajeErrorDocente(xhr,'No fue posible cargar los datos del Profesor.'));
+            $('#mnsj_per_doc').text(mensajeErrorDocente(xhr,'No fue posible cargar los datos del Profesor.'));
            }
         })
         if(!datosCargados){
@@ -477,7 +477,7 @@ $('#form_edit_pers').submit(function(e){
           error:function(xhr){
             $('#mnsj_row_per_doc').show();
             $('#mnsj_per_doc').removeClass('alert-success').addClass('alert-danger');
-            $('#mnsj_per_doc').html(mensajeErrorDocente(xhr,'No fue posible editar los datos personales.'));
+            $('#mnsj_per_doc').text(mensajeErrorDocente(xhr,'No fue posible editar los datos personales.'));
           }
        }) 
 
