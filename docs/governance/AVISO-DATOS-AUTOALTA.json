@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "estado": "borrador_pendiente_aprobacion_institucional",
+  "habilitado": false,
+  "estado_datos_institucionales": "Los tres grupos de información solicitados fueron declarados pendientes por el usuario el 13/11/2026; no se completan mediante supuestos.",
+  "version": "borrador-2026-11-13",
+  "fecha_vigencia": null,
+  "campos_editables": {
+    "programa": "Programa de Doctorado en Antropología UCN–UTA",
+    "instituciones_vinculadas": [
+      "Universidad Católica del Norte",
+      "Universidad de Tarapacá"
+    ],
+    "responsables_texto": null,
+    "representante_responsables": null,
+    "unidad_gestora": null,
+    "domicilio_institucional": null,
+    "correo_privacidad": null,
+    "telefono_contacto_opcional": null,
+    "finalidades_aprobadas": null,
+    "base_juridica_por_finalidad": null,
+    "datos_obligatorios_y_opcionales": null,
+    "perfiles_y_unidades_autorizados": null,
+    "destinatarios_externos_y_finalidades": null,
+    "proveedor_alojamiento": null,
+    "pais_alojamiento": null,
+    "transferencias_internacionales": null,
+    "conservacion_no_admitidos": null,
+    "conservacion_estudiantes": null,
+    "conservacion_docentes": null,
+    "criterio_eliminacion_y_respaldo": null,
+    "tratamiento_pueblo_originario": null,
+    "finalidad_pueblo_originario": null,
+    "tratamiento_contacto_emergencia": null,
+    "uso_decisiones_automatizadas": null,
+    "autoridad_aprobadora": null,
+    "fecha_aprobacion": null,
+    "url_aviso_publicado": null
+  },
+  "borrador_popup": {
+    "titulo": "Acuerdos y condiciones sobre tratamiento de datos personales",
+    "introduccion": "Este aviso explica el tratamiento de los datos entregados al registrarse como Estudiante o Profesor del {{programa}}. Versión: {{version}}. Vigencia: {{fecha_vigencia}}.",
+    "apartados": [
+      {
+        "titulo": "Responsables y contacto",
+        "texto": "El tratamiento estará a cargo de {{responsables_texto}}, mediante {{unidad_gestora}}, con domicilio en {{domicilio_institucional}}. Las consultas y solicitudes sobre datos personales se recibirán en {{correo_privacidad}}."
+      },
+      {
+        "titulo": "Datos y finalidades",
+        "texto": "Según el formulario, se recopilan datos de identificación, contacto, cuenta, antecedentes académicos y vinculación con el programa. Las finalidades aprobadas son: {{finalidades_aprobadas}}. La información obligatoria, la opcional y las consecuencias de no proporcionarla se detallan en {{datos_obligatorios_y_opcionales}}. La base que permite cada tratamiento es: {{base_juridica_por_finalidad}}."
+      },
+      {
+        "titulo": "Información que requiere especial cuidado",
+        "texto": "El tratamiento de la información sobre pertenencia a pueblos originarios se explica en {{tratamiento_pueblo_originario}}. Su finalidad específica es {{finalidad_pueblo_originario}}. Cuando proceda autorización, se solicitará por separado. Los datos del contacto de emergencia se tratarán según {{tratamiento_contacto_emergencia}}."
+      },
+      {
+        "titulo": "Acceso y almacenamiento",
+        "texto": "Los perfiles y unidades autorizados para acceder son {{perfiles_y_unidades_autorizados}}. Las comunicaciones a destinatarios externos y sus finalidades son {{destinatarios_externos_y_finalidades}}. El alojamiento estará a cargo de {{proveedor_alojamiento}}, en {{pais_alojamiento}}. Las transferencias internacionales, cuando existan, se informan en {{transferencias_internacionales}}."
+      },
+      {
+        "titulo": "Conservación",
+        "texto": "Los datos de postulantes no admitidos se conservarán durante {{conservacion_no_admitidos}}; los de estudiantes durante {{conservacion_estudiantes}} y los de docentes durante {{conservacion_docentes}}. Se aplicará el siguiente criterio de eliminación, anonimización y tratamiento de respaldos: {{criterio_eliminacion_y_respaldo}}."
+      },
+      {
+        "titulo": "Derechos y cambios",
+        "texto": "Puede solicitar información sobre sus datos, su corrección y, cuando corresponda legalmente, su eliminación o bloqueo. Si un tratamiento se basa en su consentimiento, podrá solicitar su revocación sin efectos retroactivos. Dirija su solicitud a {{correo_privacidad}}. Se aplicarán los derechos y procedimientos vigentes al presentar la solicitud. Las modificaciones del aviso se identificarán por fecha y versión; los nuevos usos que requieran consentimiento se someterán a una autorización específica."
+      }
+    ],
+    "casilla_lectura": "He leído el aviso de tratamiento de datos personales del Programa de Doctorado en Antropología UCN–UTA.",
+    "casilla_consentimiento_si_corresponde": "Autorizo el tratamiento de mis datos personales para las finalidades expresamente indicadas en este aviso que se sustenten en mi consentimiento.",
+    "casilla_separada_pueblo_originario_si_corresponde": "Autorizo específicamente el tratamiento de la información sobre mi pertenencia a pueblos originarios para {{finalidad_pueblo_originario}}.",
+    "boton_abrir": "Acuerdos y condiciones",
+    "boton_cerrar": "Cerrar"
+  },
+  "decisiones_pendientes": [
+    "Identificar a la entidad o entidades responsables y aprobar la distribución de responsabilidades entre UCN y UTA.",
+    "Aprobar las finalidades y su base jurídica; distinguir lectura del aviso de consentimiento, y no presentar todos los tratamientos como basados necesariamente en consentimiento.",
+    "Determinar datos obligatorios y opcionales, especialmente pertenencia a pueblos originarios y datos de terceras personas del contacto de emergencia. La propuesta de autorización separada para datos sensibles requiere validación institucional y técnica.",
+    "Definir destinatarios, proveedores, países y eventuales transferencias sin afirmar condiciones no acreditadas.",
+    "Definir conservación por grupo, procedimientos de eliminación y respaldos; no prometer borrado inmediato o ilimitado.",
+    "Informar si existen decisiones automatizadas o elaboración de perfiles y completar el aviso cuando corresponda.",
+    "Aprobar cómo registrar de manera duradera la versión aceptada, fecha y cuenta asociada; este borrador no crea almacenamiento ni ejecuta migraciones.",
+    "Revisar la versión normativa aplicable a la fecha efectiva de publicación, considerando la entrada en vigencia de Ley 21.719 el 01/12/2026."
+  ],
+  "regla_modificaciones": "Los campos pueden editarse en este archivo durante la preparación. Antes de activar una versión debe completarse y aprobarse el contenido, revisarse su coherencia con el sistema y autorizarse su integración. Tras publicar una versión, debe conservarse su texto histórico y la evidencia vinculada a ella; las modificaciones materiales se publicarán como nueva versión y se evaluará si requieren nueva autorización. Este archivo no habilita cambios en producción ni crea una pantalla de administración.",
+  "fuentes_de_referencia": [
+    {
+      "titulo": "Ley 19.628, texto consultado anterior al 01/12/2026: autorización, datos sensibles y derechos",
+      "url": "https://www.bcn.cl/leychile/navegar?idNorma=141599&idVersion=2026-10-21",
+      "consulta": "2026-11-13"
+    },
+    {
+      "titulo": "Ley 21.719, modificaciones de vigencia diferida: información y transparencia",
+      "url": "https://www.bcn.cl/leychile/navegar?idNorma=1209272",
+      "consulta": "2026-11-13"
+    },
+    {
+      "titulo": "Política UTA del Portal de Transparencia: referencia de estructura; no acredita aplicabilidad a esta intranet",
+      "url": "https://www.uta.cl/transparencia/politica_privacidad_tp.html",
+      "consulta": "2026-11-13"
+    }
+  ]
+}

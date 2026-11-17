@@ -1,5 +1,15 @@
 # Registro de TASK
 
+El 2026-11-16 el usuario autorizó expresamente staging y commit de los seis archivos de TASK-SEGURIDAD-CATALOGOS-COMPARTIDOS-001, tras Review Técnico y VF-CAT-1/2 PASS. Se conserva el alcance aprobado y se excluyen los tres archivos no rastreados ajenos. Push pendiente de autorización separada; las menciones anteriores a autorización de commit pendiente son históricas.
+
+El usuario confirmó expresamente «VF-CAT-1 y VF-CAT-2: PASS». TASK-SEGURIDAD-CATALOGOS-COMPARTIDOS-001 tiene Review Técnico y validación funcional aprobados. Pendiente autorización específica de staging/commit de los seis archivos conciliados; push separado. Las referencias anteriores a VF pendiente corresponden a la etapa previa. No se modificó aplicación ni se ejecutaron operaciones Git de escritura al registrar esta confirmación.
+
+TASK-SEGURIDAD-CATALOGOS-COMPARTIDOS-001 autorizada e implementada en seis archivos (dos de aplicación y cuatro documentales). 337/337 comprobaciones en navegador real, sintaxis JS/PHP y entrega HTTP conformes; Review Técnico APROBADO PARA VF-CAT-1/2, pendientes. Se preservan contratos, selección, controles y reglas de Otro; sin cambios de datos, permisos o SQL. Sin staging, commit o push. La propuesta pendiente que sigue es histórica.
+
+TASK-SEGURIDAD-SALIDA-HTML-CRUD-001 cerrada en commit 16e0559, con Review Técnico, 433 comprobaciones automatizadas y VF-HTML-1/2/3 PASS. El usuario confirmó «push ejecutado siguiente task»; se registra su confirmación sin nueva comprobación remota. Las referencias anteriores a autorizaciones pendientes de esta Task son históricas.
+
+Siguiente propuesta, pendiente de autorización: TASK-SEGURIDAD-CATALOGOS-COMPARTIDOS-001. Inspección de js/funcAjax.js confirma interpolaciones de valores/etiquetas API en ajaxSelect, ajaxListas y mostrarTabla, insertadas mediante .html(). Proteger esos tres renderizadores compartidos con CrudHtml, conservar ids, títulos, entidades heredadas, botones, selección y reglas de Otro (países y read_cursos), y versionar funcAjax.js en footer. No se afirma incidente confirmado. Estimación 2–3 horas con pruebas/Review/VF, sujeta a hallazgos de compatibilidad. Alcance previsto de aplicación: js/funcAjax.js y form-doc/footer.php; documentación de Task/registro/roadmap y cierre anterior. Sin cambios de permisos, SQL, esquema, datos, reglas de catálogos o hosting. No implementar hasta autorización específica.
+
 El usuario autorizó expresamente staging y commit de los trece archivos de TASK-SEGURIDAD-SALIDA-HTML-CRUD-001 tras Review Técnico y VF-HTML-1/2/3 PASS. Se conserva el alcance revisado y se excluyen los tres archivos ajenos no rastreados. Push pendiente de autorización separada; las referencias anteriores a autorización de commit pendiente son históricas.
 
 TASK-SEGURIDAD-SALIDA-HTML-CRUD-001: el usuario confirmó VF-HTML-1, VF-HTML-2 y VF-HTML-3 PASS. Review Técnico y VF aprobados; pendiente autorización de staging/commit de los trece archivos conciliados y push separado. Las referencias anteriores a VF pendiente quedan superadas por esta confirmación.

@@ -1,5 +1,9 @@
 # TASK-SEGURIDAD-SALIDA-HTML-CRUD-001
 
+## Cierre vigente
+
+TASK-SEGURIDAD-SALIDA-HTML-CRUD-001 cerrada en commit 16e0559, con Review Técnico, 433 comprobaciones automatizadas y VF-HTML-1/2/3 PASS. El usuario confirmó «push ejecutado siguiente task»; se registra su confirmación sin nueva comprobación remota. Las referencias anteriores a autorizaciones pendientes de esta Task son históricas. No se autoriza otra implementación ni un despliegue público por este cierre.
+
 El usuario autorizó expresamente staging y commit de los trece archivos de TASK-SEGURIDAD-SALIDA-HTML-CRUD-001 tras Review Técnico y VF-HTML-1/2/3 PASS. Se conserva el alcance revisado y se excluyen los tres archivos ajenos no rastreados. Push pendiente de autorización separada; las referencias anteriores a autorización de commit pendiente son históricas.
 
 ## Autorización y alcance

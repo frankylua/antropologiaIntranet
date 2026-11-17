@@ -25,7 +25,7 @@ echo json_encode([
 <script src="<?php echo RUTA;?>js/crudCsrf.js?v=<?php echo filemtime(__DIR__ . '/../js/crudCsrf.js');?>"></script>
 <script src="<?php echo RUTA;?>js/fechaCivil.js"></script>
 <script src="<?php echo RUTA;?>js/components/confirmDelete.js"></script>
-<script src="<?php echo RUTA;?>js/funcAjax.js?d=@DateTime.Now.ToString("ddMMyyddmmsss")"></script>
+<script src="<?php echo RUTA;?>js/funcAjax.js?v=<?php echo filemtime(__DIR__ . '/../js/funcAjax.js');?>"></script>
 <script src="<?php echo RUTA;?>js/funcForm.js?d=@DateTime.Now.ToString("ddMMyyddmmsss")"></script>
 <script src="<?php echo RUTA;?>js/funcValid.js"></script>
 <script src="<?php echo RUTA;?>js/agrFormReporte.js"></script>

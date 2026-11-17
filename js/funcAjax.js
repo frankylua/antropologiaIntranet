@@ -9,17 +9,17 @@ function ajaxListas(id, url, op, tipo, propiedadId, propiedadEtiqueta, permitirE
       listas.forEach((list) => {
         let idLista = propiedadId ? list[propiedadId] : list[0];
         let etiquetaLista = propiedadEtiqueta ? list[propiedadEtiqueta] : list[1];
-        template += `
+        template += CrudHtml.html`
         <li class='list-group-item'> 
         <div class='row justify-content-between'>
         <div class='col-auto '>
-        ${cadenaMay(etiquetaLista)}
+        ${CrudHtml.title(etiquetaLista)}
         </div>
         <div class='col-auto p-0 m-0'>
         <button type="button" class='btn btn-link link-success btn-sm editar_lista' name='${
           etiquetaLista
         }'  id='${idLista}'>Editar</button>
-        ${permitirEliminar ? `<button type="button" class='btn btn-link link-danger btn-sm eliminar_lista' id='${idLista}'>Eliminar</button>` : ""}
+        ${permitirEliminar ? CrudHtml.fragment`<button type="button" class='btn btn-link link-danger btn-sm eliminar_lista' id='${idLista}'>Eliminar</button>` : ""}
        
       </div>
       </div>
@@ -49,11 +49,11 @@ function ajaxSelect(
     success: function (response) {
       let listas = typeof response === "string" ? JSON.parse(response) : response;
       let template = "";
-      template = `<option value="0">${titulo}</option>`;
+      template = CrudHtml.html`<option value="0">${titulo}</option>`;
       listas.forEach((p) => {
         let idOpcion = propiedadId ? p[propiedadId] : p[0];
         let etiquetaOpcion = propiedadEtiqueta ? p[propiedadEtiqueta] : p[1];
-        template += `<option value="${idOpcion}"> ${cadenaMay(etiquetaOpcion)}</option>`;
+        template += CrudHtml.html`<option value="${idOpcion}"> ${CrudHtml.title(etiquetaOpcion)}</option>`;
       });
       const esCatalogoPais = /(?:^|\/)pais\.php(?:[?#]|$)/.test(url);
       if (!esCatalogoPais && op !== "read_cursos") {
@@ -155,7 +155,7 @@ function mostrarTabla(id, url, tipo) {
       let listas = JSON.parse(response)
       let template = "";
       listas.forEach((list) => {
-        template += `
+        template += CrudHtml.html`
             <li class='list-group-item'> 
             <div class='row justify-content-between'>
             <div class='col-auto '>
