@@ -22,6 +22,9 @@ final class Configuration
         $defaults = [
             'APP_NAME' => 'Doctorado Antropología',
             'DB_ENCODE' => 'utf8mb4',
+            'SMTP_HOST' => '', 'SMTP_PORT' => '465', 'SMTP_SECURITY' => 'ssl',
+            'SMTP_USERNAME' => '', 'SMTP_PASSWORD' => '', 'SMTP_FROM' => '',
+            'SMTP_FROM_NAME' => 'Doctorado en Antropología', 'PASSWORD_RESET_DIR' => '',
             'LOGIN_RATE_LIMIT_DIR' => '',
             'LOGIN_RATE_ACCOUNT_MAX' => '5',
             'LOGIN_RATE_IP_MAX' => '60',
@@ -31,6 +34,8 @@ final class Configuration
         $required = [
             'APP_NAME', 'APP_ENV', 'APP_URL', 'DB_HOST', 'DB_NAME',
             'DB_USERNAME', 'DB_PASS', 'DB_ENCODE',
+            'SMTP_HOST', 'SMTP_PORT', 'SMTP_SECURITY', 'SMTP_USERNAME', 'SMTP_PASSWORD',
+            'SMTP_FROM', 'SMTP_FROM_NAME', 'PASSWORD_RESET_DIR',
             'LOGIN_RATE_LIMIT_DIR', 'LOGIN_RATE_ACCOUNT_MAX', 'LOGIN_RATE_IP_MAX',
             'LOGIN_RATE_WINDOW_SECONDS', 'LOGIN_RATE_BLOCK_SECONDS',
         ];

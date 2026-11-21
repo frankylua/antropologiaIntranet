@@ -25,6 +25,9 @@ if (strlen(session_id()) < 1) {
 </header>
 
 <body>
+<?php if (($_GET['reset'] ?? '') === 'ok'): ?>
+<div class="container mt-3"><div class="alert alert-success" role="status">Contraseña actualizada. Inicia sesión con tu nueva contraseña.</div></div>
+<?php endif; ?>
     <div class="container m-5">
         <div class="row mt-5 justify-content-center h-100 ">
             <div class="col-lg-5 align-self-center m-5  ">
@@ -112,7 +115,7 @@ if (strlen(session_id()) < 1) {
                                     </div>
                                 </div>
                                 <div class="col-auto">
-                                    <a href="#" class="link-dark">Olvide mi Contraseña</a>
+                                    <a href="rec.pass.php" class="link-dark">Olvidé mi contraseña</a>
                                 </div>
 
                         </form>

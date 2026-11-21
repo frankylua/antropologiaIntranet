@@ -13,5 +13,7 @@
             "name": "franky.avilaopendat.cl"
         }
     ],
-    "require": {}
+    "require": {
+        "phpmailer/phpmailer": "^7.2"
+    }
 }
