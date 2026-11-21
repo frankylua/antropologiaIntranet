@@ -1,5 +1,7 @@
 # Muestra interna — CRUD Docentes y Estudiantes
 
+Actualización 21/11/2026: para el paquete y estado vigentes consultar [Guía de entrega final](GUIA-ENTREGA-FINAL-2026-11-21.md), sobre código 4c16732. Los paquetes y fechas siguientes son antecedentes conservados. El 20/11 ya pasó; no se afirma que la presentación haya ocurrido. Review y VF-CIERRE-1/2 del nuevo cierre aprobados; versionado documental pendiente.
+
 Aceptación vigente: el usuario confirmó **«Consolidación PASS»** y **«Ayuda PASS»**, y autorizó staging/commit de los siete archivos. Las menciones anteriores de VF o autorización pendientes son históricas. El paquete final se genera sobre ese commit y se identifica mediante el manifiesto privado indicado a continuación; push separado.
 
 ## Paquete final de la entrega aceptada
